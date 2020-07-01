@@ -1,0 +1,82 @@
+<!--
+Copyright (c) 2020 IBM Corp. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<response>
+<cases count="1" totalhits="1">
+ <case ixbug="75714" operations="edit,assign,resolve,email,remind">
+  <ixbug>
+   75714
+  </ixbug>
+  <stitle>
+   <![CDATA[(Untitled)]]>
+  </stitle>
+  <fopen>
+   true
+  </fopen>
+  <events>
+   <event ixbugevent="692872" ixbug="75714">
+    <ixbugevent>
+     692872
+    </ixbugevent>
+    <evt>
+     1
+    </evt>
+    <sverb>
+     <![CDATA[Opened]]>
+    </sverb>
+    <ixperson>
+     363
+    </ixperson>
+    <ixpersonassignedto>
+     0
+    </ixpersonassignedto>
+    <dt>
+     2016-10-05T13:43:49Z
+    </dt>
+    <s>
+    </s>
+    <femail>
+     false
+    </femail>
+    <fhtml>
+     false
+    </fhtml>
+    <fexternal>
+     false
+    </fexternal>
+    <schanges>
+    </schanges>
+    <sformat>
+    </sformat>
+    <rgattachments>
+    </rgattachments>
+    <evtdescription>
+     <![CDATA[Opened by Harshdeep Harshdeep]]>
+    </evtdescription>
+    <bemail>
+     false
+    </bemail>
+    <bexternal>
+     false
+    </bexternal>
+    <sperson>
+     <![CDATA[Harshdeep Harshdeep]]>
+    </sperson>
+    <shtml>
+    </shtml>
+  </events>
+ </case>
+</cases>
+</response>

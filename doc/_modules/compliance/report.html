@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>compliance.report &#8212; Auditree Framework 0.44.5 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 0.44.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.report</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for compliance.report</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- mode:python; coding:utf-8 -*-</span>
+<span class="c1"># Copyright (c) 2020 IBM Corp. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;Compliance report build automation module.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">from</span> <span class="nn">compliance.config</span> <span class="kn">import</span> <span class="n">get_config</span>
+<span class="kn">from</span> <span class="nn">compliance.evidence</span> <span class="kn">import</span> <span class="n">get_evidence_by_path</span>
+
+<span class="kn">import</span> <span class="nn">jinja2</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;compliance.report&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ReportBuilder"><a class="viewcode-back" href="../../compliance.html#compliance.report.ReportBuilder">[docs]</a><span class="k">class</span> <span class="nc">ReportBuilder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class builds all the required reports for the tests.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locker</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct and initialize the file descriptor notifier object.</span>
+
+<span class="sd">        :param locker: the locker to be used.</span>
+<span class="sd">        :param results: the dictionary of the test results.</span>
+<span class="sd">        :param controls: the control descriptor that manages accreditations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locker</span> <span class="o">=</span> <span class="n">locker</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controls</span> <span class="o">=</span> <span class="n">controls</span>
+
+<div class="viewcode-block" id="ReportBuilder.build"><a class="viewcode-back" href="../../compliance.html#compliance.report.ReportBuilder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build the reports and store them in the locker.&quot;&quot;&quot;</span>
+        <span class="n">test_by_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_test_by_class</span><span class="p">()</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_generate_reports</span><span class="p">(</span><span class="n">test_by_class</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_generate_raw_results</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ReportBuilder.render_evidence_with_template"><a class="viewcode-back" href="../../compliance.html#compliance.report.ReportBuilder.render_evidence_with_template">[docs]</a>    <span class="k">def</span> <span class="nf">render_evidence_with_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence</span><span class="p">,</span> <span class="n">test_obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Render content based on a template.</span>
+
+<span class="sd">        If template system was selected, this method renders the content</span>
+<span class="sd">        using the template for the given evidence.</span>
+
+<span class="sd">        :param evidence: the evidence object to be rendered using its template.</span>
+<span class="sd">        :param test_obj: test object which has all the tests for check.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">evidence</span><span class="o">.</span><span class="n">content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">tmpl_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_template_for</span><span class="p">(</span><span class="n">test_obj</span><span class="p">,</span> <span class="n">evidence</span><span class="p">)</span>
+        <span class="n">path</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tmpl_path</span><span class="p">)</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="n">test_obj</span><span class="p">,</span>
+            <span class="s1">&#39;results&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span>
+            <span class="s1">&#39;all_successes&#39;</span><span class="p">:</span> <span class="n">test_obj</span><span class="o">.</span><span class="n">successes_for_check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">),</span>
+            <span class="s1">&#39;all_failures&#39;</span><span class="p">:</span> <span class="n">test_obj</span><span class="o">.</span><span class="n">failures_for_check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">),</span>
+            <span class="s1">&#39;all_warnings&#39;</span><span class="p">:</span> <span class="n">test_obj</span><span class="o">.</span><span class="n">warnings_for_check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">),</span>
+            <span class="s1">&#39;evidence&#39;</span><span class="p">:</span> <span class="n">evidence</span><span class="p">,</span>
+            <span class="s1">&#39;builder&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">,</span>
+            <span class="s1">&#39;now&#39;</span><span class="p">:</span> <span class="n">now</span>
+        <span class="p">}</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Environment</span><span class="p">(</span>
+            <span class="n">loader</span><span class="o">=</span><span class="n">jinja2</span><span class="o">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
+            <span class="n">autoescape</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="n">evidence</span><span class="o">.</span><span class="n">set_content</span><span class="p">(</span><span class="n">content</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReportBuilder.get_template_for"><a class="viewcode-back" href="../../compliance.html#compliance.report.ReportBuilder.get_template_for">[docs]</a>    <span class="k">def</span> <span class="nf">get_template_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_obj</span><span class="p">,</span> <span class="n">evidence</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provide the file path of the template associated to the given evidence.</span>
+
+<span class="sd">        :param test_report_obj: the test object that needs to create report.</span>
+<span class="sd">        :param evidence: the ReportEvidence object expected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tmpl_dir</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">get_template_dir</span><span class="p">(</span><span class="n">test_obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tmpl_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Unable to find template directory for test </span><span class="si">{</span><span class="n">test_obj</span><span class="o">.</span><span class="n">id</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+        <span class="n">tmpl_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpl_dir</span><span class="p">,</span> <span class="n">evidence</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;.tmpl&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">tmpl_path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpl_dir</span><span class="p">,</span> <span class="s1">&#39;default.md.tmpl&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tmpl_path</span></div>
+
+    <span class="k">def</span> <span class="nf">_generate_raw_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a check results JSON file stored in the evidence locker.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">add_content_to_locker</span><span class="p">(</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_munge_chk_results</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_reports_metadata</span><span class="p">()),</span>
+                <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">),</span>
+                <span class="n">skipkeys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">default</span><span class="o">=</span><span class="nb">str</span>
+            <span class="p">),</span>
+            <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;check_results.json&#39;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_munge_chk_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rpt_metadata</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combine the check execution results with associated reports metadata.</span>
+
+<span class="sd">        This method combines check results with details about associated</span>
+<span class="sd">        reports and evidences used, found in the report metadata.  It</span>
+<span class="sd">        returns a dictionary keyed by check class dot path.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chk_results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">rpt</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">rpt_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">check_methods</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;checks&#39;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;checks&#39;</span><span class="p">]:</span>
+                <span class="n">check_class</span><span class="p">,</span> <span class="n">check_method</span> <span class="o">=</span> <span class="n">check</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">check_methods</span><span class="p">[</span><span class="n">check_method</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">check</span><span class="p">):</span>
+                    <span class="n">test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">check</span><span class="p">][</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span>
+                    <span class="n">check_methods</span><span class="p">[</span><span class="n">check_method</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">check</span><span class="p">][</span><span class="s1">&#39;status&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">check</span><span class="p">][</span><span class="s1">&#39;timestamp&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;warnings&#39;</span><span class="p">:</span> <span class="n">test</span><span class="o">.</span><span class="n">warnings</span><span class="p">,</span>
+                        <span class="s1">&#39;failures&#39;</span><span class="p">:</span> <span class="n">test</span><span class="o">.</span><span class="n">failures</span><span class="p">,</span>
+                        <span class="s1">&#39;successes&#39;</span><span class="p">:</span> <span class="n">test</span><span class="o">.</span><span class="n">successes</span><span class="p">,</span>
+                        <span class="s1">&#39;warnings_count&#39;</span><span class="p">:</span> <span class="n">test</span><span class="o">.</span><span class="n">warnings_count</span><span class="p">(),</span>
+                        <span class="s1">&#39;failures_count&#39;</span><span class="p">:</span> <span class="n">test</span><span class="o">.</span><span class="n">failures_count</span><span class="p">(),</span>
+                        <span class="s1">&#39;successes_count&#39;</span><span class="p">:</span> <span class="n">test</span><span class="o">.</span><span class="n">successes_count</span><span class="p">()</span>
+                    <span class="p">}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chk_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">check_class</span><span class="p">):</span>
+                <span class="n">chk_results</span><span class="p">[</span><span class="n">check_class</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;checks&#39;</span><span class="p">:</span> <span class="n">check_methods</span><span class="p">,</span>
+                    <span class="s1">&#39;reports&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="n">rpt</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
+                    <span class="p">},</span>
+                    <span class="s1">&#39;evidence&#39;</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;evidence&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;accreditations&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="o">.</span><span class="n">get_accreditations</span><span class="p">(</span><span class="n">check_class</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">chk_results</span><span class="p">[</span><span class="n">check_class</span><span class="p">][</span><span class="s1">&#39;reports&#39;</span><span class="p">][</span><span class="n">rpt</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">chk_results</span>
+
+    <span class="k">def</span> <span class="nf">_get_test_by_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Collect one test object per ComplianceTest class.</span>
+
+<span class="sd">        This is required to group tests into a single report. Note that</span>
+<span class="sd">        we only need _one_ test object of a certain ComplianceTest and</span>
+<span class="sd">        it its attributes get updated with each test object found for</span>
+<span class="sd">        that class. This will be useful for templates, where a test</span>
+<span class="sd">        object is passed and it will holds all possible attributes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">test_obj</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">test_obj</span><span class="p">,</span> <span class="s1">&#39;get_reports&#39;</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">test_class</span> <span class="o">=</span> <span class="n">test_obj</span><span class="o">.</span><span class="vm">__class__</span>
+            <span class="k">if</span> <span class="n">test_class</span> <span class="ow">in</span> <span class="n">retval</span><span class="p">:</span>
+                <span class="n">retval</span><span class="p">[</span><span class="n">test_class</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">test_obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">retval</span><span class="p">[</span><span class="n">test_class</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">test_obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">retval</span>
+
+    <span class="k">def</span> <span class="nf">_generate_reports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_by_class</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate the reports per-test-class basis.</span>
+
+<span class="sd">        If ``test.get_reports()`` replies with a list of evidence paths,</span>
+<span class="sd">        then the template system is used. If not, a list of evidences</span>
+<span class="sd">        is expected.</span>
+
+<span class="sd">        :param test_by_class: a dictionary of {class: test_obj}.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">test_class</span><span class="p">,</span> <span class="n">test_obj</span> <span class="ow">in</span> <span class="n">test_by_class</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># get a list of all test objects related to this test class</span>
+            <span class="n">test_infos</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">info</span> <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">==</span> <span class="n">test_class</span>
+            <span class="p">]</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">reports</span> <span class="o">=</span> <span class="n">test_obj</span><span class="o">.</span><span class="n">get_reports</span><span class="p">()</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">  Failed to generate report for </span><span class="si">{</span><span class="n">test_obj</span><span class="o">.</span><span class="n">id</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">  Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">test_infos</span><span class="p">:</span>
+                    <span class="n">info</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;error&#39;</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reports</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__render_report</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">test_obj</span><span class="p">,</span> <span class="n">test_infos</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">  Failed to generate report for </span><span class="si">{</span><span class="n">test_obj</span><span class="o">.</span><span class="n">id</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+                        <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">  Error: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> &#39;</span>
+                        <span class="sa">f</span><span class="s1">&#39;- </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">test_infos</span><span class="p">:</span>
+                        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;error&#39;</span>
+
+    <span class="k">def</span> <span class="nf">_get_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the check paths for all checks in the test object.</span>
+
+<span class="sd">        :param test_obj: test object which has all the tests for check.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">checks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span> <span class="o">==</span> <span class="n">test_obj</span><span class="p">:</span>
+                <span class="n">checks</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">test_id</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="p">]</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">checks</span>
+
+    <span class="k">def</span> <span class="nf">__render_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report</span><span class="p">,</span> <span class="n">test_obj</span><span class="p">,</span> <span class="n">test_infos</span><span class="p">):</span>
+        <span class="n">evidence</span> <span class="o">=</span> <span class="n">report</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">report</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">report</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;reports/&#39;</span><span class="p">):</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;reports/&#39;</span> <span class="o">+</span> <span class="n">report</span>
+            <span class="n">evidence</span> <span class="o">=</span> <span class="n">get_evidence_by_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">render_evidence_with_template</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="n">test_obj</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">add_evidence</span><span class="p">(</span>
+            <span class="n">evidence</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_checks</span><span class="p">(</span><span class="n">test_obj</span><span class="p">),</span>
+            <span class="n">test_obj</span><span class="o">.</span><span class="n">evidences_for_check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">test_obj_orig</span> <span class="ow">in</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">test_infos</span><span class="p">]:</span>
+            <span class="n">test_obj_orig</span><span class="o">.</span><span class="n">reports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">evidence</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 0.44.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.report</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.1.
+    </div>
+  </body>
+</html>

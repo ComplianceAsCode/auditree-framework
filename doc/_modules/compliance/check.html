@@ -1,0 +1,440 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>compliance.check &#8212; Auditree Framework 0.44.5 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 0.44.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.check</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for compliance.check</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- mode:python; coding:utf-8 -*-</span>
+<span class="c1"># Copyright (c) 2020 IBM Corp. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;Compliance check automation module.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">compliance.config</span> <span class="kn">import</span> <span class="n">get_config</span>
+
+<span class="kn">import</span> <span class="nn">inflection</span>
+
+
+<div class="viewcode-block" id="ComplianceCheck"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck">[docs]</a><span class="k">class</span> <span class="nc">ComplianceCheck</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compliance check automation TestCase class.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct and initialize the check test object.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ComplianceCheck</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ComplianceCheck</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">ComplianceCheck</span><span class="o">.</span><span class="n">config</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check title, normally used in check reports.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Property title not implemented on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reports</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List of the check reports.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;_reports&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reports</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reports</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">runbook_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runbook URL associated with the check.</span>
+
+<span class="sd">        If runbook links are enabled in the configuration, the value returned</span>
+<span class="sd">        is based on the runbook base URL and the check&#39;s class name.  It is</span>
+<span class="sd">        assumed that the runbook exists and is in HTML format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">runbook_enabled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;runbooks.enabled&#39;</span><span class="p">)</span>
+        <span class="n">runbook_baseurl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;runbooks.base_url&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">runbook_baseurl</span> <span class="ow">and</span> <span class="n">runbook_enabled</span><span class="p">:</span>
+            <span class="n">runbook_name</span> <span class="o">=</span> <span class="n">inflection</span><span class="o">.</span><span class="n">underscore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">runbook_baseurl</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">runbook_name</span><span class="si">}</span><span class="s1">.html&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fixed_failure_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count of failures fixed by the fix routine.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;_fixed_failure_count&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_failure_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_failure_count</span>
+
+    <span class="nd">@fixed_failure_count</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">fixed_failure_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_failure_count</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">warnings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Warnings as a property for each check.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_warnings&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_warnings</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warnings</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">failures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Failures as a property for each check.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_failures&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_failures</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_failures</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">successes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Successes as a property for each check.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_successes&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_successes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_successes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">evidence_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Metadata of all evidence used by each check as a property.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_evidence_metadata&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_evidence_metadata</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evidence_metadata</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">template_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Directory that contains the check report templates.</span>
+
+<span class="sd">        Defines which report template directory is searched.  Valid values are</span>
+<span class="sd">        ``DEFAULT`` and ``COMMON``.  Defaults to ``DEFAULT``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_template_dir&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_template_dir</span> <span class="o">=</span> <span class="s1">&#39;DEFAULT&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template_dir</span>
+
+    <span class="nd">@template_dir</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">template_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;DEFAULT&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_template_dir</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ComplianceCheck.id"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.id">[docs]</a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># noqa: A003</span>
+        <span class="sd">&quot;&quot;&quot;Reset the test id if it has been transplanted and return it.&quot;&quot;&quot;</span>
+        <span class="n">return_id</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ComplianceCheck</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">id</span><span class="p">()</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__origin_module__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">origin</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">return_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">origin</span><span class="p">):</span>
+            <span class="n">original</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__origin_module__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">transplanted</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span>
+                    <span class="nb">getattr</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span>
+                        <span class="s1">&#39;__qualname__&#39;</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+                    <span class="p">)</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">return_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">transplanted</span><span class="p">,</span> <span class="n">original</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">return_id</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.total_issues_count"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.total_issues_count">[docs]</a>    <span class="k">def</span> <span class="nf">total_issues_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Total number of issues as property for the check.</span>
+
+<span class="sd">        :param results: contains all the test results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">failures_for_check_count</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">warnings_for_check_count</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.add_warnings"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.add_warnings">[docs]</a>    <span class="k">def</span> <span class="nf">add_warnings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_key</span><span class="p">,</span> <span class="n">section_value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add warnings for each check.</span>
+
+<span class="sd">        :param: section_key: key for the warnings.</span>
+<span class="sd">        :param: section_value: all the warnings for that key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">section_key</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">section_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="p">[</span><span class="n">section_key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">section_value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="p">[</span><span class="n">section_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section_value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.warnings_for_check"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.warnings_for_check">[docs]</a>    <span class="k">def</span> <span class="nf">warnings_for_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provide warnings associated with all tests in the check.</span>
+
+<span class="sd">        :param results: contains all the test results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_all_test_objs</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">warnings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">w</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">w</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.warnings_for_check_count"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.warnings_for_check_count">[docs]</a>    <span class="k">def</span> <span class="nf">warnings_for_check_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Count failures for all tests in the check.</span>
+
+<span class="sd">        :param results: contains all the test results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">warnings_count</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_all_test_objs</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.warnings_count"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.warnings_count">[docs]</a>    <span class="k">def</span> <span class="nf">warnings_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count warnings for a specific test.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="o">.</span><span class="n">items</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.add_failures"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.add_failures">[docs]</a>    <span class="k">def</span> <span class="nf">add_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_key</span><span class="p">,</span> <span class="n">section_value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add failures for each check.</span>
+
+<span class="sd">        :param: section_key: key for the failures.</span>
+<span class="sd">        :param: section_value: all the failures for that key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">failures</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">section_key</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">section_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">failures</span><span class="p">[</span><span class="n">section_key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">section_value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">failures</span><span class="p">[</span><span class="n">section_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section_value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.failures_for_check"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.failures_for_check">[docs]</a>    <span class="k">def</span> <span class="nf">failures_for_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provide failures associated with all tests in the check.</span>
+
+<span class="sd">        :param results: contains all the test results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_all_test_objs</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">failures</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.failures_for_check_count"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.failures_for_check_count">[docs]</a>    <span class="k">def</span> <span class="nf">failures_for_check_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Count failures for all tests in check.</span>
+
+<span class="sd">        :param results: contains all the test results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">failures_count</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_all_test_objs</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.failures_count"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.failures_count">[docs]</a>    <span class="k">def</span> <span class="nf">failures_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count failures for a specific test.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">failures</span><span class="o">.</span><span class="n">items</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.add_successes"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.add_successes">[docs]</a>    <span class="k">def</span> <span class="nf">add_successes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_key</span><span class="p">,</span> <span class="n">section_value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add successes for each check.</span>
+
+<span class="sd">        :param: section_key: key for the successes.</span>
+<span class="sd">        :param: section_value: all the successes for that key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">successes</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">section_key</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">section_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">successes</span><span class="p">[</span><span class="n">section_key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">section_value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">successes</span><span class="p">[</span><span class="n">section_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section_value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.successes_for_check"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.successes_for_check">[docs]</a>    <span class="k">def</span> <span class="nf">successes_for_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provide successes associated with all tests in the check.</span>
+
+<span class="sd">        :param results: contains all the test results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_all_test_objs</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">successes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.successes_for_check_count"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.successes_for_check_count">[docs]</a>    <span class="k">def</span> <span class="nf">successes_for_check_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Count successes for all tests in check.</span>
+
+<span class="sd">        :param results: contains all the test results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">successes_count</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_all_test_objs</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.successes_count"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.successes_count">[docs]</a>    <span class="k">def</span> <span class="nf">successes_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count successes for a specific test.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">successes</span><span class="o">.</span><span class="n">items</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.run"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Override the unittest.TestCase.run method.</span>
+
+<span class="sd">        Decorates ``test_`` methods by adding common functionality</span>
+<span class="sd">        (e.g. failures count check).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
+
+            <span class="k">def</span> <span class="nf">check_failures</span><span class="p">():</span>
+                <span class="n">method</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">failures_count</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">check_failures</span>
+
+        <span class="n">test_method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span><span class="p">,</span> <span class="n">wrapper</span><span class="p">(</span><span class="n">test_method</span><span class="p">))</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ComplianceCheck</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.add_issue_if_diff"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.add_issue_if_diff">[docs]</a>    <span class="k">def</span> <span class="nf">add_issue_if_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">as_warning</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add failures/warnings if differences exist between actual and expected.</span>
+
+<span class="sd">        :param actual: the &quot;actual&quot; set items.</span>
+<span class="sd">        :param expected: the &quot;expected&quot; set items.</span>
+<span class="sd">        :param msg: the section key used if differences are found.</span>
+<span class="sd">        :param as_warning: warn if True, fail if False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">diff</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">as_warning</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_warnings</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_failures</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.add_evidence_metadata"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.add_evidence_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">add_evidence_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add evidence metadata to the evidences property of each check.</span>
+
+<span class="sd">        :param evidence_path: the evidence path.</span>
+<span class="sd">        :param evidence_dt: the evidence date.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_evidence_metadata</span><span class="p">(</span>
+            <span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span>
+        <span class="p">)</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">evidence_path</span>
+        <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;partitions&#39;</span><span class="p">):</span>
+            <span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">=</span> <span class="n">evidence_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">partitions</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">part_hash</span><span class="p">,</span> <span class="n">part_key</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;partitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">partitions</span><span class="p">[</span><span class="n">part_hash</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="n">part_key</span><span class="p">,</span>
+                    <span class="s1">&#39;commit_sha&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_latest_commit</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">part_hash</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">evidence_dt</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">hexsha</span>
+                <span class="p">}</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;partitions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">partitions</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;commit_sha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_latest_commit</span><span class="p">(</span>
+                <span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">hexsha</span>
+        <span class="n">metadata</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;tombstones&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">evidence_meta_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">evidence_path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;last_update&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evidence_metadata</span><span class="p">[</span><span class="n">evidence_meta_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">metadata</span></div>
+
+<div class="viewcode-block" id="ComplianceCheck.evidences_for_check"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.evidences_for_check">[docs]</a>    <span class="k">def</span> <span class="nf">evidences_for_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provide evidences used by all tests in the check.</span>
+
+<span class="sd">        :param results: contains all the test results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">evidences</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">test_obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_all_test_objs</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+            <span class="n">evidences</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">test_obj</span><span class="o">.</span><span class="n">evidence_metadata</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">evidences</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_all_test_objs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provide all completed tests from the test results.</span>
+
+<span class="sd">        All completed tests that are associated with this</span>
+<span class="sd">        check class are returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">info</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span>
+            <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="p">]</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 0.44.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.check</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.1.
+    </div>
+  </body>
+</html>
