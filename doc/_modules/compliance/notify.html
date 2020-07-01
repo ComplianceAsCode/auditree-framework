@@ -1,0 +1,1183 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>compliance.notify &#8212; Auditree Framework 0.44.5 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 0.44.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.notify</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for compliance.notify</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- mode:python; coding:utf-8 -*-</span>
+<span class="c1"># Copyright (c) 2020 IBM Corp. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;Compliance notification management automation module.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span> <span class="nn">compliance.config</span> <span class="kn">import</span> <span class="n">get_config</span>
+<span class="kn">from</span> <span class="nn">compliance.utils.test</span> <span class="kn">import</span> <span class="n">parse_test_id</span>
+
+<span class="kn">from</span> <span class="nn">ibm_cloud_sdk_core.authenticators</span> <span class="kn">import</span> <span class="n">IAMAuthenticator</span>
+
+<span class="kn">from</span> <span class="nn">ibm_security_advisor_findings_api_sdk</span> <span class="kn">import</span> <span class="n">ApiException</span><span class="p">,</span> <span class="n">FindingsApiV1</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="kn">from</span> <span class="nn">utilitarian.services</span> <span class="kn">import</span> <span class="n">pagerduty</span>
+<span class="kn">from</span> <span class="nn">utilitarian.services.github</span> <span class="kn">import</span> <span class="n">GitHub</span>
+
+
+<span class="k">class</span> <span class="nc">_BaseNotifier</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base notifier class.</span>
+
+<span class="sd">    It shouldn&#39;t be used outside of this module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controls</span> <span class="o">=</span> <span class="n">controls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;compliance.notifier&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">messages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check test messages.</span>
+
+<span class="sd">        A generator of list of tuples containing the following structure::</span>
+
+<span class="sd">          ([str] test_id, [dict] test_descriptor, [dict] message)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">test_obj</span> <span class="o">=</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span>
+            <span class="n">method_name</span> <span class="o">=</span> <span class="n">parse_test_id</span><span class="p">(</span><span class="n">test_id</span><span class="p">)[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span>
+
+            <span class="n">msg_method</span> <span class="o">=</span> <span class="s1">&#39;get_notification_message&#39;</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_obj</span><span class="o">.</span><span class="n">tests</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">candidate</span> <span class="o">=</span> <span class="n">method_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;test_&#39;</span><span class="p">,</span> <span class="s1">&#39;msg_&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">test_obj</span><span class="p">,</span> <span class="n">candidate</span><span class="p">):</span>
+                    <span class="n">msg_method</span> <span class="o">=</span> <span class="n">candidate</span>
+
+            <span class="c1"># set body to None if the notification function hasn&#39;t been</span>
+            <span class="c1"># defined or if it returns None.</span>
+            <span class="c1"># use a predefined error message for error status.</span>
+            <span class="c1"># otherwise get the results of the notification function.</span>
+            <span class="c1"># note that passed tests get their notifications called in order to</span>
+            <span class="c1"># deduce things like subtitle, but their notifications are not</span>
+            <span class="c1"># displayed.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">test_obj</span><span class="p">,</span> <span class="n">msg_method</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;error&#39;</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Test </span><span class="si">{</span><span class="n">test_id</span><span class="si">}</span><span class="s1"> failed to run&#39;</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_obj</span><span class="o">.</span><span class="n">tests</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">msg_method</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;msg_&#39;</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">test_obj</span><span class="p">,</span> <span class="n">msg_method</span><span class="p">)(</span><span class="n">method_name</span><span class="p">)</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="n">msg</span> <span class="ow">and</span> <span class="s1">&#39;body&#39;</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">and</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">test_obj</span><span class="p">,</span> <span class="n">msg_method</span><span class="p">)()</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="n">msg</span> <span class="ow">and</span> <span class="s1">&#39;body&#39;</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">and</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="kc">None</span>
+
+            <span class="n">title</span> <span class="o">=</span> <span class="n">test_obj</span><span class="o">.</span><span class="n">title</span>
+            <span class="k">if</span> <span class="n">msg</span> <span class="ow">and</span> <span class="s1">&#39;subtitle&#39;</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">and</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;subtitle&#39;</span><span class="p">]:</span>
+                <span class="n">title</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; - </span><span class="si">{</span><span class="n">msg</span><span class="p">[</span><span class="s2">&quot;subtitle&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+
+            <span class="n">failure_count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">msg</span> <span class="ow">and</span> <span class="n">test_obj</span><span class="o">.</span><span class="n">failures</span><span class="p">:</span>
+                <span class="n">failure_count</span> <span class="o">=</span> <span class="n">test_obj</span><span class="o">.</span><span class="n">failures_count</span><span class="p">()</span>
+
+            <span class="n">warning_count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">msg</span> <span class="ow">and</span> <span class="n">test_obj</span><span class="o">.</span><span class="n">warnings</span><span class="p">:</span>
+                <span class="n">warning_count</span> <span class="o">=</span> <span class="n">test_obj</span><span class="o">.</span><span class="n">warnings_count</span><span class="p">()</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+                <span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span><span class="p">,</span>
+                <span class="s1">&#39;failure_count&#39;</span><span class="p">:</span> <span class="n">failure_count</span><span class="p">,</span>
+                <span class="s1">&#39;warning_count&#39;</span><span class="p">:</span> <span class="n">warning_count</span>
+            <span class="p">}</span>
+            <span class="k">yield</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span>
+
+    <span class="k">def</span> <span class="nf">_messages_by_accreditations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span>
+            <span class="n">test_class</span> <span class="o">=</span> <span class="n">parse_test_id</span><span class="p">(</span><span class="n">test_id</span><span class="p">)[</span><span class="s1">&#39;class_path&#39;</span><span class="p">]</span>
+            <span class="n">accreditations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controls</span><span class="o">.</span><span class="n">get_accreditations</span><span class="p">(</span><span class="n">test_class</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">accreditations</span><span class="p">:</span>
+                <span class="n">messages</span> <span class="o">=</span> <span class="n">retval</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+                <span class="n">retval</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">messages</span>
+        <span class="k">return</span> <span class="n">retval</span>
+
+    <span class="k">def</span> <span class="nf">_split_by_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">):</span>
+        <span class="n">passed_tests</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">failed_tests</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">warned_tests</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">errored_tests</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sorted_msgs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">sorted_msgs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;pass&#39;</span><span class="p">:</span>
+                <span class="n">passed_tests</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;error&#39;</span><span class="p">:</span>
+                <span class="n">errored_tests</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;warn&#39;</span><span class="p">:</span>
+                <span class="n">warned_tests</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">failed_tests</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">passed_tests</span><span class="p">,</span> <span class="n">failed_tests</span><span class="p">,</span> <span class="n">warned_tests</span><span class="p">,</span> <span class="n">errored_tests</span>
+
+    <span class="k">def</span> <span class="nf">_get_check_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checks</span><span class="p">,</span> <span class="n">include_path</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">include_path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[(</span><span class="n">msg</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">checks</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">msg</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">checks</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get_report_links</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">link_format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">link_format</span><span class="p">:</span>
+            <span class="n">link_format</span> <span class="o">=</span> <span class="s1">&#39;&lt;</span><span class="si">{url}</span><span class="s1">|</span><span class="si">{name}</span><span class="s1">&gt;&#39;</span>
+
+        <span class="k">if</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;error&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">test_obj</span> <span class="o">=</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">link_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">url</span><span class="o">=</span><span class="n">test_obj</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_remote_location</span><span class="p">(</span>
+                    <span class="n">report</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">include_commit</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">),</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">report</span><span class="o">.</span><span class="n">name</span>
+            <span class="p">)</span> <span class="k">for</span> <span class="n">report</span> <span class="ow">in</span> <span class="n">test_obj</span><span class="o">.</span><span class="n">reports</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get_summary_and_body</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">test_desc</span><span class="p">,</span>
+        <span class="n">msg</span><span class="p">,</span>
+        <span class="n">include_title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">summary_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">link_format</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="n">link_format</span> <span class="o">=</span> <span class="n">link_format</span> <span class="ow">or</span> <span class="s1">&#39;&lt;</span><span class="si">{url}</span><span class="s1">|</span><span class="si">{name}</span><span class="s1">&gt;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">summary_format</span><span class="p">:</span>
+            <span class="n">summary_format</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">if</span> <span class="n">include_title</span><span class="p">:</span>
+                <span class="n">summary_format</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{title}</span><span class="s1"> - &#39;</span>
+            <span class="n">summary_format</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{status}</span><span class="s1"> (</span><span class="si">{issues}</span><span class="s1">) &#39;</span>
+                <span class="s1">&#39;Reports: </span><span class="si">{reports}</span><span class="s1"> </span><span class="si">{runbook}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+
+        <span class="n">test_obj</span> <span class="o">=</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span>
+
+        <span class="n">issues_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;failure_count&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">issues_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">msg</span><span class="p">[</span><span class="s2">&quot;failure_count&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> failures&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;warning_count&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">issues_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">msg</span><span class="p">[</span><span class="s2">&quot;warning_count&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> warnings&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">test_obj</span><span class="o">.</span><span class="n">fixed_failure_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">issues_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">test_obj</span><span class="o">.</span><span class="n">fixed_failure_count</span><span class="si">}</span><span class="s1"> fixed&#39;</span><span class="p">)</span>
+
+        <span class="n">issues</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">issues_list</span><span class="p">)</span>
+        <span class="n">report_links</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_report_links</span><span class="p">(</span><span class="n">test_desc</span><span class="p">,</span> <span class="n">link_format</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">report_links</span><span class="p">:</span>
+            <span class="n">report_links</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;(none)&#39;</span><span class="p">)</span>
+
+        <span class="n">runbook_conditional</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">test_obj</span><span class="o">.</span><span class="n">runbook_url</span><span class="p">:</span>
+            <span class="n">runbook_conditional</span> <span class="o">=</span> <span class="s1">&#39;| &#39;</span> <span class="o">+</span> <span class="n">link_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">url</span><span class="o">=</span><span class="n">test_obj</span><span class="o">.</span><span class="n">runbook_url</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Run Book&#39;</span>
+            <span class="p">)</span>
+
+        <span class="n">summary_line</span> <span class="o">=</span> <span class="n">summary_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">msg</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
+            <span class="n">issues</span><span class="o">=</span><span class="n">issues</span><span class="p">,</span>
+            <span class="n">reports</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">report_links</span><span class="p">),</span>
+            <span class="n">runbook</span><span class="o">=</span><span class="n">runbook_conditional</span>
+        <span class="p">)</span>
+
+        <span class="n">body</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">msg</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="n">summary_line</span><span class="p">,</span> <span class="n">body</span>
+
+
+<span class="k">class</span> <span class="nc">_BaseMDNotifier</span><span class="p">(</span><span class="n">_BaseNotifier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base markdown notifier class.</span>
+
+<span class="sd">    It shouldn&#39;t be used outside of this module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">_BaseMDNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_generate_accred_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accred</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">skip_title</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">md_content</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_title</span><span class="p">:</span>
+            <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S UTC&#39;</span><span class="p">)</span>
+            <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;# CHECK RESULTS: </span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">## Notification for </span><span class="si">{</span><span class="n">accred</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1"> accreditation</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">heading</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Passed Checks&#39;</span><span class="p">,</span> <span class="s1">&#39;Errored Checks&#39;</span><span class="p">]:</span>
+            <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;### </span><span class="si">{</span><span class="n">heading</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">checks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_check_names</span><span class="p">(</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">heading</span><span class="p">[:</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()],</span> <span class="n">include_path</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">checks</span><span class="p">:</span>
+                <span class="n">check_title</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="n">checks</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">check</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">check_title</span><span class="p">:</span>
+                        <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- **</span><span class="si">{</span><span class="n">check</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">**&#39;</span><span class="p">)</span>
+                        <span class="n">check_title</span> <span class="o">=</span> <span class="n">check</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">heading</span> <span class="o">==</span> <span class="s1">&#39;Errored Checks&#39;</span><span class="p">:</span>
+                        <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   - </span><span class="si">{</span><span class="n">check</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> failed to execute&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- **No </span><span class="si">{</span><span class="n">heading</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1">**&#39;</span><span class="p">)</span>
+        <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;### Failures/Warnings</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">fail_and_warn</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;fail&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;warn&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">fail_and_warn</span><span class="p">:</span>
+            <span class="n">summary_format</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s1">&#39;- **</span><span class="si">{title}</span><span class="s1">**&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;   - **</span><span class="si">{status}</span><span class="s1">** | </span><span class="si">{reports}</span><span class="s1"> </span><span class="si">{runbook}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;   - </span><span class="si">{issues}</span><span class="s1">&#39;</span>
+            <span class="p">]</span>
+            <span class="n">rpt_link_format</span> <span class="o">=</span> <span class="s1">&#39;[</span><span class="si">{name}</span><span class="s1">](</span><span class="si">{url}</span><span class="s1">)&#39;</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">fail_and_warn</span><span class="p">:</span>
+                <span class="n">summary</span><span class="p">,</span> <span class="n">addl_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_and_body</span><span class="p">(</span>
+                    <span class="n">test_desc</span><span class="p">,</span>
+                    <span class="n">msg</span><span class="p">,</span>
+                    <span class="n">summary_format</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">summary_format</span><span class="p">),</span>
+                    <span class="n">link_format</span><span class="o">=</span><span class="n">rpt_link_format</span>
+                <span class="p">)</span>
+                <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">addl_content</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">addl_content</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                        <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   - _</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s1">_&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;- **No failures or warnings**&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">md_content</span>
+
+
+<div class="viewcode-block" id="FDNotifier"><a class="viewcode-back" href="../../compliance.html#compliance.notify.FDNotifier">[docs]</a><span class="k">class</span> <span class="nc">FDNotifier</span><span class="p">(</span><span class="n">_BaseNotifier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    File descriptor notifier class.</span>
+
+<span class="sd">    Notifications are written to the file descriptor specified.</span>
+<span class="sd">    Defaults to STDOUT.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">fd</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct and initialize the file descriptor notifier object.</span>
+
+<span class="sd">        :param results: dictionary generated by</span>
+<span class="sd">          :py:class:`compliance.runners.CheckMode` at the end of the execution.</span>
+<span class="sd">        :param controls: the control descriptor that manages accreditations.</span>
+<span class="sd">        :param fd: a file descriptor where to write the notifications on.</span>
+<span class="sd">          Defaults to STDOUT.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FDNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="n">fd</span>
+
+<div class="viewcode-block" id="FDNotifier.notify"><a class="viewcode-back" href="../../compliance.html#compliance.notify.FDNotifier.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write notifications into the file descriptor.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">accreds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_messages_by_accreditations</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">acc_msgs</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">acc_msgs</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">passed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">warned</span><span class="p">,</span> <span class="n">errored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_by_status</span><span class="p">(</span><span class="n">acc_msgs</span><span class="p">)</span>
+            <span class="n">accreds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">accreditation</span><span class="p">,</span>
+                    <span class="s1">&#39;passed&#39;</span><span class="p">:</span> <span class="n">passed</span><span class="p">,</span>
+                    <span class="s1">&#39;failed&#39;</span><span class="p">:</span> <span class="n">failed</span><span class="p">,</span>
+                    <span class="s1">&#39;warned&#39;</span><span class="p">:</span> <span class="n">warned</span><span class="p">,</span>
+                    <span class="s1">&#39;errored&#39;</span><span class="p">:</span> <span class="n">errored</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">-- NOTIFICATIONS --</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">accred</span> <span class="ow">in</span> <span class="n">accreds</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Notifications for </span><span class="si">{</span><span class="n">accred</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1"> accreditation</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+            <span class="n">passed_msg</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_check_names</span><span class="p">(</span><span class="n">accred</span><span class="p">[</span><span class="s1">&#39;passed&#39;</span><span class="p">])</span>
+            <span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;(none)&#39;</span>
+            <span class="n">accred_msgs</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;PASSED tests: </span><span class="si">{</span><span class="n">passed_msg</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">msg_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;errored&#39;</span><span class="p">,</span> <span class="s1">&#39;warned&#39;</span><span class="p">,</span> <span class="s1">&#39;failed&#39;</span><span class="p">]:</span>
+                <span class="n">accred_msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_and_body</span><span class="p">(</span><span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                            <span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="ow">in</span> <span class="n">accred</span><span class="p">[</span><span class="n">msg_type</span><span class="p">]</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">accred_msgs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="LockerNotifier"><a class="viewcode-back" href="../../compliance.html#compliance.notify.LockerNotifier">[docs]</a><span class="k">class</span> <span class="nc">LockerNotifier</span><span class="p">(</span><span class="n">_BaseMDNotifier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evidence Locker notifier class.</span>
+
+<span class="sd">    Notifications are written to the evidence locker.</span>
+
+<span class="sd">    :param results: dictionary generated by</span>
+<span class="sd">      :py:class:`compliance.runners.CheckMode` at the end of the execution.</span>
+<span class="sd">    :param controls: dictionary of checks and the accreditations and controls</span>
+<span class="sd">      that they belong to.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">locker</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct and initialize the evidence locker notifier object.</span>
+
+<span class="sd">        :param results: dictionary generated by</span>
+<span class="sd">          :py:class:`compliance.runners.CheckMode` at the end of the execution.</span>
+<span class="sd">        :param controls: the control descriptor that manages accreditations.</span>
+<span class="sd">        :param locker: the evidence locker object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LockerNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locker</span> <span class="o">=</span> <span class="n">locker</span>
+
+<div class="viewcode-block" id="LockerNotifier.notify"><a class="viewcode-back" href="../../compliance.html#compliance.notify.LockerNotifier.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write notifications into the evidence locker.&quot;&quot;&quot;</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_messages_by_accreditations</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S UTC&#39;</span><span class="p">)</span>
+        <span class="n">md_content</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;# CHECK RESULTS: </span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">results</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
+            <span class="n">passed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">warned</span><span class="p">,</span> <span class="n">errored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_by_status</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+            <span class="n">results_by_status</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;pass&#39;</span><span class="p">:</span> <span class="n">passed</span><span class="p">,</span>
+                <span class="s1">&#39;fail&#39;</span><span class="p">:</span> <span class="n">failed</span><span class="p">,</span>
+                <span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="n">warned</span><span class="p">,</span>
+                <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="n">errored</span>
+            <span class="p">}</span>
+            <span class="n">md_content</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_generate_accred_content</span><span class="p">(</span>
+                    <span class="n">accreditation</span><span class="p">,</span> <span class="n">results_by_status</span><span class="p">,</span> <span class="n">skip_title</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">folder</span> <span class="o">=</span> <span class="s1">&#39;notifications&#39;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;alerts_summary.md&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">add_content_to_locker</span><span class="p">(</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">md_content</span><span class="p">),</span> <span class="n">folder</span><span class="p">,</span> <span class="n">filename</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">checkin</span><span class="p">(</span>
+            <span class="s1">&#39;Locker notification sent at local time &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span><span class="si">}</span><span class="se">\n\n</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">push</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="GHEIssuesNotifier"><a class="viewcode-back" href="../../compliance.html#compliance.notify.GHEIssuesNotifier">[docs]</a><span class="k">class</span> <span class="nc">GHEIssuesNotifier</span><span class="p">(</span><span class="n">_BaseMDNotifier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Github Enterprise notifier class.</span>
+
+<span class="sd">    Notifications are sent to Github Enterprise as repository issues.  This</span>
+<span class="sd">    notifier is configurable via :class:`compliance.config.ComplianceConfig`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct and initialize the Github Enterprise notifier object.</span>
+
+<span class="sd">        :param results: dictionary generated by</span>
+<span class="sd">          :py:class:`compliance.runners.CheckMode` at the end of the execution.</span>
+<span class="sd">        :param controls: the control descriptor that manages accreditations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GHEIssuesNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;notify.ghe_issues&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_github</span> <span class="o">=</span> <span class="n">GitHub</span><span class="p">(</span><span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">creds</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GHEIssuesNotifier.notify"><a class="viewcode-back" href="../../compliance.html#compliance.notify.GHEIssuesNotifier.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send notifications to Github Enterprise as repository issues.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Using GitHub Issues notifier without config&#39;</span><span class="p">)</span>
+
+        <span class="n">messages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_messages_by_accreditations</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">results</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">accreditation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">passed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">warned</span><span class="p">,</span> <span class="n">errored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_by_status</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+            <span class="n">results_by_status</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;pass&#39;</span><span class="p">:</span> <span class="n">passed</span><span class="p">,</span>
+                <span class="s1">&#39;fail&#39;</span><span class="p">:</span> <span class="n">failed</span><span class="p">,</span>
+                <span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="n">warned</span><span class="p">,</span>
+                <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="n">errored</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;summary_issue&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_notify_by_summary_issue</span><span class="p">(</span><span class="n">accreditation</span><span class="p">,</span> <span class="n">results_by_status</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_notify_by_check_issues</span><span class="p">(</span><span class="n">accreditation</span><span class="p">,</span> <span class="n">results_by_status</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_notify_by_summary_issue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accred</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="n">issue</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_generate_summary_issue</span><span class="p">(</span><span class="n">accred</span><span class="p">,</span> <span class="n">results</span><span class="p">)]</span>
+        <span class="n">repos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accred</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;repo&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">repos</span><span class="p">:</span>
+            <span class="n">owner</span><span class="p">,</span> <span class="n">repository</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+            <span class="n">issue_urls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_new_alerts</span><span class="p">(</span>
+                <span class="n">owner</span><span class="p">,</span>
+                <span class="n">repository</span><span class="p">,</span>
+                <span class="n">issue</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accred</span><span class="p">][</span><span class="s1">&#39;summary_issue&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_assign_projects</span><span class="p">(</span><span class="n">issue_urls</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">accred</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_generate_summary_issue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accred</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="n">summary_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accred</span><span class="p">][</span><span class="s1">&#39;summary_issue&#39;</span><span class="p">]</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">summary_config</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">summary_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;labels&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">assignees</span> <span class="o">=</span> <span class="n">summary_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;assignees&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">frequency</span> <span class="o">=</span> <span class="n">summary_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;frequency&#39;</span><span class="p">)</span>
+        <span class="n">rotation</span> <span class="o">=</span> <span class="n">summary_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rotation&#39;</span><span class="p">)</span>
+        <span class="n">rotation_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">frequency</span> <span class="o">==</span> <span class="s1">&#39;day&#39;</span><span class="p">:</span>
+            <span class="n">today</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">today</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">labels</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">frequency</span><span class="p">,</span> <span class="n">today</span><span class="p">])</span>
+            <span class="n">rotation_index</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()</span><span class="o">.</span><span class="n">tm_yday</span>
+        <span class="k">elif</span> <span class="n">frequency</span> <span class="o">==</span> <span class="s1">&#39;week&#39;</span><span class="p">:</span>
+            <span class="n">year</span><span class="p">,</span> <span class="n">week</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">isocalendar</span><span class="p">()</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">week</span><span class="si">}</span><span class="s1">W - </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">labels</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">frequency</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">week</span><span class="si">}</span><span class="s1">W&#39;</span><span class="p">])</span>
+            <span class="n">rotation_index</span> <span class="o">=</span> <span class="n">week</span>
+        <span class="k">elif</span> <span class="n">frequency</span> <span class="o">==</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span>
+            <span class="n">year</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y&#39;</span><span class="p">)</span>
+            <span class="n">month</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%mM&#39;</span><span class="p">)</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">month</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">labels</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">frequency</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">])</span>
+            <span class="n">rotation_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">month</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">frequency</span> <span class="o">==</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span>
+            <span class="n">year</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y&#39;</span><span class="p">)</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">labels</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">frequency</span><span class="p">,</span> <span class="n">year</span><span class="p">])</span>
+            <span class="n">rotation_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rotation</span> <span class="ow">and</span> <span class="n">rotation_index</span><span class="p">:</span>
+            <span class="n">assignees</span> <span class="o">=</span> <span class="n">rotation</span><span class="p">[</span><span class="nb">divmod</span><span class="p">(</span><span class="n">rotation_index</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rotation</span><span class="p">))[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">issue</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span> <span class="s1">&#39;assignees&#39;</span><span class="p">:</span> <span class="n">assignees</span><span class="p">}</span>
+        <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_generate_accred_content</span><span class="p">(</span><span class="n">accred</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">issue</span>
+
+    <span class="k">def</span> <span class="nf">_notify_by_check_issues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accred</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="n">issues</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">statuses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accred</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;fail&#39;</span><span class="p">])</span>
+        <span class="n">repos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accred</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;repo&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">for</span> <span class="n">status</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="n">statuses</span><span class="p">:</span>
+                <span class="n">issues</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_issues</span><span class="p">(</span><span class="n">accred</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">repos</span><span class="p">:</span>
+            <span class="n">owner</span><span class="p">,</span> <span class="n">repository</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+            <span class="n">issue_urls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_new_alerts</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">issues</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_assign_projects</span><span class="p">(</span><span class="n">issue_urls</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">accred</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;pass&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">statuses</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">repos</span><span class="p">:</span>
+                <span class="n">owner</span><span class="p">,</span> <span class="n">repository</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+                <span class="n">issues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_issues</span><span class="p">(</span><span class="n">accred</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;pass&#39;</span><span class="p">])</span>
+                <span class="n">issue_urls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_old_alerts</span><span class="p">(</span>
+                    <span class="n">owner</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">issues</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_assign_projects</span><span class="p">(</span><span class="n">issue_urls</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">accred</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_generate_issues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accred</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="n">issues</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">issues</span>
+        <span class="k">for</span> <span class="n">check_path</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S UTC&#39;</span><span class="p">)</span>
+            <span class="n">body</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;## Compliance check alert - </span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
+            <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- Check: </span><span class="si">{</span><span class="n">check_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">test_obj</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span>
+            <span class="n">check_name</span> <span class="o">=</span> <span class="n">check_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">test_obj</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">check_name</span><span class="p">)</span><span class="o">.</span><span class="vm">__doc__</span>
+            <span class="k">if</span> <span class="n">doc</span><span class="p">:</span>
+                <span class="n">doc</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">newline</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">newline</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">doc</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[:</span><span class="n">newline</span><span class="p">]</span>
+                <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- Description: </span><span class="si">{</span><span class="n">doc</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- Accreditation: </span><span class="si">{</span><span class="n">accred</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_and_body</span><span class="p">(</span>
+                    <span class="n">result</span><span class="p">,</span>
+                    <span class="n">message</span><span class="p">,</span>
+                    <span class="n">include_title</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">summary_format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{status}</span><span class="s1"> (</span><span class="si">{issues}</span><span class="s1">)&#39;</span><span class="p">,</span>
+                    <span class="n">link_format</span><span class="o">=</span><span class="s1">&#39;[</span><span class="si">{name}</span><span class="s1">](</span><span class="si">{url}</span><span class="s1">)&#39;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- Run Status: **</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s1">**&#39;</span><span class="p">)</span>
+            <span class="n">run_dttm</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">])</span>
+            <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- Run Date/Time: </span><span class="si">{</span><span class="n">run_dttm</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">report_links</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_report_links</span><span class="p">(</span>
+                <span class="n">result</span><span class="p">,</span> <span class="n">link_format</span><span class="o">=</span><span class="s1">&#39;[</span><span class="si">{name}</span><span class="s1">](</span><span class="si">{url}</span><span class="s1">)&#39;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">report_links</span><span class="p">:</span>
+                <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- Reports: </span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">report_links</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="n">issue</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">message</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">body</span><span class="p">),</span>
+                <span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="sa">f</span><span class="s1">&#39;accreditation: </span><span class="si">{</span><span class="n">accred</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s1">&#39;run status: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="p">]</span>
+            <span class="p">}</span>
+            <span class="n">issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">issue</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">issues</span>
+
+    <span class="k">def</span> <span class="nf">_process_new_alerts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">issues</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">issue_urls</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">issue</span> <span class="ow">in</span> <span class="n">issues</span><span class="p">:</span>
+            <span class="n">ghe_issue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_ghe_issue</span><span class="p">(</span>
+                <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">owner</span><span class="p">,</span> <span class="n">repository</span><span class="p">]),</span> <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ghe_issue</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">message</span><span class="p">:</span>
+                    <span class="n">joined_msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+                    <span class="n">body</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">joined_msg</span><span class="si">}</span><span class="se">\n\n</span><span class="si">{</span><span class="n">issue</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">ghe_issue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_github</span><span class="o">.</span><span class="n">add_issue</span><span class="p">(</span>
+                    <span class="n">owner</span><span class="p">,</span>
+                    <span class="n">repository</span><span class="p">,</span>
+                    <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span>
+                    <span class="n">body</span><span class="p">,</span>
+                    <span class="n">labels</span><span class="o">=</span><span class="n">issue</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">],</span>
+                    <span class="n">assignees</span><span class="o">=</span><span class="n">issue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;assignees&#39;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_update_issue_labels</span><span class="p">(</span>
+                    <span class="n">owner</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">ghe_issue</span><span class="p">,</span> <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_github</span><span class="o">.</span><span class="n">add_issue_comment</span><span class="p">(</span>
+                    <span class="n">owner</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">ghe_issue</span><span class="p">[</span><span class="s1">&#39;number&#39;</span><span class="p">],</span> <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="n">issue_urls</span><span class="p">[</span><span class="n">ghe_issue</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ghe_issue</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">issue_urls</span>
+
+    <span class="k">def</span> <span class="nf">_process_old_alerts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">issues</span><span class="p">):</span>
+        <span class="n">issue_urls</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">issue</span> <span class="ow">in</span> <span class="n">issues</span><span class="p">:</span>
+            <span class="n">ghe_issue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_ghe_issue</span><span class="p">(</span>
+                <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">owner</span><span class="p">,</span> <span class="n">repository</span><span class="p">]),</span> <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ghe_issue</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_update_issue_labels</span><span class="p">(</span>
+                    <span class="n">owner</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">ghe_issue</span><span class="p">,</span> <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_github</span><span class="o">.</span><span class="n">add_issue_comment</span><span class="p">(</span>
+                    <span class="n">owner</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">ghe_issue</span><span class="p">[</span><span class="s1">&#39;number&#39;</span><span class="p">],</span> <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">issue_urls</span><span class="p">[</span><span class="n">ghe_issue</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ghe_issue</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">issue_urls</span>
+
+    <span class="k">def</span> <span class="nf">_find_ghe_issue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="n">ghe_issues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_github</span><span class="o">.</span><span class="n">search_issues</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1"> type:issue in:title is:open repo:</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">issue</span> <span class="ow">in</span> <span class="n">ghe_issues</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">title</span><span class="p">:</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="n">issue</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">found</span>
+
+    <span class="k">def</span> <span class="nf">_update_issue_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+        <span class="n">current_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]]</span>
+        <span class="n">new_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">current_labels</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">new_labels</span><span class="p">:</span>
+            <span class="n">current_labels</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">label</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">current_labels</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">label</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;run status: &#39;</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_github</span><span class="o">.</span><span class="n">patch_issue</span><span class="p">(</span>
+                <span class="n">owner</span><span class="p">,</span>
+                <span class="n">repository</span><span class="p">,</span>
+                <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;number&#39;</span><span class="p">],</span>
+                <span class="n">labels</span><span class="o">=</span><span class="n">current_labels</span> <span class="o">+</span> <span class="n">new_labels</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_assign_projects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">issues</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">accred</span><span class="p">):</span>
+        <span class="n">config_projects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accred</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;project&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config_projects</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">all_projects</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">p</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_github</span><span class="o">.</span><span class="n">get_all_projects</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">project</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">config_projects</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">project</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_projects</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Project </span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s1"> not found in </span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">c</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_github</span><span class="o">.</span><span class="n">get_columns</span><span class="p">(</span><span class="n">all_projects</span><span class="p">[</span><span class="n">project</span><span class="p">])</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Column </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1"> not found &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;in </span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s1"> project, </span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s1"> repo&#39;</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">card_lists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_github</span><span class="o">.</span><span class="n">get_all_cards</span><span class="p">(</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="n">issue_urls</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;content_url&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="n">card_lists</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cl</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">issue_id</span><span class="p">,</span> <span class="n">issue_url</span> <span class="ow">in</span> <span class="n">issues</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">issue_url</span> <span class="ow">in</span> <span class="n">issue_urls</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_github</span><span class="o">.</span><span class="n">add_card</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">issue</span><span class="o">=</span><span class="n">issue_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SlackNotifier"><a class="viewcode-back" href="../../compliance.html#compliance.notify.SlackNotifier">[docs]</a><span class="k">class</span> <span class="nc">SlackNotifier</span><span class="p">(</span><span class="n">_BaseNotifier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Slack notifier class.</span>
+
+<span class="sd">    Notifications are sent to Slack channel(s).  This notifier is</span>
+<span class="sd">    configurable via :class:`compliance.config.ComplianceConfig`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">MESSAGE_COLORS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;pass&#39;</span><span class="p">:</span> <span class="s1">&#39;#00D000&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;fail&#39;</span><span class="p">:</span> <span class="s1">&#39;#D00000&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;#9932CC&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="s1">&#39;#FFD300&#39;</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct and initialize the Slack notifier object.</span>
+
+<span class="sd">        :param results: dictionary generated by</span>
+<span class="sd">          :py:class:`compliance.runners.CheckMode` at the end of the execution.</span>
+<span class="sd">        :param controls: the control descriptor that manages accreditations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SlackNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">creds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;notify.slack&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+<div class="viewcode-block" id="SlackNotifier.notify"><a class="viewcode-back" href="../../compliance.html#compliance.notify.SlackNotifier.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send notifications to Slack channel(s).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Using Slack notifier without config&#39;</span><span class="p">)</span>
+
+        <span class="n">messages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_messages_by_accreditations</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">accreditation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">channels</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;normal&#39;</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;channels&#39;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rotation&#39;</span><span class="p">)</span>
+                <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="s1">&#39;normal&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">rotation</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">iso_week</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isocalendar</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">on_duty</span> <span class="o">=</span> <span class="n">rotation</span><span class="p">[</span><span class="nb">divmod</span><span class="p">(</span><span class="n">iso_week</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rotation</span><span class="p">))[</span><span class="mi">1</span><span class="p">]]</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">on_duty</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="n">channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">on_duty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">on_duty</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_message</span><span class="p">(</span><span class="n">accreditation</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">channels</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_generate_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">test_descs</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;normal&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">test_descs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Notification for </span><span class="si">{</span><span class="n">accreditation</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1"> accreditation &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;at </span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S UTC&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;Compliance Alerts&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;icon_emoji&#39;</span><span class="p">:</span> <span class="s1">&#39;:robot_face:&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">text</span>
+        <span class="p">}</span>
+        <span class="n">modes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;normal&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_normal_attachments</span><span class="p">,</span>
+            <span class="s1">&#39;compact&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_compact_attachments</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">modes</span><span class="p">:</span>
+            <span class="n">message</span><span class="p">[</span><span class="s1">&#39;attachments&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">modes</span><span class="p">[</span><span class="n">mode</span><span class="p">](</span><span class="n">accreditation</span><span class="p">,</span> <span class="n">test_descs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown Slack message mode: &#39;</span> <span class="o">+</span> <span class="n">mode</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">message</span>
+
+    <span class="k">def</span> <span class="nf">_generate_normal_attachments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">test_descs</span><span class="p">):</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">passed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">warned</span><span class="p">,</span> <span class="n">errored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_by_status</span><span class="p">(</span><span class="n">test_descs</span><span class="p">)</span>
+
+        <span class="c1"># first list each error, failure, and warning</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="p">(</span><span class="n">errored</span> <span class="o">+</span> <span class="n">failed</span> <span class="o">+</span> <span class="n">warned</span><span class="p">):</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_and_body</span><span class="p">(</span>
+                    <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">include_title</span><span class="o">=</span><span class="kc">False</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">attachment</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span>
+                <span class="s1">&#39;mrkdwn_in&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;pretext&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">SlackNotifier</span><span class="o">.</span><span class="n">MESSAGE_COLORS</span><span class="p">[</span><span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]]</span>
+            <span class="p">}</span>
+            <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attachment</span><span class="p">)</span>
+
+        <span class="c1"># then have a list of passed checks</span>
+        <span class="n">passed_titles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_check_names</span><span class="p">(</span><span class="n">passed</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">passed_titles</span><span class="p">:</span>
+            <span class="n">passed_titles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;(none)&#39;</span><span class="p">)</span>
+        <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PASSED tests&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">passed_titles</span><span class="p">),</span>
+                <span class="s1">&#39;mrkdwn_in&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;pretext&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">SlackNotifier</span><span class="o">.</span><span class="n">MESSAGE_COLORS</span><span class="p">[</span><span class="s1">&#39;pass&#39;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">retval</span>
+
+    <span class="k">def</span> <span class="nf">_generate_compact_attachments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">test_descs</span><span class="p">):</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">passed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">warned</span><span class="p">,</span> <span class="n">errored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_by_status</span><span class="p">(</span><span class="n">test_descs</span><span class="p">)</span>
+
+        <span class="c1"># passed tests</span>
+        <span class="k">if</span> <span class="n">passed</span><span class="p">:</span>
+            <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;PASS: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">passed</span><span class="p">)</span><span class="si">}</span><span class="s1"> tests&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;mrkdwn_in&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;pretext&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">SlackNotifier</span><span class="o">.</span><span class="n">MESSAGE_COLORS</span><span class="p">[</span><span class="s1">&#39;pass&#39;</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="c1"># warned and failed tests</span>
+        <span class="n">collections</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="n">warned</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;fail&#39;</span><span class="p">,</span> <span class="n">failed</span><span class="p">)]</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{title}</span><span class="s1"> - </span><span class="si">{reports}</span><span class="s1"> </span><span class="si">{runbook}</span><span class="s1"> - (</span><span class="si">{issues}</span><span class="s1">)&#39;</span>
+        <span class="k">for</span> <span class="n">status</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+                <span class="n">summary</span><span class="p">,</span> <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_and_body</span><span class="p">(</span>
+                    <span class="n">test_desc</span><span class="p">,</span>
+                    <span class="n">msg</span><span class="p">,</span>
+                    <span class="n">include_title</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">summary_format</span><span class="o">=</span><span class="n">fmt</span>
+                <span class="p">)</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;* &#39;</span> <span class="o">+</span> <span class="n">summary</span>
+                <span class="k">if</span> <span class="n">body</span><span class="p">:</span>
+                    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39; - &#39;</span> <span class="o">+</span> <span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="n">body</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Failures:&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="k">if</span> <span class="n">text</span><span class="p">:</span>
+                <span class="n">attachment</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">status</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="si">}</span><span class="s1"> tests&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+                    <span class="s1">&#39;mrkdwn_in&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;pretext&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">SlackNotifier</span><span class="o">.</span><span class="n">MESSAGE_COLORS</span><span class="p">[</span><span class="n">status</span><span class="p">]</span>
+                <span class="p">}</span>
+                <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attachment</span><span class="p">)</span>
+
+        <span class="c1"># errors tests</span>
+        <span class="k">if</span> <span class="n">errored</span><span class="p">:</span>
+            <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;ERRORS: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">errored</span><span class="p">)</span><span class="si">}</span><span class="s1"> tests&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_check_names</span><span class="p">(</span><span class="n">errored</span><span class="p">))),</span>
+                    <span class="s1">&#39;mrkdwn_in&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;pretext&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">SlackNotifier</span><span class="o">.</span><span class="n">MESSAGE_COLORS</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">retval</span>
+
+    <span class="k">def</span> <span class="nf">_send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">channels</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+            <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="p">[</span><span class="s1">&#39;cloobot&#39;</span><span class="p">],</span> <span class="s1">&#39;webhook&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="p">[</span><span class="s1">&#39;slack&#39;</span><span class="p">],</span> <span class="s1">&#39;webhook&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="p">:</span>
+                <span class="n">token</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="p">[</span><span class="s1">&#39;cloobot&#39;</span><span class="p">],</span> <span class="s1">&#39;token&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="p">[</span><span class="s1">&#39;slack&#39;</span><span class="p">],</span> <span class="s1">&#39;token&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                        <span class="s1">&#39;Unable to get a Slack webhook or token from &#39;</span>
+                        <span class="s1">&#39;credentials file&#39;</span>
+                    <span class="p">)</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://slack.com/api/chat.postMessage&#39;</span>
+                <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Authorization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Bearer &#39;</span> <span class="o">+</span> <span class="n">token</span>
+                <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Content-type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;application/json&#39;</span>
+            <span class="n">retries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;retries&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">retry</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">retry</span> <span class="o">&lt;</span> <span class="n">retries</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                    <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">429</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span>
+                        <span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Retry-After&#39;</span><span class="p">,</span> <span class="n">retry</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="p">)</span>
+                    <span class="n">retry</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+                    <span class="k">break</span></div>
+
+
+<div class="viewcode-block" id="PagerDutyNotifier"><a class="viewcode-back" href="../../compliance.html#compliance.notify.PagerDutyNotifier">[docs]</a><span class="k">class</span> <span class="nc">PagerDutyNotifier</span><span class="p">(</span><span class="n">_BaseNotifier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;PagerDuty notifier class.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct and initialize the PagerDuty notifier object.</span>
+
+<span class="sd">        :param results: dictionary generated by</span>
+<span class="sd">          :py:class:`compliance.runners.CheckMode` at the end of the execution.</span>
+<span class="sd">        :param controls: the control descriptor that manages accreditations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PagerDutyNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">creds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;notify.pagerduty&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+<div class="viewcode-block" id="PagerDutyNotifier.notify"><a class="viewcode-back" href="../../compliance.html#compliance.notify.PagerDutyNotifier.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send notifications as PagerDuty alerts.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Using PagerDuty notifier without config&#39;</span><span class="p">)</span>
+
+        <span class="c1"># get all checks by accreditation</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_messages_by_accreditations</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">accreditation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">desc</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># get all current PD alerts</span>
+            <span class="n">alerts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_alerts</span><span class="p">(</span><span class="n">accreditation</span><span class="p">)</span>
+
+            <span class="c1"># fail/error will trigger alerts, and pass/warn will clear them</span>
+            <span class="n">passed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">warned</span><span class="p">,</span> <span class="n">errored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_by_status</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="p">(</span><span class="n">failed</span> <span class="o">+</span> <span class="n">errored</span><span class="p">):</span>
+                <span class="n">summary</span><span class="p">,</span> <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_and_body</span><span class="p">(</span>
+                    <span class="n">test_desc</span><span class="p">,</span>
+                    <span class="n">msg</span><span class="p">,</span>
+                    <span class="n">summary_format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{status}</span><span class="s1"> (</span><span class="si">{issues}</span><span class="s1">)&#39;</span>
+                <span class="p">)</span>
+                <span class="n">details</span> <span class="o">=</span> <span class="n">summary</span> <span class="o">+</span> <span class="n">body</span>
+
+                <span class="c1"># don&#39;t trigger an alert if it&#39;s already in PD, unless its</span>
+                <span class="c1"># details have changed</span>
+                <span class="n">existing_alert</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">alerts</span> <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">test_id</span><span class="p">),</span> <span class="kc">None</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">existing_alert</span> <span class="ow">and</span> <span class="n">existing_alert</span><span class="p">[</span><span class="s1">&#39;details&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">details</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="n">existing_alert</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_update_alert</span><span class="p">(</span>
+                        <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">details</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_alert</span><span class="p">(</span>
+                        <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">details</span>
+                    <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="p">(</span><span class="n">passed</span> <span class="o">+</span> <span class="n">warned</span><span class="p">):</span>
+                <span class="c1"># don&#39;t resolve an alert if it isn&#39;t in PD</span>
+                <span class="n">existing_alert</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">alerts</span> <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">test_id</span><span class="p">),</span> <span class="kc">None</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">existing_alert</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_alert</span><span class="p">(</span><span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_alerts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">):</span>
+        <span class="n">pd_service</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">]</span>
+
+        <span class="c1"># Get all triggered alerts</span>
+        <span class="c1"># NOTE: statuses[]=triggered is supposed to work, but doesn&#39;t</span>
+        <span class="c1"># so we have to filter the response. leaving it in the query,</span>
+        <span class="c1"># as it will be a bit more efficient if they fix the issue.</span>
+        <span class="n">pages</span> <span class="o">=</span> <span class="n">pagerduty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;alerts&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;service_ids[]&#39;</span><span class="p">:</span> <span class="n">pd_service</span><span class="p">,</span>
+                <span class="s1">&#39;statuses[]&#39;</span><span class="p">:</span> <span class="s1">&#39;triggered&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;time_zone&#39;</span><span class="p">:</span> <span class="s1">&#39;UTC&#39;</span>
+            <span class="p">},</span>
+            <span class="n">creds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_creds</span>
+        <span class="p">)</span>
+        <span class="n">alerts</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="n">alert</span><span class="p">[</span><span class="s1">&#39;alert_key&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;details&#39;</span><span class="p">:</span> <span class="n">alert</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;details&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;created_at&#39;</span><span class="p">:</span> <span class="n">alert</span><span class="p">[</span><span class="s1">&#39;created_at&#39;</span><span class="p">]</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">pages</span>
+            <span class="k">for</span> <span class="n">alert</span> <span class="ow">in</span> <span class="n">page</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;alerts&#39;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">alert</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;triggered&#39;</span>
+        <span class="p">]</span>
+
+        <span class="c1"># if more than one alert is listed for a check, only return the latest</span>
+        <span class="n">latest_alerts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">alerts</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">alert</span><span class="p">:</span> <span class="n">alert</span><span class="p">[</span><span class="s1">&#39;created_at&#39;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">alert</span> <span class="ow">in</span> <span class="n">alerts</span><span class="p">:</span>
+            <span class="n">alert_short</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="n">alert</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">],</span> <span class="s1">&#39;details&#39;</span><span class="p">:</span> <span class="n">alert</span><span class="p">[</span><span class="s1">&#39;details&#39;</span><span class="p">]}</span>
+            <span class="k">if</span> <span class="n">alert_short</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">latest_alerts</span><span class="p">:</span>
+                <span class="n">latest_alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alert_short</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">latest_alerts</span>
+
+    <span class="k">def</span> <span class="nf">_trigger_alert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">details</span><span class="p">):</span>
+        <span class="n">report_links</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_report_links</span><span class="p">(</span>
+            <span class="n">test_desc</span><span class="p">,</span> <span class="n">link_format</span><span class="o">=</span><span class="s1">&#39;Report: </span><span class="si">{name}</span><span class="s1">|</span><span class="si">{url}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="n">links</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span><span class="p">:</span> <span class="n">rl</span>
+            <span class="p">}</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span>
+            <span class="n">rl</span> <span class="ow">in</span> <span class="p">[</span><span class="n">rl</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">rl</span> <span class="ow">in</span> <span class="n">report_links</span><span class="p">]</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">runbook_url</span><span class="p">:</span>
+            <span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Runbook&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;href&#39;</span><span class="p">:</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">runbook_url</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="n">pagerduty</span><span class="o">.</span><span class="n">send_event</span><span class="p">(</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;trigger&#39;</span><span class="p">,</span>
+            <span class="n">check</span><span class="o">=</span><span class="n">test_id</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">msg</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">accreditation</span><span class="p">,</span>
+            <span class="n">severity</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span>
+            <span class="n">details</span><span class="o">=</span><span class="n">details</span><span class="p">,</span>
+            <span class="n">links</span><span class="o">=</span><span class="n">links</span><span class="p">,</span>
+            <span class="n">creds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_creds</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update_alert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">details</span><span class="p">):</span>
+        <span class="c1"># NOTE: Unfortunately the PD API v2 doesn&#39;t have any way</span>
+        <span class="c1">#       that I&#39;ve found to actually update an existing alert</span>
+        <span class="c1">#       or incident. A new log entry with the details is added</span>
+        <span class="c1">#       but is hidden away. The visible info when you click on</span>
+        <span class="c1">#       an incident remains as it was when it was first</span>
+        <span class="c1">#       triggered.</span>
+        <span class="c1">#       We can work around this by resolving the incident and</span>
+        <span class="c1">#       then opening a new one.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_alert</span><span class="p">(</span><span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_alert</span><span class="p">(</span><span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">details</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_resolve_alert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">):</span>
+        <span class="n">pagerduty</span><span class="o">.</span><span class="n">send_event</span><span class="p">(</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;resolve&#39;</span><span class="p">,</span>
+            <span class="n">check</span><span class="o">=</span><span class="n">test_id</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">msg</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">accreditation</span><span class="p">,</span>
+            <span class="n">severity</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span>
+            <span class="n">creds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_creds</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FindingsNotifier"><a class="viewcode-back" href="../../compliance.html#compliance.notify.FindingsNotifier">[docs]</a><span class="k">class</span> <span class="nc">FindingsNotifier</span><span class="p">(</span><span class="n">_BaseNotifier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Findings notifier class.</span>
+
+<span class="sd">    Notifications are sent using the Findings API.  This notifier is</span>
+<span class="sd">    configurable via :class:`compliance.config.ComplianceConfig`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct and initialize the Findings notifier object.</span>
+
+<span class="sd">        :param results: dictionary generated by</span>
+<span class="sd">          :py:class:`compliance.runners.CheckMode` at the end of the execution.</span>
+<span class="sd">        :param controls: the control descriptor that manages accreditations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;notify.findings&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">creds</span>
+        <span class="n">api_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="p">[</span><span class="s1">&#39;findings&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">api_key</span>
+        <span class="n">authenticator</span> <span class="o">=</span> <span class="n">IAMAuthenticator</span><span class="p">(</span><span class="n">apikey</span><span class="o">=</span><span class="n">api_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">findings_api</span> <span class="o">=</span> <span class="n">FindingsApiV1</span><span class="p">(</span><span class="n">authenticator</span><span class="o">=</span><span class="n">authenticator</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FindingsNotifier.notify"><a class="viewcode-back" href="../../compliance.html#compliance.notify.FindingsNotifier.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send notifications to the Findings API.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Using findings notification without config&#39;</span><span class="p">)</span>
+
+        <span class="n">messages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_messages_by_accreditations</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">accreditation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">findings_api_endpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">findings_api</span><span class="o">.</span><span class="n">set_service_url</span><span class="p">(</span><span class="n">findings_api_endpoint</span><span class="p">)</span>
+
+            <span class="n">passed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">warned</span><span class="p">,</span> <span class="n">errored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_by_status</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="p">(</span><span class="n">failed</span> <span class="o">+</span> <span class="n">errored</span> <span class="o">+</span> <span class="n">passed</span> <span class="o">+</span> <span class="n">warned</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_create_findings</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span></div>
+
+    <span class="k">def</span> <span class="nf">_create_findings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">occurrence_list</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;occurrence_list&#39;</span><span class="p">]</span>
+        <span class="n">account_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;account_id&#39;</span><span class="p">]</span>
+        <span class="n">provider_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;provider_id&#39;</span><span class="p">]</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">occurrence</span> <span class="ow">in</span> <span class="n">occurrence_list</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findings_api</span><span class="o">.</span><span class="n">create_occurrence</span><span class="p">(</span>
+                    <span class="n">account_id</span><span class="o">=</span><span class="n">account_id</span><span class="p">,</span>
+                    <span class="n">provider_id</span><span class="o">=</span><span class="n">provider_id</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">occurrence</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">ApiException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s1">&#39;Finding creation failed &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;for occurrence id </span><span class="si">{</span><span class="n">occurrence</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;with </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">)</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected error occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">status</span></div>
+
+
+<div class="viewcode-block" id="get_notifiers"><a class="viewcode-back" href="../../compliance.html#compliance.notify.get_notifiers">[docs]</a><span class="k">def</span> <span class="nf">get_notifiers</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provide a dictionary of all notifier class objects.</span>
+
+<span class="sd">    This dictionary contains all valid notifier choices for the ``--notify``</span>
+<span class="sd">    option in the CLI as keys and their corresponding notifier classes as</span>
+<span class="sd">    values.</span>
+
+<span class="sd">    NOTE: When adding/removing a notifier, update this dictionary accordingly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;stdout&#39;</span><span class="p">:</span> <span class="n">FDNotifier</span><span class="p">,</span>
+        <span class="s1">&#39;slack&#39;</span><span class="p">:</span> <span class="n">SlackNotifier</span><span class="p">,</span>
+        <span class="s1">&#39;pagerduty&#39;</span><span class="p">:</span> <span class="n">PagerDutyNotifier</span><span class="p">,</span>
+        <span class="s1">&#39;ghe_issues&#39;</span><span class="p">:</span> <span class="n">GHEIssuesNotifier</span><span class="p">,</span>
+        <span class="s1">&#39;locker&#39;</span><span class="p">:</span> <span class="n">LockerNotifier</span><span class="p">,</span>
+        <span class="s1">&#39;findings&#39;</span><span class="p">:</span> <span class="n">FindingsNotifier</span>
+    <span class="p">}</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 0.44.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.notify</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partitioned Evidence &#8212; Auditree Framework 0.44.5 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Fixers" href="fixers.html" />
+    <link rel="prev" title="OSCAL Support" href="oscal.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fixers.html" title="Fixers"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="oscal.html" title="OSCAL Support"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 0.44.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Partitioned Evidence</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="partitioned-evidence">
+<span id="evidence-partitioning"></span><h1>Partitioned Evidence<a class="headerlink" href="#partitioned-evidence" title="Permalink to this headline">¶</a></h1>
+<p>Depending on the repository hosting service being used, it may be necessary to
+manage evidence more effectively.  For example Github Enterprise will not allow
+pushing files larger than 100MB.  In cases like this it is possible to
+partition evidence into smaller, more manageable chunks if that evidence
+satisfies the following conditions:</p>
+<ul class="simple">
+<li><p>Evidence is of the type <a class="reference internal" href="compliance.html#compliance.evidence.RawEvidence" title="compliance.evidence.RawEvidence"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawEvidence</span></code></a> or a
+sub-class of <a class="reference internal" href="compliance.html#compliance.evidence.RawEvidence" title="compliance.evidence.RawEvidence"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawEvidence</span></code></a>.</p></li>
+<li><p>The evidence content is JSON and the evidence file has a <code class="docutils literal notranslate"><span class="pre">.json</span></code> file
+extension.</p></li>
+<li><p>A partition key exists, that can logically separate the evidence into parts.</p>
+<ul>
+<li><p>A key can be a single field or multiple fields in the evidence JSON
+document structure.  If multiple fields are used, the partitioning of the
+evidence will be handled in the order of the fields provided.</p></li>
+<li><p>The path to a key can be represented using <code class="docutils literal notranslate"><span class="pre">dot</span></code> notation if necessary.</p></li>
+</ul>
+</li>
+<li><p>A single partition root exists where partitioning can be applied.</p>
+<ul>
+<li><p>The partition root must be a list field that serves as the origin of
+evidence partitioning based on the partition key provided.</p></li>
+<li><p>The partition root can be the entire evidence JSON document or a nested
+field with the evidence JSON document.</p></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="partition-by-configuration">
+<h2>Partition By Configuration<a class="headerlink" href="#partition-by-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Turning partitioning on for a given evidence can be accomplished by setting the
+appropriate <code class="docutils literal notranslate"><span class="pre">locker.partitions</span></code> parameters in your configuration file.
+Parameters include the relative repository path to the raw evidence (sans the
+<em>raw</em>), the partition key(s) as a list, and optionally the partition root
+where the evidence will be partitioned.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.ibm.com/my-org/my-repo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;partitions&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;foo/evidence_bar.json&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;location.country&quot;</span><span class="p">,</span> <span class="s2">&quot;location.region&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="s2">&quot;path.to.list&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.ibm.com/my-org/my-repo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;partitions&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;foo/evidence_bar.json&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;location.country&quot;</span><span class="p">,</span> <span class="s2">&quot;location.region&quot;</span><span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="partition-by-evidence">
+<h2>Partition By Evidence<a class="headerlink" href="#partition-by-evidence" title="Permalink to this headline">¶</a></h2>
+<p>Turning partitioning on for a given evidence can also be accomplished by
+directly constructing your raw evidence object in your fetcher with the
+appropriate partitioning parameters.  Parameters include the partition key(s)
+as a list, and optionally the partition root where the evidence will be
+partitioned.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RawEvidence</span><span class="p">(</span>
+    <span class="s1">&#39;evidence_bar.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+    <span class="n">DAY</span><span class="p">,</span>
+    <span class="s1">&#39;My partitioned evidence&#39;</span><span class="p">,</span>
+    <span class="n">partition</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">&#39;fields&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;location.country&#39;</span><span class="p">,</span> <span class="s1">&#39;location.region&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;root&#39;</span><span class="p">:</span> <span class="s1">&#39;path.to.list&#39;</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RawEvidence</span><span class="p">(</span>
+    <span class="s1">&#39;evidence_bar.json&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+    <span class="n">DAY</span><span class="p">,</span>
+    <span class="s1">&#39;My partitioned evidence&#39;</span><span class="p">,</span>
+    <span class="n">partition</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fields&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;location.country&#39;</span><span class="p">,</span> <span class="s1">&#39;location.region&#39;</span><span class="p">]}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>NOTE:</strong> Constructing a partitioned <a class="reference internal" href="compliance.html#compliance.evidence.RawEvidence" title="compliance.evidence.RawEvidence"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawEvidence</span></code></a>
+object overrides partitioning by configuration.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="default-partition-root">
+<h3>Default Partition Root<a class="headerlink" href="#default-partition-root" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Unpartitioned evidence content:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;IL&quot;</span><span class="p">},</span>
+  <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;IL&quot;</span><span class="p">},</span>
+  <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;NY&quot;</span><span class="p">},</span>
+  <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;UK&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;Essex&quot;</span><span class="p">},</span>
+  <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;UK&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;Essex&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Partitioned configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.ibm.com/my-org/my-repo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;partitions&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;foo/evidence_bar.json&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Partitions yielded</p>
+<ul>
+<li><p>US/IL partition - <code class="docutils literal notranslate"><span class="pre">foo/&lt;us_il_hash&gt;_evidence.bar.json</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;IL&quot;</span><span class="p">},</span>
+  <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;IL&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>US/NY partition - <code class="docutils literal notranslate"><span class="pre">foo/&lt;us_ny_hash&gt;_evidence.bar.json</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;NY&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>UK/Essex partition - <code class="docutils literal notranslate"><span class="pre">foo/&lt;uk_essex_hash&gt;_evidence.bar.json</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;UK&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;Essex&quot;</span><span class="p">},</span>
+  <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;UK&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;Essex&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="explicit-partition-root">
+<h3>Explicit Partition Root<a class="headerlink" href="#explicit-partition-root" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Unpartitioned evidence content:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;nested&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;good_stuff&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;IL&quot;</span><span class="p">},</span>
+      <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;IL&quot;</span><span class="p">},</span>
+      <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;NY&quot;</span><span class="p">},</span>
+      <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;UK&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;Essex&quot;</span><span class="p">},</span>
+      <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;UK&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;Essex&quot;</span><span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;nested_other_stuff&quot;</span><span class="p">:</span> <span class="s2">&quot;nested meh&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;other_stuff&quot;</span><span class="p">:</span> <span class="s2">&quot;other meh&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Partitioned configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.ibm.com/my-org/my-repo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;partitions&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;foo/evidence_bar.json&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="s2">&quot;nested.good_stuff&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Partitions yielded</p>
+<ul>
+<li><p>US/IL partition - <code class="docutils literal notranslate"><span class="pre">foo/&lt;us_il_hash&gt;_evidence.bar.json</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;nested&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;good_stuff&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;IL&quot;</span><span class="p">},</span>
+      <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;IL&quot;</span><span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;nested_other_stuff&quot;</span><span class="p">:</span> <span class="s2">&quot;nested meh&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;other_stuff&quot;</span><span class="p">:</span> <span class="s2">&quot;other meh&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>US/NY partition - <code class="docutils literal notranslate"><span class="pre">foo/&lt;us_ny_hash&gt;_evidence.bar.json</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;nested&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;good_stuff&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;NY&quot;</span><span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;nested_other_stuff&quot;</span><span class="p">:</span> <span class="s2">&quot;nested meh&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;other_stuff&quot;</span><span class="p">:</span> <span class="s2">&quot;other meh&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>UK/Essex partition - <code class="docutils literal notranslate"><span class="pre">foo/&lt;uk_essex_hash&gt;_evidence.bar.json</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;nested&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;good_stuff&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;UK&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;Essex&quot;</span><span class="p">},</span>
+      <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;UK&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;Essex&quot;</span><span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;nested_other_stuff&quot;</span><span class="p">:</span> <span class="s2">&quot;nested meh&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;other_stuff&quot;</span><span class="p">:</span> <span class="s2">&quot;other meh&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Partitioned Evidence</a><ul>
+<li><a class="reference internal" href="#partition-by-configuration">Partition By Configuration</a></li>
+<li><a class="reference internal" href="#partition-by-evidence">Partition By Evidence</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#default-partition-root">Default Partition Root</a></li>
+<li><a class="reference internal" href="#explicit-partition-root">Explicit Partition Root</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="oscal.html"
+                        title="previous chapter">OSCAL Support</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fixers.html"
+                        title="next chapter">Fixers</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/evidence-partitioning.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fixers.html" title="Fixers"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="oscal.html" title="OSCAL Support"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 0.44.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Partitioned Evidence</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.1.
+    </div>
+  </body>
+</html>

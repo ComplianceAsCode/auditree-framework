@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>compliance.fix &#8212; Auditree Framework 0.44.5 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 0.44.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.fix</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for compliance.fix</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- mode:python; coding:utf-8 -*-</span>
+<span class="c1"># Copyright (c) 2020 IBM Corp. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;Compliance fixer automation module.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">compliance.config</span> <span class="kn">import</span> <span class="n">get_config</span>
+<span class="kn">from</span> <span class="nn">compliance.utils.test</span> <span class="kn">import</span> <span class="n">parse_test_id</span>
+
+
+<div class="viewcode-block" id="Fixer"><a class="viewcode-back" href="../../compliance.html#compliance.fix.Fixer">[docs]</a><span class="k">class</span> <span class="nc">Fixer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class attempts to resolve check failures.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct and initialize the fixer object.</span>
+
+<span class="sd">        :param results: dictionary of check results.</span>
+<span class="sd">        :param dry_run: dictate whether to inform or perform actions to fix.</span>
+<span class="sd">        :param out: where to write the output for dry-run messages.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run</span> <span class="o">=</span> <span class="n">dry_run</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="o">=</span> <span class="n">out</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">creds</span>
+
+<div class="viewcode-block" id="Fixer.fix"><a class="viewcode-back" href="../../compliance.html#compliance.fix.Fixer.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform all fix routines found in executed checks.</span>
+
+<span class="sd">        Iterate through all compliance checks and looks for `fix_*` methods</span>
+<span class="sd">        with corresponding `test_*` methods. These are executed, and results</span>
+<span class="sd">        are recorded if fixes are made.</span>
+
+<span class="sd">        Note: Instead of individual `fix_*` methods, you can instead define</span>
+<span class="sd">        a single `fix_failures` method which handles all fixes for the class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;fail&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">test_obj</span> <span class="o">=</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">test</span>
+            <span class="n">method_name</span> <span class="o">=</span> <span class="n">parse_test_id</span><span class="p">(</span><span class="n">test_id</span><span class="p">)[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span>
+            <span class="n">candidate</span> <span class="o">=</span> <span class="n">method_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;test_&#39;</span><span class="p">,</span> <span class="s1">&#39;fix_&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_obj</span><span class="o">.</span><span class="n">tests</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">test_obj</span><span class="p">,</span> <span class="n">candidate</span><span class="p">):</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">test_obj</span><span class="p">,</span> <span class="n">candidate</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">test_obj</span><span class="p">,</span> <span class="s1">&#39;fix_failures&#39;</span><span class="p">):</span>
+                <span class="n">test_obj</span><span class="o">.</span><span class="n">fix_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Fixer.execute_fix"><a class="viewcode-back" href="../../compliance.html#compliance.fix.Fixer.execute_fix">[docs]</a>    <span class="k">def</span> <span class="nf">execute_fix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_obj</span><span class="p">,</span> <span class="n">fct</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute the fix routine for a given check test object.</span>
+
+<span class="sd">        This method gets called by fix_* methods in checks.</span>
+<span class="sd">        It gets passed a function (method) that must be called in order</span>
+<span class="sd">        to fix one specific issue.  The method&#39;s fix will either get</span>
+<span class="sd">        executed, or if in dry-run mode, will print out the method&#39;s</span>
+<span class="sd">        docstring, injecting any arguments if needed.  The check&#39;s</span>
+<span class="sd">        fixed_failure_count is incremented if the fix was successful.</span>
+
+<span class="sd">        :param test_obj: instance of subclass of</span>
+<span class="sd">          :py:class:`compliance.utils.check.ComplianceCheck` on which</span>
+<span class="sd">          to execute the fix</span>
+<span class="sd">        :param fct: a callback function that will actually perform</span>
+<span class="sd">          the fix. this function will be passed a reference to this</span>
+<span class="sd">          fixer, along with a reference to a</span>
+<span class="sd">          :py:class:`utilitarian.credentials.Config` object. this</span>
+<span class="sd">          callback will also need to have a docstring, which is</span>
+<span class="sd">          what will be displayed in dry-run mode. the docstring</span>
+<span class="sd">          will get formatted with the arguments passed to the fix</span>
+<span class="sd">          function.</span>
+<span class="sd">        :param args: dictionary of named arguments to pass to the</span>
+<span class="sd">          fix function fct.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">args</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DRY-RUN: </span><span class="si">{</span><span class="n">fct</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="n">fct</span><span class="p">(</span>
+                <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="o">+</span> <span class="p">[(</span><span class="s1">&#39;creds&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="p">)])</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">test_obj</span><span class="o">.</span><span class="n">fixed_failure_count</span> <span class="o">+=</span> <span class="mi">1</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 0.44.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.fix</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.1.
+    </div>
+  </body>
+</html>
