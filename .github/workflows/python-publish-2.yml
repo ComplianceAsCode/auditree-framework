@@ -21,10 +21,6 @@ jobs:
     - name: Install dependencies
       run: |
         make develop
-    - name: Test & lint
-      run: |
-        make code-lint
-        make test
 # https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
     - name: Build and publish
       env:
