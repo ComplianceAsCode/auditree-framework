@@ -215,7 +215,11 @@ class CheckMode(_BaseRunner):
         """
         super(CheckMode, self).__init__(opts, extra_opts)
         self.accreds = [a.strip() for a in opts.check.split(',')]
-        self.notifiers = [n.strip() for n in opts.notify.split(',')]
+        # Backward compatibility to support ghe_issues option
+        self.notifiers = [
+            n.strip().replace('ghe_issues', 'gh_issues')
+            for n in opts.notify.split(',')
+        ]
 
     def __enter__(self):
         """Initialize check mode processing."""

@@ -69,3 +69,25 @@ def format_json(data):
     :returns: A formatted JSON string.
     """
     return json.dumps(data, indent=2, sort_keys=True, separators=(',', ': '))
+
+
+def deep_merge(a, b, path=None, append=False):
+    """
+    Merge two dicts, taking into account any sub (or sub-sub-*) dicts.
+
+    If ``append`` is ``True`` then list values from ``b`` will be appended to
+    ``a``'s.  Modified from: https://stackoverflow.com/a/7205107/566346
+    """
+    for key in b:
+        if key in a:
+            if isinstance(a[key], dict) and isinstance(b[key], dict):
+                deep_merge(a[key], b[key], (path or []) + [str(key)], append)
+                continue
+            is_lists = isinstance(a[key], list) and isinstance(b[key], list)
+            if is_lists and append:
+                a[key] += b[key]
+            else:
+                a[key] = b[key]
+        else:
+            a[key] = b[key]
+    return a

@@ -80,7 +80,7 @@ def build_compliance_check(
     }
 
     for test in tests:
-        fcts[test] = lambda self: self.assertEquals(0, 0)
+        fcts[test] = lambda self: self.assertEqual(0, 0)
         fix_fct = 'fix_failures'
         if len(tests) > 1:
             fix_fct = test.replace('test_', 'fix_')

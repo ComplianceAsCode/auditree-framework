@@ -21,8 +21,7 @@ from unittest.mock import patch
 
 from compliance.check import ComplianceCheck
 from compliance.fix import Fixer
-
-from nose.case import Test
+from compliance.runners import ComplianceTestWrapper
 
 from .. import build_compliance_check_obj
 
@@ -61,11 +60,11 @@ class ComplianceFixerTest(unittest.TestCase):
             'Dummy5Check', 'dummy5', 'Report for dummy5', [], False
         )
 
-        test1_obj = Test(compliance_check1)
-        test2_obj = Test(compliance_check2)
-        test3_obj = Test(compliance_check3)
-        test4_obj = Test(compliance_check4)
-        test5_obj = Test(compliance_check5)
+        test1_obj = ComplianceTestWrapper(compliance_check1)
+        test2_obj = ComplianceTestWrapper(compliance_check2)
+        test3_obj = ComplianceTestWrapper(compliance_check3)
+        test4_obj = ComplianceTestWrapper(compliance_check4)
+        test5_obj = ComplianceTestWrapper(compliance_check5)
 
         results_empty = {}
         results_full = {
@@ -115,7 +114,7 @@ class ComplianceFixerTest(unittest.TestCase):
         self.real_fixer.fix()
 
         self.assertEqual(self.real_out.getvalue(), '')
-        self.assertEquals(
+        self.assertEqual(
             sorted(self.dry_run_fixer._results.keys()),
             [
                 'compliance.dummy_accred.test_dummy1_test1',

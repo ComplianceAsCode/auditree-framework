@@ -51,4 +51,4 @@ class ReportTest(unittest.TestCase):
         controls = create_autospec(ControlDescriptor)
         builder = ReportBuilder(locker, results, controls)
         builder.build()
-        self.assertEquals(results['mock.test.test_one']['status'], 'error')
+        self.assertEqual(results['mock.test.test_one']['status'], 'error')

@@ -23,6 +23,7 @@ import tempfile
 import time
 from datetime import datetime as dt
 from threading import Lock
+from urllib.parse import urlparse
 
 from compliance.evidence import TmpEvidence, get_evidence_class
 from compliance.utils.data_parse import (
@@ -72,8 +73,8 @@ class Locker(object):
           pushing to a remote.
         :param branch: branch of the repo, defaults to master, only used if
           repo is cloned from repo_url.
-        :param creds: a utilitarian.credentials.Config object for getting
-          github creds from.
+        :param creds: a compliance.utils.credentials.Config object containing
+          remote locker credentials.
         :param do_push: if True, perform push to remove git repo if needed.
         :param ttl_tolerance: the applied to evidence time to live.  If within
           that tolerance the evidence will be treated as stale.
@@ -82,11 +83,20 @@ class Locker(object):
         self.repo_url = repo_url
         self.repo_url_with_creds = self.repo_url
         if creds is not None:
-            self.repo_url_with_creds = re.sub(
-                '://',
-                f'://{creds["github_enterprise"].token}@',
-                self.repo_url_with_creds
-            )
+            service_hostname = urlparse(self.repo_url).hostname
+            token = None
+            if 'github.com' in service_hostname:
+                token = creds['github'].token
+            elif 'github' in service_hostname:
+                token = creds['github_enterprise'].token
+            elif 'bitbucket' in service_hostname:
+                token = creds['bitbucket'].token
+            elif 'gitlab' in service_hostname:
+                token = creds['gitlab'].token
+            if token:
+                self.repo_url_with_creds = re.sub(
+                    '://', f'://{token}@', self.repo_url_with_creds
+                )
         self.branch = branch
         if name is not None:
             self.name = name

@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Compliance automation GHE notifier tests module."""
+"""Compliance automation GH notifier tests module."""
 
 import time
 import unittest
@@ -21,13 +21,13 @@ from unittest.mock import MagicMock, create_autospec, patch
 
 from compliance.config import ComplianceConfig
 from compliance.controls import ControlDescriptor
-from compliance.notify import GHEIssuesNotifier
+from compliance.notify import GHIssuesNotifier
 
 from .. import build_compliance_check_obj
 
 
-class GHENotifierTest(unittest.TestCase):
-    """GHEIssuesNotifier test class."""
+class GHNotifierTest(unittest.TestCase):
+    """GHIssuesNotifier test class."""
 
     def setUp(self):
         """Initialize each test."""
@@ -67,18 +67,21 @@ class GHENotifierTest(unittest.TestCase):
     def test_notify_creates_new_issue_no_match(self, get_config_mock):
         """Test notifier creates a new issue when no match exists."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'foo': {
-                'repo': ['foo/bar'], 'status': ['pass']
-            }
-        }
+        config_mock.get.side_effect = [
+            {
+                'foo': {
+                    'repo': ['foo/bar'], 'status': ['pass']
+                }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
         controls.get_accreditations.return_value = ['foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             'pass_example type:issue in:title is:open repo:foo/bar'
@@ -105,18 +108,21 @@ class GHENotifierTest(unittest.TestCase):
     def test_notify_creates_new_issue_partial_match(self, get_config_mock):
         """Test notifier creates new issue when partial title match exists."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'foo': {
-                'repo': ['foo/bar'], 'status': ['pass']
-            }
-        }
+        config_mock.get.side_effect = [
+            {
+                'foo': {
+                    'repo': ['foo/bar'], 'status': ['pass']
+                }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
         controls.get_accreditations.return_value = ['foo']
         self.search_issues_mock.return_value = [{'title': 'x pass_example x'}]
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             'pass_example type:issue in:title is:open repo:foo/bar'
@@ -141,20 +147,23 @@ class GHENotifierTest(unittest.TestCase):
 
     @patch('compliance.notify.get_config')
     def test_notify_creates_multiple_new_issues(self, get_config_mock):
-        """Test notifier creates multiple GHE issues when none exist."""
+        """Test notifier creates multiple GH issues when none exist."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'foo': {
-                'repo': ['foo/bar'], 'status': ['fail', 'pass']
-            }
-        }
+        config_mock.get.side_effect = [
+            {
+                'foo': {
+                    'repo': ['foo/bar'], 'status': ['fail', 'pass']
+                }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
         controls.get_accreditations.return_value = ['foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.assertEqual(self.search_issues_mock.call_count, 2)
         self.search_issues_mock.assert_any_call(
@@ -171,18 +180,21 @@ class GHENotifierTest(unittest.TestCase):
     def test_notify_alerts_in_multiple_repos(self, get_config_mock):
         """Test notifier notifies in multiple repositories."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'foo': {
-                'repo': ['foo/bar', 'bing/bong'], 'status': ['pass']
-            }
-        }
+        config_mock.get.side_effect = [
+            {
+                'foo': {
+                    'repo': ['foo/bar', 'bing/bong'], 'status': ['pass']
+                }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
         controls.get_accreditations.return_value = ['foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.assertEqual(self.search_issues_mock.call_count, 2)
         self.search_issues_mock.assert_any_call(
@@ -204,13 +216,16 @@ class GHENotifierTest(unittest.TestCase):
 
     @patch('compliance.notify.get_config')
     def test_notify_adds_comment_only_to_issue(self, get_config_mock):
-        """Test notifier adds a comment to an existing GHE issue."""
+        """Test notifier adds a comment to an existing GH issue."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'foo': {
-                'repo': ['foo/bar'], 'status': ['pass']
-            }
-        }
+        config_mock.get.side_effect = [
+            {
+                'foo': {
+                    'repo': ['foo/bar'], 'status': ['pass']
+                }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
@@ -231,7 +246,7 @@ class GHENotifierTest(unittest.TestCase):
             }
         ]
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             'pass_example type:issue in:title is:open repo:foo/bar'
@@ -249,13 +264,16 @@ class GHENotifierTest(unittest.TestCase):
 
     @patch('compliance.notify.get_config')
     def test_notify_adds_label_and_comment_to_issue(self, get_config_mock):
-        """Test notifier updates labels, adds comment on existing GHE issue."""
+        """Test notifier updates labels, adds comment on existing GH issue."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'foo': {
-                'repo': ['foo/bar'], 'status': ['pass']
-            }
-        }
+        config_mock.get.side_effect = [
+            {
+                'foo': {
+                    'repo': ['foo/bar'], 'status': ['pass']
+                }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
@@ -276,7 +294,7 @@ class GHENotifierTest(unittest.TestCase):
             }
         ]
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             'pass_example type:issue in:title is:open repo:foo/bar'
@@ -299,13 +317,16 @@ class GHENotifierTest(unittest.TestCase):
 
     @patch('compliance.notify.get_config')
     def test_notify_for_new_and_old_alerts(self, get_config_mock):
-        """Test notifier updates an open GHE issue for a passed check."""
+        """Test notifier updates an open GH issue for a passed check."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'foo': {
-                'repo': ['foo/bar'], 'status': ['fail']
-            }
-        }
+        config_mock.get.side_effect = [
+            {
+                'foo': {
+                    'repo': ['foo/bar'], 'status': ['fail']
+                }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
@@ -329,7 +350,7 @@ class GHENotifierTest(unittest.TestCase):
             ]
         ]
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.assertEqual(self.search_issues_mock.call_count, 2)
         self.search_issues_mock.assert_any_call(
@@ -372,18 +393,21 @@ class GHENotifierTest(unittest.TestCase):
     def test_notify_old_alert_does_nothing(self, get_config_mock):
         """Test notifier does not notify for passed check w/out open issue."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'foo': {
-                'repo': ['foo/bar'], 'status': ['fail']
-            }
-        }
+        config_mock.get.side_effect = [
+            {
+                'foo': {
+                    'repo': ['foo/bar'], 'status': ['fail']
+                }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
         controls.get_accreditations.return_value = ['foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.assertEqual(self.search_issues_mock.call_count, 2)
         self.search_issues_mock.assert_any_call(
@@ -413,20 +437,24 @@ class GHENotifierTest(unittest.TestCase):
     def test_notify_plain_summary_issue(self, get_config_mock):
         """Test notifier creates a new plain summary issue."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'], 'summary_issue': {
-                    'title': 'foo-title'
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'summary_issue': {
+                        'title': 'foo-title'
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
         controls.get_accreditations.return_value = ['accred_foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             'foo-title type:issue in:title is:open repo:foo/bar'
@@ -449,21 +477,25 @@ class GHENotifierTest(unittest.TestCase):
     def test_notify_summary_issue_w_labels(self, get_config_mock):
         """Test notifier creates a new summary issue with labels only."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'summary_issue': {
-                    'title': 'foo-title', 'labels': ['label:foo', 'foo:label']
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'summary_issue': {
+                        'title': 'foo-title',
+                        'labels': ['label:foo', 'foo:label']
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
         controls.get_accreditations.return_value = ['accred_foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             'foo-title type:issue in:title is:open repo:foo/bar'
@@ -490,24 +522,27 @@ class GHENotifierTest(unittest.TestCase):
     def test_notify_summary_issue_assign(self, get_config_mock):
         """Test notifier creates a new summary issue and assigns the issue."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'summary_issue': {
-                    'title': 'foo-title',
-                    'labels': ['label:foo', 'foo:label'],
-                    'message': ['blah blah', 'foo message'],
-                    'assignees': ['the-dude', 'walter', 'donnie']
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'summary_issue': {
+                        'title': 'foo-title',
+                        'labels': ['label:foo', 'foo:label'],
+                        'message': ['blah blah', 'foo message'],
+                        'assignees': ['the-dude', 'walter', 'donnie']
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
         controls.get_accreditations.return_value = ['accred_foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             'foo-title type:issue in:title is:open repo:foo/bar'
@@ -539,18 +574,21 @@ class GHENotifierTest(unittest.TestCase):
     ):
         """Test new daily summary issue created and assigned to rota 0."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'summary_issue': {
-                    'title': 'foo-title',
-                    'labels': ['label:foo', 'foo:label'],
-                    'message': ['blah blah', 'foo message'],
-                    'frequency': 'day',
-                    'rotation': [['the-dude'], ['walter', 'donnie']]
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'summary_issue': {
+                        'title': 'foo-title',
+                        'labels': ['label:foo', 'foo:label'],
+                        'message': ['blah blah', 'foo message'],
+                        'frequency': 'day',
+                        'rotation': [['the-dude'], ['walter', 'donnie']]
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
         datetime_mock.utcnow.return_value = datetime(2019, 7, 31)  # Day 212
 
@@ -558,7 +596,7 @@ class GHENotifierTest(unittest.TestCase):
         controls.get_accreditations.return_value = ['accred_foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             '2019-07-31 - foo-title type:issue in:title is:open repo:foo/bar'
@@ -590,18 +628,21 @@ class GHENotifierTest(unittest.TestCase):
     ):
         """Test new daily summary issue created and assigned to rota 1."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'summary_issue': {
-                    'title': 'foo-title',
-                    'labels': ['label:foo', 'foo:label'],
-                    'message': ['blah blah', 'foo message'],
-                    'frequency': 'day',
-                    'rotation': [['the-dude'], ['walter', 'donnie']]
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'summary_issue': {
+                        'title': 'foo-title',
+                        'labels': ['label:foo', 'foo:label'],
+                        'message': ['blah blah', 'foo message'],
+                        'frequency': 'day',
+                        'rotation': [['the-dude'], ['walter', 'donnie']]
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
         datetime_mock.utcnow.return_value = datetime(2019, 7, 30)  # Day 211
 
@@ -609,7 +650,7 @@ class GHENotifierTest(unittest.TestCase):
         controls.get_accreditations.return_value = ['accred_foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             '2019-07-30 - foo-title type:issue in:title is:open repo:foo/bar'
@@ -641,18 +682,21 @@ class GHENotifierTest(unittest.TestCase):
     ):
         """Test new weekly summary issue created and assigned to rota 0."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'summary_issue': {
-                    'title': 'foo-title',
-                    'labels': ['label:foo', 'foo:label'],
-                    'message': ['blah blah', 'foo message'],
-                    'frequency': 'week',
-                    'rotation': [['the-dude'], ['walter', 'donnie']]
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'summary_issue': {
+                        'title': 'foo-title',
+                        'labels': ['label:foo', 'foo:label'],
+                        'message': ['blah blah', 'foo message'],
+                        'frequency': 'week',
+                        'rotation': [['the-dude'], ['walter', 'donnie']]
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
         datetime_mock.utcnow.return_value = datetime(2019, 7, 25)  # Week 30
 
@@ -660,7 +704,7 @@ class GHENotifierTest(unittest.TestCase):
         controls.get_accreditations.return_value = ['accred_foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             '2019, 30W - foo-title type:issue in:title is:open repo:foo/bar'
@@ -692,18 +736,21 @@ class GHENotifierTest(unittest.TestCase):
     ):
         """Test new weekly summary issue created and assigned to rota 1."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'summary_issue': {
-                    'title': 'foo-title',
-                    'labels': ['label:foo', 'foo:label'],
-                    'message': ['blah blah', 'foo message'],
-                    'frequency': 'week',
-                    'rotation': [['the-dude'], ['walter', 'donnie']]
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'summary_issue': {
+                        'title': 'foo-title',
+                        'labels': ['label:foo', 'foo:label'],
+                        'message': ['blah blah', 'foo message'],
+                        'frequency': 'week',
+                        'rotation': [['the-dude'], ['walter', 'donnie']]
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
         datetime_mock.utcnow.return_value = datetime(2019, 7, 31)  # Week 31
 
@@ -711,7 +758,7 @@ class GHENotifierTest(unittest.TestCase):
         controls.get_accreditations.return_value = ['accred_foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             '2019, 31W - foo-title type:issue in:title is:open repo:foo/bar'
@@ -743,18 +790,21 @@ class GHENotifierTest(unittest.TestCase):
     ):
         """Test new monthly summary issue created and assigned to rota 0."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'summary_issue': {
-                    'title': 'foo-title',
-                    'labels': ['label:foo', 'foo:label'],
-                    'message': ['blah blah', 'foo message'],
-                    'frequency': 'month',
-                    'rotation': [['the-dude'], ['walter', 'donnie']]
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'summary_issue': {
+                        'title': 'foo-title',
+                        'labels': ['label:foo', 'foo:label'],
+                        'message': ['blah blah', 'foo message'],
+                        'frequency': 'month',
+                        'rotation': [['the-dude'], ['walter', 'donnie']]
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
         datetime_mock.utcnow.return_value = datetime(2019, 6, 25)  # Month 6
 
@@ -762,7 +812,7 @@ class GHENotifierTest(unittest.TestCase):
         controls.get_accreditations.return_value = ['accred_foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             '2019, 06M - foo-title type:issue in:title is:open repo:foo/bar'
@@ -794,18 +844,21 @@ class GHENotifierTest(unittest.TestCase):
     ):
         """Test new monthly summary issue created and assigned to rota 1."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'summary_issue': {
-                    'title': 'foo-title',
-                    'labels': ['label:foo', 'foo:label'],
-                    'message': ['blah blah', 'foo message'],
-                    'frequency': 'month',
-                    'rotation': [['the-dude'], ['walter', 'donnie']]
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'summary_issue': {
+                        'title': 'foo-title',
+                        'labels': ['label:foo', 'foo:label'],
+                        'message': ['blah blah', 'foo message'],
+                        'frequency': 'month',
+                        'rotation': [['the-dude'], ['walter', 'donnie']]
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
         datetime_mock.utcnow.return_value = datetime(2019, 7, 31)  # Month 7
 
@@ -813,7 +866,7 @@ class GHENotifierTest(unittest.TestCase):
         controls.get_accreditations.return_value = ['accred_foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             '2019, 07M - foo-title type:issue in:title is:open repo:foo/bar'
@@ -845,18 +898,21 @@ class GHENotifierTest(unittest.TestCase):
     ):
         """Test new yearly summary issue created and assigned to rota 0."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'summary_issue': {
-                    'title': 'foo-title',
-                    'labels': ['label:foo', 'foo:label'],
-                    'message': ['blah blah', 'foo message'],
-                    'frequency': 'year',
-                    'rotation': [['the-dude'], ['walter', 'donnie']]
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'summary_issue': {
+                        'title': 'foo-title',
+                        'labels': ['label:foo', 'foo:label'],
+                        'message': ['blah blah', 'foo message'],
+                        'frequency': 'year',
+                        'rotation': [['the-dude'], ['walter', 'donnie']]
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
         datetime_mock.utcnow.return_value = datetime(2018, 6, 25)  # Year 2018
 
@@ -864,7 +920,7 @@ class GHENotifierTest(unittest.TestCase):
         controls.get_accreditations.return_value = ['accred_foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             '2018 - foo-title type:issue in:title is:open repo:foo/bar'
@@ -896,18 +952,21 @@ class GHENotifierTest(unittest.TestCase):
     ):
         """Test new yearly summary issue created and assigned to rota 1."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'summary_issue': {
-                    'title': 'foo-title',
-                    'labels': ['label:foo', 'foo:label'],
-                    'message': ['blah blah', 'foo message'],
-                    'frequency': 'year',
-                    'rotation': [['the-dude'], ['walter', 'donnie']]
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'summary_issue': {
+                        'title': 'foo-title',
+                        'labels': ['label:foo', 'foo:label'],
+                        'message': ['blah blah', 'foo message'],
+                        'frequency': 'year',
+                        'rotation': [['the-dude'], ['walter', 'donnie']]
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
         datetime_mock.utcnow.return_value = datetime(2019, 7, 31)  # Year 2019
 
@@ -915,7 +974,7 @@ class GHENotifierTest(unittest.TestCase):
         controls.get_accreditations.return_value = ['accred_foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.notify()
         self.search_issues_mock.assert_called_once_with(
             '2019 - foo-title type:issue in:title is:open repo:foo/bar'
@@ -944,20 +1003,24 @@ class GHENotifierTest(unittest.TestCase):
     def test_add_issue_to_project_no_config(self, get_config_mock):
         """Test issue is not added to project without config."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'], 'summary_issue': {
-                    'title': 'foo-title'
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'summary_issue': {
+                        'title': 'foo-title'
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
         controls.get_accreditations.return_value = ['accred_foo']
         self.search_issues_mock.return_value = []
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.logger.warning = MagicMock()
         notifier.notify()
         self.get_all_projects_mock.assert_not_called()
@@ -970,17 +1033,20 @@ class GHENotifierTest(unittest.TestCase):
     def test_add_issue_to_project_invalid_project(self, get_config_mock):
         """Test issue is not added to project without valid project config."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'project': {
-                    'invalid-project': 'a-column'
-                },
-                'summary_issue': {
-                    'title': 'foo-title'
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'project': {
+                        'invalid-project': 'a-column'
+                    },
+                    'summary_issue': {
+                        'title': 'foo-title'
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
@@ -992,7 +1058,7 @@ class GHENotifierTest(unittest.TestCase):
             }
         ]
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.logger.warning = MagicMock()
         notifier.notify()
         self.get_all_projects_mock.assert_called_once_with('foo/bar')
@@ -1007,17 +1073,20 @@ class GHENotifierTest(unittest.TestCase):
     def test_add_issue_to_project_invalid_column(self, get_config_mock):
         """Test issue is not added to project without valid column config."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'project': {
-                    'valid-project': 'invalid-column'
-                },
-                'summary_issue': {
-                    'title': 'foo-title'
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'project': {
+                        'valid-project': 'invalid-column'
+                    },
+                    'summary_issue': {
+                        'title': 'foo-title'
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
@@ -1034,7 +1103,7 @@ class GHENotifierTest(unittest.TestCase):
             }
         ]
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.logger.warning = MagicMock()
         notifier.notify()
         self.get_all_projects_mock.assert_called_once_with('foo/bar')
@@ -1050,17 +1119,20 @@ class GHENotifierTest(unittest.TestCase):
     def test_add_issue_to_project_found(self, get_config_mock):
         """Test issue is not added to project if issue already assigned."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'project': {
-                    'valid-project': 'valid-column'
-                },
-                'summary_issue': {
-                    'title': 'foo-title'
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'project': {
+                        'valid-project': 'valid-column'
+                    },
+                    'summary_issue': {
+                        'title': 'foo-title'
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
@@ -1096,7 +1168,7 @@ class GHENotifierTest(unittest.TestCase):
             }]
         }
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.logger.warning = MagicMock()
         notifier.notify()
         self.get_all_projects_mock.assert_called_once_with('foo/bar')
@@ -1109,17 +1181,20 @@ class GHENotifierTest(unittest.TestCase):
     def test_add_issue_to_project(self, get_config_mock):
         """Test issue is added to project when issue not yet assigned."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {
-            'accred_foo': {
-                'repo': ['foo/bar'],
-                'project': {
-                    'valid-project': 'valid-column'
-                },
-                'summary_issue': {
-                    'title': 'foo-title'
+        config_mock.get.side_effect = [
+            {
+                'accred_foo': {
+                    'repo': ['foo/bar'],
+                    'project': {
+                        'valid-project': 'valid-column'
+                    },
+                    'summary_issue': {
+                        'title': 'foo-title'
+                    }
                 }
-            }
-        }
+            },
+            'https://github.com/foo/bar'
+        ]
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
@@ -1142,7 +1217,7 @@ class GHENotifierTest(unittest.TestCase):
             }]
         }
 
-        notifier = GHEIssuesNotifier(self.results, controls)
+        notifier = GHIssuesNotifier(self.results, controls)
         notifier.logger.warning = MagicMock()
         notifier.notify()
         self.get_all_projects_mock.assert_called_once_with('foo/bar')

@@ -96,7 +96,7 @@ class ComplianceCLI(Command):
                 f'{", ".join(get_notifiers().keys())}.  '
                 'Defaults to %(default)s.'
             ),
-            metavar='[slack,ghe_issues,...]',
+            metavar='[slack,gh_issues,...]',
             default='stdout'
         )
         self.add_argument(
