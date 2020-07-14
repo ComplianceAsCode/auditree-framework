@@ -20,10 +20,9 @@ import tempfile
 import unittest
 
 from compliance.config import get_config
+from compliance.utils.http import BaseSession
 
 import requests
-
-from utilitarian.http import BaseSession
 
 
 class ComplianceFetcher(unittest.TestCase):

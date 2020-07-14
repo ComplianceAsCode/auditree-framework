@@ -80,7 +80,7 @@ class Fixer(object):
         :param fct: a callback function that will actually perform
           the fix. this function will be passed a reference to this
           fixer, along with a reference to a
-          :py:class:`utilitarian.credentials.Config` object. this
+          compliance.utils.credentials.Config object. this
           callback will also need to have a docstring, which is
           what will be displayed in dry-run mode. the docstring
           will get formatted with the arguments passed to the fix

@@ -21,19 +21,15 @@ def parse_test_id(test_id):
 
     Takes a test ID and parses out useful parts of it::
 
-        > parse_test_id(
-            'cloudant.checks.infra.test_user_audit_softlayer.'
-            'UserAuditSoftLayer.test_users')
+        > parse_test_id('foo.bar.baz.test_mod.MyTestClass.test_method')
         {
-            'scope': 'cloudant',
-            'type': 'checks',
-            'accreditation': 'infra',
-            'file': 'test_user_audit_softlayer',
-            'class': 'UserAuditSoftLayer',
-            'method': 'test_users',
-            'class_path': (
-                'cloudant.checks.infra.'
-                'test_user_audit_softlayer.UserAuditSoftLayer')
+            'scope': 'foo',
+            'type': 'bar',
+            'accreditation': 'baz',
+            'file': 'test_mod',
+            'class': 'MyTestClass',
+            'method': 'test_method',
+            'class_path': 'foo.bar.baz.test_mod.MyTestClass.test_method'
         }
 
     Note: scope/type/accreditation might not be returned if your

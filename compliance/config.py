@@ -20,9 +20,9 @@ import os
 from collections import OrderedDict
 from copy import deepcopy
 
-from pkg_resources import resource_filename
+from compliance.utils.credentials import Config
 
-from utilitarian import config_spec, credentials
+from pkg_resources import resource_filename
 
 
 class ComplianceConfig(object):
@@ -45,7 +45,12 @@ class ComplianceConfig(object):
             # E.g. {"mycompany.soc2": ["#compliance"]}
             'slack': {},
 
+            # GH repo to use for an accreditation
+            # E.g. {"mycompany.soc2": {"repo": ["my-org/accr1-repo"]}}
+            'gh_issues': {},
+
             # GHE repo to use for an accreditation
+            # Deprecated (use gh_issues), included for backward compatibility.
             # E.g. {"mycompany.soc2": {"repo": ["my-org/accr1-repo"]}}
             'ghe_issues': {},
 
@@ -78,9 +83,7 @@ class ComplianceConfig(object):
             raise ValueError('Path to credentials file not provided')
 
         if self._creds is None:
-            self._creds = credentials.Config(
-                self.creds_path, spec=config_spec.NullConfigSpec()
-            )
+            self._creds = Config(self.creds_path)
         return self._creds
 
     @property

@@ -33,7 +33,7 @@ code-lint:
 	pre-commit run flake8 --all-files
 
 test::
-	nosetests --cover-branches --with-coverage --cover-package=compliance --cover-erase -v test
+	pytest --cov compliance test -v
 
 docs:
 	# Build the API docs from the source code - overwrites those files, which are ignored by git

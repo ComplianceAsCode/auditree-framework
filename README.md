@@ -1,7 +1,8 @@
-[![OS Compatibility][platform-badge]](#prerequisites) [![Python Compatibility][python-badge]][python] [![pre-commit][pre-commit-badge]][pre-commit]
-
-![Test python code & lint](https://github.com/ComplianceAsCode/auditree-framework/workflows/Test%20python%20code%20&%20lint/badge.svg)
-![Upload Python Package](https://github.com/ComplianceAsCode/auditree-framework/workflows/Upload%20Python%20Package/badge.svg)
+[![OS Compatibility][platform-badge]](#prerequisites)
+[![Python Compatibility][python-badge]][python]
+[![pre-commit][pre-commit-badge]][pre-commit]
+[![Test python code & lint](https://github.com/ComplianceAsCode/auditree-framework/workflows/Test%20python%20code%20&%20lint/badge.svg)][lint-test]
+[![Upload Python Package](https://github.com/ComplianceAsCode/auditree-framework/workflows/Upload%20Python%20Package/badge.svg)][pypi-upload]
 
 # auditree-framework
 
@@ -144,3 +145,5 @@ We have a tool called [Prune](https://github.com/ComplianceAsCode/auditree-prune
 [python]: https://www.python.org/downloads/
 [quick start guide]: https://github.com/ComplianceAsCode/auditree-framework/blob/master/doc/quick-start.rst
 [yapf]: https://github.com/google/yapf
+[lint-test]: https://github.com/ComplianceAsCode/auditree-framework/actions?query=workflow%3A%22Test+python+code+%26+lint%22
+[pypi-upload]: https://github.com/ComplianceAsCode/auditree-framework/actions?query=workflow%3A%22Upload+Python+Package%22

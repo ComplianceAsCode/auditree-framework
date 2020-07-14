@@ -24,8 +24,6 @@ from compliance.locker import Locker
 
 from git import Commit
 
-from nose.tools import raises
-
 
 class ComplianceCheckTest(unittest.TestCase):
     """ComplianceCheck test class."""
@@ -44,10 +42,14 @@ class ComplianceCheckTest(unittest.TestCase):
         # on it as expected.
         self.check.locker = create_autospec(Locker)
 
-    @raises(NotImplementedError)
     def test_title(self):
         """Check title raises an exception in the base class."""
-        self.check.title
+        with self.assertRaises(NotImplementedError) as cm:
+            self.check.title
+        self.assertEqual(
+            str(cm.exception),
+            'Property title not implemented on ComplianceCheck'
+        )
 
     def test_config(self):
         """Check that the config property returns a ComplianceConfig object."""
@@ -55,9 +57,9 @@ class ComplianceCheckTest(unittest.TestCase):
 
     def test_reports(self):
         """Check reports property."""
-        self.assertEquals(self.check.reports, [])
+        self.assertEqual(self.check.reports, [])
         self.check.reports.append('dummy')
-        self.assertEquals(self.check.reports, ['dummy'])
+        self.assertEqual(self.check.reports, ['dummy'])
 
     def test_disabled_runbook_url(self):
         """Check runbook URL is none - disabled."""
@@ -68,7 +70,7 @@ class ComplianceCheckTest(unittest.TestCase):
                 }
             }
         )
-        self.assertEquals(self.check.runbook_url, None)
+        self.assertEqual(self.check.runbook_url, None)
 
     def test_unconfigured_runbook_url(self):
         """Check runbook URL is none - not configured."""
@@ -77,7 +79,7 @@ class ComplianceCheckTest(unittest.TestCase):
                 'enabled': True, 'base_url': ''
             }}
         )
-        self.assertEquals(self.check.runbook_url, None)
+        self.assertEqual(self.check.runbook_url, None)
 
     def test_configured_runbook_url(self):
         """Check runbook URL is set."""
@@ -88,39 +90,39 @@ class ComplianceCheckTest(unittest.TestCase):
                 }
             }
         )
-        self.assertEquals(
+        self.assertEqual(
             self.check.runbook_url,
             'http://configuredrunbooks/compliance_check.html'
         )
 
     def test_evidence_metadata(self):
         """Check evidence_metadata property."""
-        self.assertEquals(self.check.evidence_metadata, {})
+        self.assertEqual(self.check.evidence_metadata, {})
 
     def test_fixed_failure_count(self):
         """Check fixed_failure_count property."""
-        self.assertEquals(self.check.fixed_failure_count, 0)
+        self.assertEqual(self.check.fixed_failure_count, 0)
         self.check.fixed_failure_count = 100
-        self.assertEquals(self.check.fixed_failure_count, 100)
+        self.assertEqual(self.check.fixed_failure_count, 100)
 
     def test_failures(self):
         """Test failures property, and the length of dict and of type."""
-        self.assertEquals(self.check.failures, {})
+        self.assertEqual(self.check.failures, {})
         self.check.add_failures('fail_type', 'fail_for')
         self.check.add_failures('fail_type_2', 'fail_for_2')
         expected_failure = {
             'fail_type': ['fail_for'], 'fail_type_2': ['fail_for_2']
         }
-        self.assertEquals(expected_failure, self.check.failures)
-        self.assertEquals(self.check.failures_count(), 2)
+        self.assertEqual(expected_failure, self.check.failures)
+        self.assertEqual(self.check.failures_count(), 2)
 
     def test_warnings(self):
         """Test warning property and if key does not exist, throws KeyError."""
         self.check._failures = {}
-        self.assertEquals(self.check.warnings, {})
+        self.assertEqual(self.check.warnings, {})
         self.check.add_warnings('warn_type', 'warn_for')
         expected_warning = {'warn_type': ['warn_for']}
-        self.assertEquals(expected_warning, self.check.warnings)
+        self.assertEqual(expected_warning, self.check.warnings)
 
     def test_add_issue_if_diff_failure(self):
         """Test add_issue_if_diff adds a failure as expected."""
@@ -128,9 +130,9 @@ class ComplianceCheckTest(unittest.TestCase):
         self.check.add_issue_if_diff(
             {1, 2, 3, 5}, {1, 2, 3, 4}, 'Extra users found'
         )
-        self.assertEquals(self.check.failures_count(), 1)
-        self.assertEquals(self.check.warnings_count(), 0)
-        self.assertEquals(self.check._failures, {'Extra users found': [5]})
+        self.assertEqual(self.check.failures_count(), 1)
+        self.assertEqual(self.check.warnings_count(), 0)
+        self.assertEqual(self.check._failures, {'Extra users found': [5]})
 
     def test_add_issue_if_diff_warning(self):
         """Test add_issue_if_diff adds a warning as expected."""
@@ -138,16 +140,16 @@ class ComplianceCheckTest(unittest.TestCase):
         self.check.add_issue_if_diff(
             {1, 2, 3, 4}, {1, 2, 3, 5}, 'Users not found', True
         )
-        self.assertEquals(self.check.failures_count(), 0)
-        self.assertEquals(self.check.warnings_count(), 1)
-        self.assertEquals(self.check._warnings, {'Users not found': [4]})
+        self.assertEqual(self.check.failures_count(), 0)
+        self.assertEqual(self.check.warnings_count(), 1)
+        self.assertEqual(self.check._warnings, {'Users not found': [4]})
 
     def test_add_issue_if_diff_no_diff(self):
         """Test add_issue_if_diff does not add a fail/warning when no diff."""
         # Ensure no issues are raised when there is no diff
         self.check.add_issue_if_diff([], [], 'FAILED')
-        self.assertEquals(self.check.failures_count(), 0)
-        self.assertEquals(self.check.warnings_count(), 0)
+        self.assertEqual(self.check.failures_count(), 0)
+        self.assertEqual(self.check.warnings_count(), 0)
 
     def test_add_evidence_metadata(self):
         """Test evidence_metadata is populated correctly."""
@@ -169,7 +171,7 @@ class ComplianceCheckTest(unittest.TestCase):
         self.check.locker.get_evidence_metadata.assert_called_once_with(
             'raw/foo/foo.json', ev_date
         )
-        self.assertEquals(
+        self.assertEqual(
             self.check.evidence_metadata,
             {
                 ('raw/foo/foo.json', '2019-11-15'): {
@@ -200,7 +202,7 @@ class ComplianceCheckTest(unittest.TestCase):
 
         self.check.add_evidence_metadata('raw/foo/foo.json', ev_date)
 
-        self.assertEquals(self.check.locker.get_latest_commit.call_count, 2)
+        self.assertEqual(self.check.locker.get_latest_commit.call_count, 2)
         self.check.locker.get_latest_commit.assert_has_calls(
             [
                 call('raw/foo/123_foo.json', ev_date),
@@ -211,7 +213,7 @@ class ComplianceCheckTest(unittest.TestCase):
         self.check.locker.get_evidence_metadata.assert_called_once_with(
             'raw/foo/foo.json', ev_date
         )
-        self.assertEquals(
+        self.assertEqual(
             self.check.evidence_metadata,
             {
                 ('raw/foo/foo.json', '2019-11-15'): {

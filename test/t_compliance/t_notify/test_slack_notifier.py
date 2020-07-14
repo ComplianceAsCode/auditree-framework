@@ -80,8 +80,8 @@ class SlackNotifierTest(unittest.TestCase):
         args, kwargs = post_mock.call_args
         self.assertTrue(args[0].startswith('https://hooks.slack.com'))
         msg = json.loads(kwargs['data'])
-        self.assertEquals(len(msg['attachments']), 3)
-        self.assertEquals('PASSED tests', msg['attachments'][2]['title'])
+        self.assertEqual(len(msg['attachments']), 3)
+        self.assertEqual('PASSED tests', msg['attachments'][2]['title'])
         for att in msg['attachments'][:-1]:
             self.assertIn('failed to run', att['text'])
 
@@ -126,8 +126,8 @@ class SlackNotifierTest(unittest.TestCase):
         args, kwargs = post_mock.call_args
         self.assertTrue(args[0].startswith('https://hooks.slack.com'))
         msg = json.loads(kwargs['data'])
-        self.assertEquals(len(msg['attachments']), 3)
-        self.assertEquals('PASSED tests', msg['attachments'][2]['title'])
+        self.assertEqual(len(msg['attachments']), 3)
+        self.assertEqual('PASSED tests', msg['attachments'][2]['title'])
         for att in msg['attachments'][:-1]:
             testname = att['title'].rsplit(' ', 1)[1]
             url = f'http://mockedrunbooks/path/to/runbook_{testname}'

@@ -35,7 +35,7 @@ class FDNotifierTest(unittest.TestCase):
         """Check that FDNotifier does not notify if no results."""
         notifier = FDNotifier({}, {}, self.fd)
         notifier.notify()
-        self.assertEquals(self.fd.getvalue(), '')
+        self.assertEqual(self.fd.getvalue(), '')
 
     def test_notify_error(self):
         """Check that FDNotifier notifies a test with Error."""
