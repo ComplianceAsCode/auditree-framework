@@ -22,8 +22,6 @@ from copy import deepcopy
 
 from compliance.utils.credentials import Config
 
-from pkg_resources import resource_filename
-
 
 class ComplianceConfig(object):
     """
@@ -160,24 +158,17 @@ class ComplianceConfig(object):
         """
         Provide the full path to the template directory for the test object.
 
-        The associated path will be the first directory found named as
-        ``template`` in any of the test object ancestors.  If ``test_obj``
-        is ``None``, then current directory ``'.'`` is assumed as initial path.
+        The associated path will be the first directory found named
+        ``templates`` in the test object absolute path traversed in reverse.
+        If ``test_obj`` is ``None``, then current directory ``'.'`` is
+        assumed as initial path.
 
         :param test_obj: a :class:`compliance.ComplianceTest` object from
-          where the directory search will start from.
+          where the template directory search will start from.
         """
-        if test_obj is None:
-            path = os.path.abspath(os.curdir)
-        elif test_obj.template_dir == 'COMMON':
-            path = resource_filename('common_compliance', '')
-        elif test_obj.template_dir != 'DEFAULT':
-            path = resource_filename(
-                'auditree_central', test_obj.template_dir.lower()
-            )
-        else:
+        path = os.path.abspath(os.curdir)
+        if test_obj is not None:
             path = inspect.getfile(test_obj.__class__)
-
         while True:
             if path == '/':
                 return None

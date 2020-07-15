@@ -100,22 +100,6 @@ class ComplianceCheck(unittest.TestCase):
             self._evidence_metadata = {}
         return self._evidence_metadata
 
-    @property
-    def template_dir(self):
-        """
-        Directory that contains the check report templates.
-
-        Defines which report template directory is searched.  Valid values are
-        ``DEFAULT`` and ``COMMON``.  Defaults to ``DEFAULT``.
-        """
-        if not hasattr(self, '_template_dir'):
-            self._template_dir = 'DEFAULT'
-        return self._template_dir
-
-    @template_dir.setter
-    def template_dir(self, value='DEFAULT'):
-        self._template_dir = value.upper()
-
     def id(self):  # noqa: A003
         """Reset the test id if it has been transplanted and return it."""
         return_id = super(ComplianceCheck, self).id()
