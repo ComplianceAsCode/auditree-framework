@@ -17,7 +17,7 @@ issue creation and can be completed at a later time._
 
 ## Approach
 
-_Provide a detailed approach to satsify all of the requirements listed in the
+_Provide a detailed approach to satisfy all of the requirements listed in the
 previous section.  This level of detail may not be available at the time of
 issue creation and can be completed at a later time._
 
@@ -34,20 +34,7 @@ approach above satisfies the requirements provided.  This level of detail may
 not be available at the time of issue creation and can be completed at a later
 time._
 
-## Deployment Rollout, Rollback
-
-_Provide a rollout and a rollback strategy.  This level of detail may
-not be available at the time of issue creation and can be completed at a later
-time._
-
-## Monitoring and Logging
-
-_Describe the process by which the resulting work can be verified for
-ongoing correctness through monitoring and/or logging.  This level of detail
-may not be available at the time of issue creation and can be completed at a
-later time._
-
-## Timeline and Components
+## Time-line and Components
 
 _If the resolution of the issue needs to be split into multiple units of work
 then provide a task/component breakdown.  Otherwise, N/A for not applicable._
