@@ -4,7 +4,7 @@ If you want to add to the framework, please familiarise yourself with the code &
 
 If you would like to contribute checks, either add them via PR to[Arboretum][] or push to your own repository & let us know of its existence.
 
-There are some guidelines to follow when making a common check:
+There are some guidelines to follow when making a common fetcher or check:
 
 - Be sure to leverage the configuration JSON file used at runtime by the compliance-tool.
 
@@ -54,7 +54,7 @@ CI/CD will run tests on all new commits and reject changes if there are failures
 suite locally by using:
 
 ```shell
-make tests
+make test
 ```
 
 [Arboretum]: https://github.com/ComplianceAsCode/auditree-arboretum

@@ -24,7 +24,7 @@ install:
 	pip install -q . --upgrade --upgrade-strategy eager
 
 uninstall:
-	pip uninstall compliance
+	pip uninstall auditree-framework
 
 code-format:
 	pre-commit run yapf --all-files

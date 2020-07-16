@@ -1,3 +1,3 @@
 # 1.0.0
 
-[NEW] Make the auditree framework public.
+[NEW] Make the Auditree Framework public.
