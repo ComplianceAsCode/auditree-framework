@@ -1,7 +1,0 @@
-# -*- mode:python; coding:utf-8 -*-
-
-<<<<<<< current
-__version__ = '0.35.1'
-=======
-__version__ = '0.35.0'
->>>>>>> patched

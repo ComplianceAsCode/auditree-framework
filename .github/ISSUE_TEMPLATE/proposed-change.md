@@ -33,8 +33,3 @@ _Provide the test process that will be followed to adequately verify that the
 approach above satisfies the requirements provided.  This level of detail may
 not be available at the time of issue creation and can be completed at a later
 time._
-
-## Time-line and Components
-
-_If the resolution of the issue needs to be split into multiple units of work
-then provide a task/component breakdown.  Otherwise, N/A for not applicable._
