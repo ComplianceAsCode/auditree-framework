@@ -18,8 +18,7 @@ _Provide a bulleted list of the changes included in the pull request._
 _Provide a bulleted list of tests included in the pull request and/or tests
 performed to validate the work included in the pull request._
 
-## Issue(s)
+## Context
 
-_Provide a bulleted list of links to any GitHub issue, or any other task
-management reference (FogBugz, Box Note, etc...) that reviewers can reference
+_Provide a bulleted list of GitHub issues, or any other references (mailing list discussion, etc...) that reviewers can reference
 for additional information regarding scope of the pull request._

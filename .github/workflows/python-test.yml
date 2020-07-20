@@ -1,4 +1,4 @@
-name: Test python code & lint
+name: Test python code and lint
 on: push
 jobs:
   deploy:
@@ -10,11 +10,15 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.x'
+        python-version: '3.7'
     - name: Install dependencies
       run: |
         make develop
-    - name: Test & lint
+    - name: Lint
       run: |
         make code-lint
+    - name: Test
+      run: |
+        git config --global user.email "you@example.com"
+        git config --global user.name "A. Name"
         make test
