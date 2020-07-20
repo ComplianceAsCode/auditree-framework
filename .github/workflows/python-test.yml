@@ -1,4 +1,4 @@
-name: Test python code and lint
+name: lint | test
 on: push
 jobs:
   deploy:
