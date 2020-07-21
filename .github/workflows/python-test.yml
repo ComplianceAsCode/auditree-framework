@@ -1,7 +1,8 @@
-name: lint | test
-on: push
+name: format | lint | test
+on: [push, pull_request]
 jobs:
-  deploy:
+  lint_unit_tests_coverage:
+    name: Run code validation steps
 
     runs-on: ubuntu-latest
 
@@ -14,10 +15,13 @@ jobs:
     - name: Install dependencies
       run: |
         make develop
-    - name: Lint
+    - name: Run formatter
+      run: |
+        make code-format
+    - name: Run linter
       run: |
         make code-lint
-    - name: Test
+    - name: Run unit tests with coverage
       run: |
         git config --global user.email "you@example.com"
         git config --global user.name "A. Name"
