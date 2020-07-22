@@ -1,0 +1,455 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>compliance.runners &#8212; Auditree Framework 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.runners</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for compliance.runners</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- mode:python; coding:utf-8 -*-</span>
+<span class="c1"># Copyright (c) 2020 IBM Corp. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;Compliance automation flow management module.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">from</span> <span class="nn">compliance.check</span> <span class="kn">import</span> <span class="n">ComplianceCheck</span>
+<span class="kn">from</span> <span class="nn">compliance.config</span> <span class="kn">import</span> <span class="n">get_config</span>
+<span class="kn">from</span> <span class="nn">compliance.controls</span> <span class="kn">import</span> <span class="n">ControlDescriptor</span>
+<span class="kn">from</span> <span class="nn">compliance.fetch</span> <span class="kn">import</span> <span class="n">ComplianceFetcher</span>
+<span class="kn">from</span> <span class="nn">compliance.fix</span> <span class="kn">import</span> <span class="n">Fixer</span>
+<span class="kn">from</span> <span class="nn">compliance.locker</span> <span class="kn">import</span> <span class="n">Locker</span>
+<span class="kn">from</span> <span class="nn">compliance.notify</span> <span class="kn">import</span> <span class="n">get_notifiers</span>
+<span class="kn">from</span> <span class="nn">compliance.report</span> <span class="kn">import</span> <span class="n">ReportBuilder</span>
+<span class="kn">from</span> <span class="nn">compliance.utils.path</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CHECK_PREFIX</span><span class="p">,</span> <span class="n">FETCH_PREFIX</span><span class="p">,</span> <span class="n">get_toplevel_dirpath</span><span class="p">,</span> <span class="n">load_evidences_modules</span>
+<span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_BaseRunner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for fetcher and check processing.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opts</span><span class="p">,</span> <span class="n">extra_opts</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opts</span> <span class="o">=</span> <span class="n">opts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_opts</span> <span class="o">=</span> <span class="n">extra_opts</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_config</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">init_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the framework configuration.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_compliance_config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_dirs</span><span class="p">()</span>
+        <span class="n">ComplianceFetcher</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">ComplianceCheck</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+
+    <span class="k">def</span> <span class="nf">init_locker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ttl_tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the framework locker.</span>
+
+<span class="sd">        :param ttl_tolerance: Evidence TTL tolerance in seconds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_the_locker</span><span class="p">(</span><span class="n">ttl_tolerance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">logger_init_msgs</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">force</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">forced_evidence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">ComplianceFetcher</span><span class="o">.</span><span class="n">locker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span>
+        <span class="n">ComplianceCheck</span><span class="o">.</span><span class="n">locker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span>
+
+    <span class="k">def</span> <span class="nf">get_test_candidates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suite</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provide the test cases from a test suite.</span>
+
+<span class="sd">        :param suite: a TestSuite object</span>
+
+<span class="sd">        :returns: generator iterable of test cases</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">suite_test</span> <span class="ow">in</span> <span class="n">suite</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">unittest</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">_isnotsuite</span><span class="p">(</span><span class="n">suite_test</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">suite_test</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_test_candidates</span><span class="p">(</span><span class="n">suite_test</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">test</span>
+
+    <span class="k">def</span> <span class="nf">_load_compliance_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">creds_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">creds_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">creds_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">creds_path</span><span class="si">}</span><span class="s1"> does not exist.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">creds_path</span> <span class="o">=</span> <span class="n">creds_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">compliance_config</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_init_dirs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_opts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">get_toplevel_dirpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">p</span><span class="p">)))</span>
+            <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                <span class="n">dirpath</span> <span class="o">=</span> <span class="n">get_toplevel_dirpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">dirpath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+
+        <span class="n">at_least_one_valid_dir</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">get_toplevel_dirpath</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">at_least_one_valid_dir</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;None of the paths provided are valid directories.  &#39;</span>
+                <span class="s1">&#39;Please provide at least one directory containing a &#39;</span>
+                <span class="s1">&#39;&quot;controls.json&quot; file.&#39;</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="p">:</span>
+            <span class="n">load_evidences_modules</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_the_locker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ttl_tolerance</span><span class="p">):</span>
+        <span class="n">dirname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;locker.dirname&#39;</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">evidence</span>
+
+        <span class="n">gitconfig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;locker.gitconfig&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Locker</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">dirname</span><span class="p">,</span> <span class="n">ttl_tolerance</span><span class="o">=</span><span class="n">ttl_tolerance</span><span class="p">,</span> <span class="n">gitconfig</span><span class="o">=</span><span class="n">gitconfig</span>
+            <span class="p">)</span>
+        <span class="n">repo_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;locker.repo_url&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">repo_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Evidence mode &quot;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&quot; requires a URL.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Locker</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">dirname</span><span class="p">,</span>
+            <span class="n">repo_url</span><span class="o">=</span><span class="n">repo_url</span><span class="p">,</span>
+            <span class="n">creds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">creds</span><span class="p">,</span>
+            <span class="n">do_push</span><span class="o">=</span><span class="kc">True</span> <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;full-remote&#39;</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">ttl_tolerance</span><span class="o">=</span><span class="n">ttl_tolerance</span><span class="p">,</span>
+            <span class="n">gitconfig</span><span class="o">=</span><span class="n">gitconfig</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="FetchMode"><a class="viewcode-back" href="../../compliance.html#compliance.runners.FetchMode">[docs]</a><span class="k">class</span> <span class="nc">FetchMode</span><span class="p">(</span><span class="n">_BaseRunner</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The fetcher process flow.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize fetcher mode processing.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FetchMode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_locker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;locker.ttl_tolerance&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle post fetcher test execution processing.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FetchMode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
+        <span class="c1"># make sure that all added evidence are committed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">checkin</span><span class="p">()</span>
+
+<div class="viewcode-block" id="FetchMode.get_fetchers"><a class="viewcode-back" href="../../compliance.html#compliance.runners.FetchMode.get_fetchers">[docs]</a>    <span class="k">def</span> <span class="nf">get_fetchers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Provide all compliance framework fetcher classes.&quot;&quot;&quot;</span>
+        <span class="n">fetchers</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="p">:</span>
+            <span class="n">tl</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestLoader</span><span class="p">()</span>
+            <span class="n">tl</span><span class="o">.</span><span class="n">testMethodPrefix</span> <span class="o">=</span> <span class="n">FETCH_PREFIX</span>
+            <span class="n">candidates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_test_candidates</span><span class="p">(</span>
+                <span class="n">tl</span><span class="o">.</span><span class="n">discover</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">FETCH_PREFIX</span><span class="si">}</span><span class="s1">*.py&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">ComplianceFetcher</span><span class="p">):</span>
+                    <span class="n">fetchers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fetchers</span></div>
+
+<div class="viewcode-block" id="FetchMode.run_fetchers"><a class="viewcode-back" href="../../compliance.html#compliance.runners.FetchMode.run_fetchers">[docs]</a>    <span class="k">def</span> <span class="nf">run_fetchers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reruns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute fetchers.</span>
+
+<span class="sd">        :param reruns: A list of fetchers in dot notation to rerun</span>
+
+<span class="sd">        :returns: Success (True) if no errors other than dependency unavailable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">loader</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestLoader</span><span class="p">()</span>
+        <span class="n">loader</span><span class="o">.</span><span class="n">testMethodPrefix</span> <span class="o">=</span> <span class="n">FETCH_PREFIX</span>
+        <span class="n">fetchers</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestSuite</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">reruns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fetcher_overrides</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">fo</span> <span class="k">for</span> <span class="n">fo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_opts</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">fo</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="n">fetcher_overrides</span><span class="p">:</span>
+                <span class="n">fetchers</span><span class="o">.</span><span class="n">addTests</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">loadTestsFromNames</span><span class="p">(</span><span class="n">fetcher_overrides</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">fetcher</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fetchers</span><span class="p">():</span>
+                    <span class="n">fetchers</span><span class="o">.</span><span class="n">addTests</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">loadTestsFromTestCase</span><span class="p">(</span><span class="n">fetcher</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dependency_rerun</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">reset_depenency_rerun</span><span class="p">()</span>
+            <span class="n">fetchers</span><span class="o">.</span><span class="n">addTests</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">loadTestsFromNames</span><span class="p">(</span><span class="n">reruns</span><span class="p">))</span>
+        <span class="n">runner</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TextTestRunner</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="s1">&#39;DependencyUnavailableError&#39;</span> <span class="ow">in</span> <span class="n">tb</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;Traceback&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">tb</span><span class="p">)</span> <span class="ow">in</span> <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">fetchers</span><span class="p">)</span><span class="o">.</span><span class="n">errors</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CheckMode"><a class="viewcode-back" href="../../compliance.html#compliance.runners.CheckMode">[docs]</a><span class="k">class</span> <span class="nc">CheckMode</span><span class="p">(</span><span class="n">_BaseRunner</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The check process flow.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opts</span><span class="p">,</span> <span class="n">extra_opts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct and initialize the check mode context manager.</span>
+
+<span class="sd">        :param opts: arguments provided from the command line.</span>
+<span class="sd">        :param extra_opts: additional arguments provided from the command line.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CheckMode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">opts</span><span class="p">,</span> <span class="n">extra_opts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">accreds</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">opts</span><span class="o">.</span><span class="n">check</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+        <span class="c1"># Backward compatibility to support ghe_issues option</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notifiers</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;ghe_issues&#39;</span><span class="p">,</span> <span class="s1">&#39;gh_issues&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">opts</span><span class="o">.</span><span class="n">notify</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize check mode processing.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CheckMode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_locker</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle post check test execution processing.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CheckMode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fix_failures</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_reports</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_notifiers</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CheckMode.init_config"><a class="viewcode-back" href="../../compliance.html#compliance.runners.CheckMode.init_config">[docs]</a>    <span class="k">def</span> <span class="nf">init_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the framework configuration for check execution.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CheckMode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">init_config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controls</span> <span class="o">=</span> <span class="n">ControlDescriptor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CheckMode.get_checks"><a class="viewcode-back" href="../../compliance.html#compliance.runners.CheckMode.get_checks">[docs]</a>    <span class="k">def</span> <span class="nf">get_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Provide the appropriate compliance framework check classes.&quot;&quot;&quot;</span>
+        <span class="n">checks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="p">:</span>
+            <span class="n">tl</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestLoader</span><span class="p">()</span>
+            <span class="n">tl</span><span class="o">.</span><span class="n">testMethodPrefix</span> <span class="o">=</span> <span class="n">CHECK_PREFIX</span>
+            <span class="n">candidates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_test_candidates</span><span class="p">(</span>
+                <span class="n">tl</span><span class="o">.</span><span class="n">discover</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">CHECK_PREFIX</span><span class="si">}</span><span class="s1">*.py&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="vm">__class__</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">]:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">test</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">test</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">in_accred_grouping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="o">.</span><span class="n">is_test_included</span><span class="p">(</span>
+                    <span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">accreds</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">ComplianceCheck</span><span class="p">)</span> <span class="ow">and</span> <span class="n">in_accred_grouping</span><span class="p">:</span>
+                    <span class="n">test</span><span class="o">.</span><span class="n">tests</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="n">method</span> <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">test</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span>
+                            <span class="n">method</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">CHECK_PREFIX</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                                <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">method</span><span class="p">))</span>
+                                <span class="ow">or</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">method</span><span class="p">))</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="p">]</span>
+                    <span class="n">checks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">checks</span></div>
+
+<div class="viewcode-block" id="CheckMode.run_checks"><a class="viewcode-back" href="../../compliance.html#compliance.runners.CheckMode.run_checks">[docs]</a>    <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute checks.</span>
+
+<span class="sd">        :returns: Success (True) if no errors encountered</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">loader</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestLoader</span><span class="p">()</span>
+        <span class="n">loader</span><span class="o">.</span><span class="n">testMethodPrefix</span> <span class="o">=</span> <span class="n">CHECK_PREFIX</span>
+        <span class="n">checks</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestSuite</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_checks</span><span class="p">():</span>
+            <span class="n">checks</span><span class="o">.</span><span class="n">addTests</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">loadTestsFromTestCase</span><span class="p">(</span><span class="n">check</span><span class="p">))</span>
+        <span class="n">runner</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TextTestRunner</span><span class="p">(</span>
+            <span class="n">verbosity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="n">resultclass</span><span class="o">=</span><span class="n">ComplianceCheckResult</span>
+        <span class="p">)</span>
+        <span class="n">check_run</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">checks</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">check_run</span><span class="o">.</span><span class="n">results</span>
+        <span class="k">return</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">check_run</span><span class="o">.</span><span class="n">errors</span> <span class="k">else</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="CheckMode.fix_failures"><a class="viewcode-back" href="../../compliance.html#compliance.runners.CheckMode.fix_failures">[docs]</a>    <span class="k">def</span> <span class="nf">fix_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fix failures if fixer methods are included in checks.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">fix</span> <span class="o">!=</span> <span class="s1">&#39;off&#39;</span><span class="p">:</span>
+            <span class="n">fixer</span> <span class="o">=</span> <span class="n">Fixer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">fix</span> <span class="o">==</span> <span class="s1">&#39;dry-run&#39;</span><span class="p">))</span>
+            <span class="n">fixer</span><span class="o">.</span><span class="n">fix</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CheckMode.build_reports"><a class="viewcode-back" href="../../compliance.html#compliance.runners.CheckMode.build_reports">[docs]</a>    <span class="k">def</span> <span class="nf">build_reports</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate reports based on check results.&quot;&quot;&quot;</span>
+        <span class="n">builder</span> <span class="o">=</span> <span class="n">ReportBuilder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="p">)</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CheckMode.run_notifiers"><a class="viewcode-back" href="../../compliance.html#compliance.runners.CheckMode.run_notifiers">[docs]</a>    <span class="k">def</span> <span class="nf">run_notifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute all requested notifiers.&quot;&quot;&quot;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="n">notifiers</span> <span class="o">=</span> <span class="n">get_notifiers</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">notifier_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">notifiers</span><span class="p">:</span>
+            <span class="n">notifier_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">notifier_name</span> <span class="o">==</span> <span class="s1">&#39;locker&#39;</span><span class="p">:</span>
+                <span class="n">notifier_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="p">)</span>
+            <span class="n">notifier</span> <span class="o">=</span> <span class="n">notifiers</span><span class="p">[</span><span class="n">notifier_name</span><span class="p">](</span><span class="o">*</span><span class="n">notifier_args</span><span class="p">)</span>
+            <span class="n">notifier</span><span class="o">.</span><span class="n">notify</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="ComplianceCheckResult"><a class="viewcode-back" href="../../compliance.html#compliance.runners.ComplianceCheckResult">[docs]</a><span class="k">class</span> <span class="nc">ComplianceCheckResult</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TextTestResult</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compliance check result class.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct and initialize the compliance check result.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ComplianceCheckResult</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ComplianceCheckResult.addSuccess"><a class="viewcode-back" href="../../compliance.html#compliance.runners.ComplianceCheckResult.addSuccess">[docs]</a>    <span class="k">def</span> <span class="nf">addSuccess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test</span><span class="p">):</span>  <span class="c1"># noqa: N802</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add test successes and warnings to check results.</span>
+
+<span class="sd">        :param test: a ``unittest.TestCase`` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ComplianceCheckResult</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">addSuccess</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span> <span class="k">if</span> <span class="n">test</span><span class="o">.</span><span class="n">warnings_count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;warn&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceCheckResult.addError"><a class="viewcode-back" href="../../compliance.html#compliance.runners.ComplianceCheckResult.addError">[docs]</a>    <span class="k">def</span> <span class="nf">addError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>  <span class="c1"># noqa: N802</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add test errors to check results.</span>
+
+<span class="sd">        :param test: a ``unittest.TestCase`` object.</span>
+<span class="sd">        :param err: a tuple of the form returned by sys.exc_info()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ComplianceCheckResult</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">addError</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceCheckResult.addFailure"><a class="viewcode-back" href="../../compliance.html#compliance.runners.ComplianceCheckResult.addFailure">[docs]</a>    <span class="k">def</span> <span class="nf">addFailure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>  <span class="c1"># noqa: N802</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add test failures to check results.</span>
+
+<span class="sd">        :param test: a ``unittest.TestCase`` object.</span>
+<span class="sd">        :param err: a tuple of the form returned by sys.exc_info()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ComplianceCheckResult</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">addFailure</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="s1">&#39;fail&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceCheckResult.record"><a class="viewcode-back" href="../../compliance.html#compliance.runners.ComplianceCheckResult.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Populate the results as expected by downstream reports and notifiers.</span>
+
+<span class="sd">        :param test: a ``unittest.TestCase`` object.</span>
+<span class="sd">        :param status: a string status (`pass`, `warn`, `fail`, or `error`)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">test</span><span class="o">.</span><span class="n">id</span><span class="p">()]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="n">status</span><span class="p">,</span>
+            <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="n">ComplianceTestWrapper</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+        <span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="ComplianceTestWrapper"><a class="viewcode-back" href="../../compliance.html#compliance.runners.ComplianceTestWrapper">[docs]</a><span class="k">class</span> <span class="nc">ComplianceTestWrapper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TestCase wrapper class.</span>
+
+<span class="sd">    Wraps the TestCase test object as an attribute to ensure backwards</span>
+<span class="sd">    compatibility with checks, reporting, and notifiers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct and initialize the test case wrapper object.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="n">test</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.runners</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

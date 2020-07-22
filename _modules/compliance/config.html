@@ -1,0 +1,272 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>compliance.config &#8212; Auditree Framework 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.config</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for compliance.config</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- mode:python; coding:utf-8 -*-</span>
+<span class="c1"># Copyright (c) 2020 IBM Corp. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;Compliance configuration automation module.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">from</span> <span class="nn">compliance.utils.credentials</span> <span class="kn">import</span> <span class="n">Config</span>
+
+
+<div class="viewcode-block" id="ComplianceConfig"><a class="viewcode-back" href="../../compliance.html#compliance.config.ComplianceConfig">[docs]</a><span class="k">class</span> <span class="nc">ComplianceConfig</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The configuration for a compliance run.</span>
+
+<span class="sd">    Credentials and a cache of known evidences are included.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">DEFAULTS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;locker&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;dirname&#39;</span><span class="p">:</span> <span class="s1">&#39;compliance&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;repo_url&#39;</span><span class="p">:</span> <span class="s1">&#39;https://github.com/YOUR_ORG/YOUR_PROJECT&#39;</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;runbooks&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;base_url&#39;</span><span class="p">:</span> <span class="s1">&#39;https://example.com/runbooks&#39;</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;notify&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c1"># Slack channel to use for an accreditation</span>
+            <span class="c1"># E.g. {&quot;mycompany.soc2&quot;: [&quot;#compliance&quot;]}</span>
+            <span class="s1">&#39;slack&#39;</span><span class="p">:</span> <span class="p">{},</span>
+
+            <span class="c1"># GH repo to use for an accreditation</span>
+            <span class="c1"># E.g. {&quot;mycompany.soc2&quot;: {&quot;repo&quot;: [&quot;my-org/accr1-repo&quot;]}}</span>
+            <span class="s1">&#39;gh_issues&#39;</span><span class="p">:</span> <span class="p">{},</span>
+
+            <span class="c1"># GHE repo to use for an accreditation</span>
+            <span class="c1"># Deprecated (use gh_issues), included for backward compatibility.</span>
+            <span class="c1"># E.g. {&quot;mycompany.soc2&quot;: {&quot;repo&quot;: [&quot;my-org/accr1-repo&quot;]}}</span>
+            <span class="s1">&#39;ghe_issues&#39;</span><span class="p">:</span> <span class="p">{},</span>
+
+            <span class="c1"># Pagerduty service id to use for an accreditation</span>
+            <span class="c1"># E.g. {&quot;mycompany.soc2&quot;: &quot;ABCDEFG&quot;}</span>
+            <span class="s1">&#39;pagerduty&#39;</span><span class="p">:</span> <span class="p">{},</span>
+
+            <span class="c1"># Security Advisor FindingsAPI endpoint to use for an accreditation</span>
+            <span class="c1"># E.g. {&quot;mycompany.soc2&quot;: &quot;https://my.findings.api/findings&quot;}</span>
+            <span class="s1">&#39;findings&#39;</span><span class="p">:</span> <span class="p">{}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;org&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;YOUR_ORG&#39;</span><span class="p">,</span> <span class="s1">&#39;settings&#39;</span><span class="p">:</span> <span class="p">{}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct and initialize the configuration object.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_evidence_cache</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_org</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">creds_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dependency_rerun</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">creds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Credentials used for locker management and running fetchers.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">creds_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Path to credentials file not provided&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">creds_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">evidences</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;All evidence objects currently in the evidence cache.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evidence_cache</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">raw_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raw configuration settings as a dictionary.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span>
+
+<div class="viewcode-block" id="ComplianceConfig.load"><a class="viewcode-back" href="../../compliance.html#compliance.config.ComplianceConfig.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load configuration from a JSON file.</span>
+
+<span class="sd">        :param config_file: the path to the JSON config file.</span>
+<span class="sd">          If ``None``, the ``DEFAULT`` configuration is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">config_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULTS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">err</span><span class="o">.</span><span class="n">args</span> <span class="o">+=</span> <span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="p">)</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="ComplianceConfig.get"><a class="viewcode-back" href="../../compliance.html#compliance.config.ComplianceConfig.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provide the configuration value for the supplied ``config_path``.</span>
+
+<span class="sd">        Returns the default if ``config_path`` cannot be retrieved.</span>
+
+<span class="sd">        :param config_path: dot notation path with the following format</span>
+<span class="sd">          ``&#39;key[.subkey]``. For instance, ``locker.dirname``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="n">config_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULTS</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">default</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceConfig.get_evidence"><a class="viewcode-back" href="../../compliance.html#compliance.config.ComplianceConfig.get_evidence">[docs]</a>    <span class="k">def</span> <span class="nf">get_evidence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provide an evidence object from the evidence cache.</span>
+
+<span class="sd">        :param path: the path to the evidence within the Locker.</span>
+<span class="sd">          For example, ``raw/source1/evidence.json``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evidence_cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">evidence_path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComplianceConfig.add_evidences"><a class="viewcode-back" href="../../compliance.html#compliance.config.ComplianceConfig.add_evidences">[docs]</a>    <span class="k">def</span> <span class="nf">add_evidences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a list of evidence objects to the evidence cache.</span>
+
+<span class="sd">        :param evidence_list: a list of evidence objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">evidence_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependency_rerun</span>
+                    <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evidence_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Evidence </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1"> duplicated&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_evidence_cache</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span></div>
+
+<div class="viewcode-block" id="ComplianceConfig.get_template_dir"><a class="viewcode-back" href="../../compliance.html#compliance.config.ComplianceConfig.get_template_dir">[docs]</a>    <span class="k">def</span> <span class="nf">get_template_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provide the full path to the template directory for the test object.</span>
+
+<span class="sd">        The associated path will be the first directory found named</span>
+<span class="sd">        ``templates`` in the test object absolute path traversed in reverse.</span>
+<span class="sd">        If ``test_obj`` is ``None``, then current directory ``&#39;.&#39;`` is</span>
+<span class="sd">        assumed as initial path.</span>
+
+<span class="sd">        :param test_obj: a :class:`compliance.ComplianceTest` object from</span>
+<span class="sd">          where the template directory search will start from.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">test_obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfile</span><span class="p">(</span><span class="n">test_obj</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">result</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div></div>
+
+
+<span class="n">__config</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="get_config"><a class="viewcode-back" href="../../compliance.html#compliance.config.get_config">[docs]</a><span class="k">def</span> <span class="nf">get_config</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Provide the global configuration object.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">__config</span>
+    <span class="k">if</span> <span class="n">__config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">__config</span> <span class="o">=</span> <span class="n">ComplianceConfig</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">__config</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.config</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

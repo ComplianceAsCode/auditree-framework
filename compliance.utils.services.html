@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>compliance.utils.services package &#8212; Auditree Framework 1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="compliance.utils package" href="compliance.utils.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="compliance.utils.html" title="compliance.utils package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="compliance.utils.html" accesskey="U">compliance.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.utils.services package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="compliance-utils-services-package">
+<h1>compliance.utils.services package<a class="headerlink" href="#compliance-utils-services-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-compliance.utils.services.github">
+<span id="compliance-utils-services-github-module"></span><h2>compliance.utils.services.github module<a class="headerlink" href="#module-compliance.utils.services.github" title="Permalink to this headline">¶</a></h2>
+<p>Compliance Github service helper.</p>
+<dl class="py class">
+<dt id="compliance.utils.services.github.GitHub">
+<em class="property">class </em><code class="sig-prename descclassname">compliance.utils.services.github.</code><code class="sig-name descname">GitHub</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">base_url</span><span class="o">=</span><span class="default_value">'https://github.com'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Github service helper class.</p>
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.add_card">
+<code class="sig-name descname">add_card</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">column_id</span></em>, <em class="sig-param"><span class="n">message</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">issue</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.add_card"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.add_card" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a card in a project column.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.add_issue">
+<code class="sig-name descname">add_issue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">title</span></em>, <em class="sig-param"><span class="n">body</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">annotation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.add_issue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.add_issue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a repository issue.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.add_issue_comment">
+<code class="sig-name descname">add_issue_comment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">issue</span></em>, <em class="sig-param"><span class="n">body</span></em>, <em class="sig-param"><span class="n">annotation</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.add_issue_comment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.add_issue_comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a comment for a repository issue.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.add_milestone">
+<code class="sig-name descname">add_milestone</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">milestone</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.add_milestone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.add_milestone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a repository milestone.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.apply_labels">
+<code class="sig-name descname">apply_labels</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">issue</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">labels</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.apply_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.apply_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add label(s) to an issue.</p>
+<p>repo looks like: my-gh-org/my-gh-repo
+issue is an issue number (not id)
+API takes a json list of labels
+POST /repos/:owner/:repo/issues/:number/labels</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.create_column">
+<code class="sig-name descname">create_column</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project_id</span></em>, <em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">org</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.create_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.create_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a project column.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.create_label">
+<code class="sig-name descname">create_label</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">org</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.create_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.create_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a label within a repository.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.create_project">
+<code class="sig-name descname">create_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">body</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">org</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.create_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.create_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a repository project.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.creates_for_project">
+<code class="sig-name descname">creates_for_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">org</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.creates_for_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.creates_for_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a repository project based on a properly formed url.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.extract_owner_repo">
+<code class="sig-name descname">extract_owner_repo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.extract_owner_repo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.extract_owner_repo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the owner (org) and repo from the url.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.extract_owner_repo_issue">
+<code class="sig-name descname">extract_owner_repo_issue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.extract_owner_repo_issue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.extract_owner_repo_issue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the owner (org), repo and issue number from the url.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.extract_path_chunks">
+<code class="sig-name descname">extract_path_chunks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.extract_path_chunks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.extract_path_chunks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the path from the url.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.get_all_cards">
+<code class="sig-name descname">get_all_cards</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">columns</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.get_all_cards"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.get_all_cards" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all cards for a given list of project columns.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.get_all_issues">
+<code class="sig-name descname">get_all_issues</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.get_all_issues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.get_all_issues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all issues for a repository.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.get_all_projects">
+<code class="sig-name descname">get_all_projects</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">repo_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.get_all_projects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.get_all_projects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all GH repo projects.</p>
+<p>repo_path looks like: my-gh-org/my-gh-repo</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.get_cards">
+<code class="sig-name descname">get_cards</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">column_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.get_cards"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.get_cards" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all cards for a given project column.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.get_columns">
+<code class="sig-name descname">get_columns</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.get_columns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.get_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the columns for a project.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.get_issue">
+<code class="sig-name descname">get_issue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">issue</span></em>, <em class="sig-param"><span class="n">parse_annotations</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.get_issue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.get_issue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the content and metadata for a repository issue.</p>
+<p>If parse_annotations is True, then returns (issue, body, annotations),
+where body is the body with the JSON annotations removed, and
+annotations is a dictionary of the annotations. The annotations will
+be an empty dictionary if there aren’t any.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.get_issue_comments">
+<code class="sig-name descname">get_issue_comments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">issue</span></em>, <em class="sig-param"><span class="n">parse_annotations</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.get_issue_comments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.get_issue_comments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a repository issue’s comments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.get_issue_template">
+<code class="sig-name descname">get_issue_template</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">template_name</span></em>, <em class="sig-param"><span class="n">strip_annotations</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">strip_header</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">annotations</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">render</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.get_issue_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.get_issue_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the contents of an issue template based on template name.</p>
+<p>The .md extension and any numeric prefix) from the owner and repo
+are ignored.  Both the header (the YAML section at the top), and any
+defined annotations (the JSON code block inside the issue body) are
+returned as dictionaries along with the body of the template. You can
+pass <code class="docutils literal notranslate"><span class="pre">strip_annotations</span></code> or <code class="docutils literal notranslate"><span class="pre">strip_header</span></code> to remove these sections
+from the body that’s returned.  You can pass a dictionary as
+<code class="docutils literal notranslate"><span class="pre">annotations</span></code>, and the values will be merged with those extracted
+from the template.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">render</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then all annotations will be substituted on
+the body and header.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.get_issues_page">
+<code class="sig-name descname">get_issues_page</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.get_issues_page"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.get_issues_page" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a repository’s issues by page.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.get_project">
+<code class="sig-name descname">get_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project</span></em>, <em class="sig-param"><span class="n">org</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.get_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.get_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the GH org or org/repo project.</p>
+<dl class="simple">
+<dt>For a repo project the project variable looks like:</dt><dd><p>my-gh-org/my-gh-repo/projects/1</p>
+</dd>
+<dt>For an org project the project variable looks like:</dt><dd><p>my-gh-org/projects/1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.list_milestones">
+<code class="sig-name descname">list_milestones</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">state</span><span class="o">=</span><span class="default_value">'open'</span></em>, <em class="sig-param"><span class="n">sort</span><span class="o">=</span><span class="default_value">'due_on'</span></em>, <em class="sig-param"><span class="n">direction</span><span class="o">=</span><span class="default_value">'asc'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.list_milestones"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.list_milestones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a repository’s milestones.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.move_card">
+<code class="sig-name descname">move_card</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">card</span></em>, <em class="sig-param"><span class="n">to_column_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.move_card"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.move_card" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move a card from one project column to another.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.patch_issue">
+<code class="sig-name descname">patch_issue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">issue</span></em>, <em class="sig-param"><span class="n">annotation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.patch_issue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.patch_issue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edit a repository issue.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.rand_color">
+<code class="sig-name descname">rand_color</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.rand_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.rand_color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a random color for labels.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.remove_labels">
+<code class="sig-name descname">remove_labels</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">issue</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">labels</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.remove_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.remove_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove label(s) from an issue.</p>
+<p>repo looks like: my-gh-org/my-gh-repo
+issue is an issue number (not id)
+API takes a json list of labels
+POST /repos/:owner/:repo/issues/:number/labels</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.search_issues">
+<code class="sig-name descname">search_issues</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">sort</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">order</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">owner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">repo</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.search_issues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.search_issues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a search against all issues based on the query provided.</p>
+<p>If an owner and repo are passed in, then restrict the results to
+that repo. Note that this can also be done in the query directly.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.GitHub.update_annotations">
+<code class="sig-name descname">update_annotations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">issue</span></em>, <em class="sig-param"><span class="n">annotations</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#GitHub.update_annotations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.GitHub.update_annotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the body of an existing issue, only changing the annotations.</p>
+<p>If there are no existing annotations, the annotation block will be
+added. If there is existing annotations, the given annotations will
+be merged into them.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="compliance.utils.services.github.extract_annotations">
+<code class="sig-prename descclassname">compliance.utils.services.github.</code><code class="sig-name descname">extract_annotations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">content</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#extract_annotations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.extract_annotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve JSON annotations from a string (issue body).</p>
+<p>Returns the remaining content without the annotations,
+and then the annotations themselves as a dictionary.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="compliance.utils.services.github.extract_header">
+<code class="sig-prename descclassname">compliance.utils.services.github.</code><code class="sig-name descname">extract_header</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">content</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#extract_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.extract_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve header (YAML) from a string (issue body).</p>
+<p>Returns the remaining content without the header,
+and then the header fields themselves as a dictionary.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-compliance.utils.services.pagerduty">
+<span id="compliance-utils-services-pagerduty-module"></span><h2>compliance.utils.services.pagerduty module<a class="headerlink" href="#module-compliance.utils.services.pagerduty" title="Permalink to this headline">¶</a></h2>
+<p>Compliance Pagerduty service helper.</p>
+<dl class="py function">
+<dt id="compliance.utils.services.pagerduty.delete">
+<code class="sig-prename descclassname">compliance.utils.services.pagerduty.</code><code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">headers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">creds</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/pagerduty.html#delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.pagerduty.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a DELETE operation.</p>
+<p>Returns the result as <code class="xref py py-class docutils literal notranslate"><span class="pre">requests.Response</span></code> object.
+This uses the PD API v2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – API endpoint to call (e.g. ‘users’)</p></li>
+<li><p><strong>params</strong> – a dictionary with parameters</p></li>
+<li><p><strong>headers</strong> – a dictionary with headers to include</p></li>
+<li><p><strong>creds</strong> – a Config object with PagerDuty credentials</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="compliance.utils.services.pagerduty.get">
+<code class="sig-prename descclassname">compliance.utils.services.pagerduty.</code><code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">headers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">creds</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/pagerduty.html#get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.pagerduty.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a GET operation.</p>
+<p>Returns the pages wrapped as <code class="xref py py-class docutils literal notranslate"><span class="pre">requests.Response</span></code> object.
+This uses the PD API v2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – API endpoint to call (e.g. ‘users’)</p></li>
+<li><p><strong>params</strong> – a dictionary with parameters</p></li>
+<li><p><strong>headers</strong> – a dictionary with headers to include</p></li>
+<li><p><strong>creds</strong> – a Config object with PagerDuty credentials</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="compliance.utils.services.pagerduty.post">
+<code class="sig-prename descclassname">compliance.utils.services.pagerduty.</code><code class="sig-name descname">post</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">headers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">creds</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/pagerduty.html#post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.pagerduty.post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a POST operation.</p>
+<p>Returns the result as <code class="xref py py-class docutils literal notranslate"><span class="pre">requests.Response</span></code> objects.
+This uses the PD API v2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – API endpoint to call (e.g. ‘users’)</p></li>
+<li><p><strong>params</strong> – a dictionary with parameters</p></li>
+<li><p><strong>headers</strong> – a dictionary with headers to include</p></li>
+<li><p><strong>creds</strong> – a Config object with PagerDuty credentials</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="compliance.utils.services.pagerduty.put">
+<code class="sig-prename descclassname">compliance.utils.services.pagerduty.</code><code class="sig-name descname">put</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">headers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">creds</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/pagerduty.html#put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.pagerduty.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a PUT operation.</p>
+<p>Return the result as <code class="xref py py-class docutils literal notranslate"><span class="pre">requests.Response</span></code> object.
+This uses the PD API v2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – API endpoint to call (e.g. ‘users’)</p></li>
+<li><p><strong>params</strong> – a dictionary with parameters</p></li>
+<li><p><strong>headers</strong> – a dictionary with headers to include</p></li>
+<li><p><strong>creds</strong> – a Config object with PagerDuty credentials</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="compliance.utils.services.pagerduty.send_event">
+<code class="sig-prename descclassname">compliance.utils.services.pagerduty.</code><code class="sig-name descname">send_event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span></em>, <em class="sig-param"><span class="n">check</span></em>, <em class="sig-param"><span class="n">title</span></em>, <em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">severity</span><span class="o">=</span><span class="default_value">'error'</span></em>, <em class="sig-param"><span class="n">details</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">links</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">creds</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/pagerduty.html#send_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.pagerduty.send_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send an event to PD using the Events API.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-compliance.utils.services">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-compliance.utils.services" title="Permalink to this headline">¶</a></h2>
+<p>Compliance automation utilities services package.</p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">compliance.utils.services package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-compliance.utils.services.github">compliance.utils.services.github module</a></li>
+<li><a class="reference internal" href="#module-compliance.utils.services.pagerduty">compliance.utils.services.pagerduty module</a></li>
+<li><a class="reference internal" href="#module-compliance.utils.services">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="compliance.utils.html"
+                        title="previous chapter">compliance.utils package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/compliance.utils.services.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="compliance.utils.html" title="compliance.utils package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="compliance.utils.html" >compliance.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.utils.services package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,69 @@
+compliance.utils package
+========================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   compliance.utils.services
+
+Submodules
+----------
+
+compliance.utils.credentials module
+-----------------------------------
+
+.. automodule:: compliance.utils.credentials
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+compliance.utils.data\_parse module
+-----------------------------------
+
+.. automodule:: compliance.utils.data_parse
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+compliance.utils.exceptions module
+----------------------------------
+
+.. automodule:: compliance.utils.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+compliance.utils.http module
+----------------------------
+
+.. automodule:: compliance.utils.http
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+compliance.utils.path module
+----------------------------
+
+.. automodule:: compliance.utils.path
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+compliance.utils.test module
+----------------------------
+
+.. automodule:: compliance.utils.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: compliance.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

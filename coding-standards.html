@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Standards &#8212; Auditree Framework 1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Running on Travis" href="running-on-travis.html" />
+    <link rel="prev" title="Notifiers" href="notifiers.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="running-on-travis.html" title="Running on Travis"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="notifiers.html" title="Notifiers"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Coding Standards</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="coding-standards">
+<span id="id1"></span><h1>Coding Standards<a class="headerlink" href="#coding-standards" title="Permalink to this headline">¶</a></h1>
+<p>In this project, we use Python as programming language so please
+follow these rules:</p>
+<ul>
+<li><p>Keep the code tidy using <a class="reference external" href="http://flake8.pycqa.org/en/latest">flake8</a>. Don’t introduce new
+violations and remove them if you spot any. This is enforced now by
+travis build. To check your code locally, use:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">make</span> <span class="pre">lint</span>
+<span class="pre">`</span></code></p>
+</li>
+<li><p>Please provide good unit tests for your code changes. It is
+important to keep a good level of test coverage.</p></li>
+<li><p>Document everything you create using docstring within the code. We
+use <a class="reference external" href="http://www.sphinx-doc.org">sphinx</a> for documentation.</p></li>
+<li><p>Test your code locally and make sure it works before creating a PR.</p>
+<p><code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">make</span> <span class="pre">unit-tests-with-coverage</span>
+<span class="pre">`</span></code></p>
+</li>
+</ul>
+<div class="section" id="avoid-code-smells">
+<h2>Avoid code smells<a class="headerlink" href="#avoid-code-smells" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://sourcemaking.com/refactoring/smells">An interested reading</a></p></li>
+<li><p>Your change makes the tool to run slower. Ask yourself if actually
+that’s the only way to do it (or somebody for advice).</p></li>
+<li><p>Unit tests must be fast (really fast) and never use network
+resources.</p></li>
+<li><p>Do not use shell commands (<cite>os.system</cite>, <cite>subprocess</cite>, etc.) unless
+the usage would save us from days/tons of work. Python libraries are
+preferred in most cases and if there is not a Python library for it,
+then explain your case and try to convince people why it is better
+using a shell command.</p></li>
+</ul>
+</div>
+<div class="section" id="avoid-third-party-stuff">
+<h2>Avoid third-party stuff<a class="headerlink" href="#avoid-third-party-stuff" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Third-party libraries: using third-party libraries is not always a
+good idea. While they can be beneficial, using third-party libraries
+means we must maintain the code to be compatible with them and the
+installation process gets more complicated. So, by default, try to use
+Python built-ins. If you actually need to introduce a new third-party
+library, please explain your reasoning and get a +1 from somebody else
+for it.</p></li>
+<li><p>Third-party programs: due the reasons above, avoid using external programs as
+much as possible and get consensus if you need to introduce one.</p></li>
+</ul>
+</div>
+<div class="section" id="always-test">
+<h2>Always Test<a class="headerlink" href="#always-test" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Always test your code, please dont assume it works. To do this, add
+unit tests and pay attention to the coverage results that come back.</p>
+<p><code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">make</span> <span class="pre">unit-tests-with-coverage</span>
+<span class="pre">`</span></code></p>
+</li>
+<li><p>Always make sure that the entire test suite runs cleanly</p></li>
+</ul>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Coding Standards</a><ul>
+<li><a class="reference internal" href="#avoid-code-smells">Avoid code smells</a></li>
+<li><a class="reference internal" href="#avoid-third-party-stuff">Avoid third-party stuff</a></li>
+<li><a class="reference internal" href="#always-test">Always Test</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="notifiers.html"
+                        title="previous chapter">Notifiers</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="running-on-travis.html"
+                        title="next chapter">Running on Travis</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/coding-standards.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="running-on-travis.html" title="Running on Travis"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="notifiers.html" title="Notifiers"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Coding Standards</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

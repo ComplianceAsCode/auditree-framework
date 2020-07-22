@@ -1,0 +1,670 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>compliance.utils.services.github &#8212; Auditree Framework 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.utils.services.github</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for compliance.utils.services.github</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- mode:python; coding:utf-8 -*-</span>
+<span class="c1"># Copyright (c) 2020 IBM Corp. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;Compliance Github service helper.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">parse_qs</span><span class="p">,</span> <span class="n">urlparse</span>
+
+<span class="kn">from</span> <span class="nn">compliance.utils.credentials</span> <span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">compliance.utils.data_parse</span> <span class="kn">import</span> <span class="n">deep_merge</span>
+<span class="kn">from</span> <span class="nn">compliance.utils.http</span> <span class="kn">import</span> <span class="n">BaseSession</span>
+
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+
+<div class="viewcode-block" id="GitHub"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub">[docs]</a><span class="k">class</span> <span class="nc">GitHub</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Github service helper class.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="s1">&#39;https://github.com&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct the Github service object.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span>
+        <span class="n">api_url</span> <span class="o">=</span> <span class="s1">&#39;https://api.github.com&#39;</span>
+        <span class="n">service</span> <span class="o">=</span> <span class="s1">&#39;github&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">!=</span> <span class="s1">&#39;https://github.com&#39;</span><span class="p">:</span>
+            <span class="n">service</span> <span class="o">=</span> <span class="s1">&#39;github_enterprise&#39;</span>
+            <span class="n">api_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s1">/api/v3/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="n">service</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">BaseSession</span><span class="p">(</span><span class="n">api_url</span><span class="p">)</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">token</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">auth</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Authorization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;token &#39;</span> <span class="o">+</span> <span class="n">token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/vnd.github.inertia-preview+json&#39;</span><span class="p">}</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="GitHub.extract_path_chunks"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.extract_path_chunks">[docs]</a>    <span class="k">def</span> <span class="nf">extract_path_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve the path from the url.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;URL &quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1">&quot; is not valid. &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Expected base URL is: &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.extract_owner_repo"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.extract_owner_repo">[docs]</a>    <span class="k">def</span> <span class="nf">extract_owner_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve the owner (org) and repo from the url.&quot;&quot;&quot;</span>
+        <span class="n">path_chunks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_path_chunks</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path_chunks</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;URL &quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1">&quot; needs to include, at least, &quot;&lt;owner&gt;/&lt;repo&gt;&quot;&#39;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">path_chunks</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="GitHub.extract_owner_repo_issue"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.extract_owner_repo_issue">[docs]</a>    <span class="k">def</span> <span class="nf">extract_owner_repo_issue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve the owner (org), repo and issue number from the url.&quot;&quot;&quot;</span>
+        <span class="n">path_chunks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_path_chunks</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path_chunks</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span> <span class="ow">or</span> <span class="n">path_chunks</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;issues&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;URL &quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                <span class="s1">&#39;needs to include &quot;&lt;owner&gt;/&lt;repo&gt;/issues/&lt;number&gt;&quot;&#39;</span>
+            <span class="p">)</span>
+        <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">issue_number</span> <span class="o">=</span> <span class="n">path_chunks</span>
+        <span class="k">return</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue_number</span></div>
+
+<div class="viewcode-block" id="GitHub.get_all_projects"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_all_projects">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_projects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve all GH repo projects.</span>
+
+<span class="sd">        repo_path looks like: my-gh-org/my-gh-repo</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span> <span class="o">=</span> <span class="n">repo_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+        <span class="c1"># /repos/:owner/:repo/projects</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;projects&#39;</span><span class="p">])</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.get_project"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_project">[docs]</a>    <span class="k">def</span> <span class="nf">get_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the GH org or org/repo project.</span>
+
+<span class="sd">        For a repo project the project variable looks like:</span>
+<span class="sd">            my-gh-org/my-gh-repo/projects/1</span>
+
+<span class="sd">        For an org project the project variable looks like:</span>
+<span class="sd">            my-gh-org/projects/1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pieces</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">org</span><span class="p">:</span>
+            <span class="n">owner</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">number</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+            <span class="c1"># /orgs/:org/projects</span>
+            <span class="n">pieces</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;orgs&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">number</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+            <span class="c1"># /repos/:owner/:repo/projects</span>
+            <span class="n">pieces</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">]</span>
+        <span class="n">pieces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;projects&#39;</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pieces</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">r</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;number&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="GitHub.get_columns"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_columns">[docs]</a>    <span class="k">def</span> <span class="nf">get_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve the columns for a project.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;projects&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span> <span class="s1">&#39;columns&#39;</span><span class="p">])</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.get_all_cards"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_all_cards">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_cards</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve all cards for a given list of project columns.&quot;&quot;&quot;</span>
+        <span class="n">cards</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">column_id</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+            <span class="n">cards</span><span class="p">[</span><span class="n">column_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cards</span><span class="p">(</span><span class="n">column_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cards</span></div>
+
+<div class="viewcode-block" id="GitHub.get_cards"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_cards">[docs]</a>    <span class="k">def</span> <span class="nf">get_cards</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve all cards for a given project column.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paginate_api</span><span class="p">(</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;projects&#39;</span><span class="p">,</span> <span class="s1">&#39;columns&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">column_id</span><span class="p">),</span> <span class="s1">&#39;cards&#39;</span><span class="p">])</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.move_card"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.move_card">[docs]</a>    <span class="k">def</span> <span class="nf">move_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">card</span><span class="p">,</span> <span class="n">to_column_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Move a card from one project column to another.&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="s1">&#39;bottom&#39;</span><span class="p">,</span> <span class="s1">&#39;column_id&#39;</span><span class="p">:</span> <span class="n">to_column_id</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;post&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;projects&#39;</span><span class="p">,</span> <span class="s1">&#39;columns&#39;</span><span class="p">,</span> <span class="s1">&#39;cards&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">card</span><span class="p">),</span> <span class="s1">&#39;moves&#39;</span><span class="p">]),</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">data</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.add_card"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.add_card">[docs]</a>    <span class="k">def</span> <span class="nf">add_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_id</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">issue</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a card in a project column.&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">issue</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;content_id&#39;</span><span class="p">:</span> <span class="n">issue</span><span class="p">,</span> <span class="s1">&#39;content_type&#39;</span><span class="p">:</span> <span class="s1">&#39;Issue&#39;</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;note&#39;</span><span class="p">:</span> <span class="n">message</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;post&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;projects&#39;</span><span class="p">,</span> <span class="s1">&#39;columns&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">column_id</span><span class="p">),</span> <span class="s1">&#39;cards&#39;</span><span class="p">]),</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">data</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.add_milestone"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.add_milestone">[docs]</a>    <span class="k">def</span> <span class="nf">add_milestone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">milestone</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a repository milestone.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;post&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;milestones&#39;</span><span class="p">]),</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">milestone</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.list_milestones"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.list_milestones">[docs]</a>    <span class="k">def</span> <span class="nf">list_milestones</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s1">&#39;open&#39;</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="s1">&#39;due_on&#39;</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;asc&#39;</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve a repository&#39;s milestones.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paginate_api</span><span class="p">(</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;milestones&#39;</span><span class="p">]),</span>
+            <span class="o">**</span><span class="p">{</span>
+                <span class="s1">&#39;state&#39;</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span> <span class="s1">&#39;sort&#39;</span><span class="p">:</span> <span class="n">sort</span><span class="p">,</span> <span class="s1">&#39;direction&#39;</span><span class="p">:</span> <span class="n">direction</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.add_issue"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.add_issue">[docs]</a>    <span class="k">def</span> <span class="nf">add_issue</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a repository issue.&quot;&quot;&quot;</span>
+        <span class="n">issue</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span><span class="p">}</span>
+        <span class="n">issue</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">annotation</span><span class="p">:</span>
+            <span class="n">issue</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_annotate_body</span><span class="p">(</span><span class="n">issue</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">],</span> <span class="n">annotation</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;issues&#39;</span><span class="p">]),</span> <span class="n">json</span><span class="o">=</span><span class="n">issue</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.patch_issue"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.patch_issue">[docs]</a>    <span class="k">def</span> <span class="nf">patch_issue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Edit a repository issue.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">annotation</span> <span class="ow">and</span> <span class="s1">&#39;body&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_annotate_body</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">],</span> <span class="n">annotation</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;PATCH&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;issues&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">issue</span><span class="p">)]),</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">params</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.get_issue"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_issue">[docs]</a>    <span class="k">def</span> <span class="nf">get_issue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">parse_annotations</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the content and metadata for a repository issue.</span>
+
+<span class="sd">        If parse_annotations is True, then returns (issue, body, annotations),</span>
+<span class="sd">        where body is the body with the JSON annotations removed, and</span>
+<span class="sd">        annotations is a dictionary of the annotations. The annotations will</span>
+<span class="sd">        be an empty dictionary if there aren&#39;t any.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">issue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;issues&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">issue</span><span class="p">)])</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">parse_annotations</span><span class="p">:</span>
+            <span class="n">body</span><span class="p">,</span> <span class="n">annotations</span> <span class="o">=</span> <span class="n">extract_annotations</span><span class="p">(</span><span class="n">issue</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">issue</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">annotations</span>
+        <span class="k">return</span> <span class="n">issue</span></div>
+
+<div class="viewcode-block" id="GitHub.update_annotations"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.update_annotations">[docs]</a>    <span class="k">def</span> <span class="nf">update_annotations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">annotations</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the body of an existing issue, only changing the annotations.</span>
+
+<span class="sd">        If there are no existing annotations, the annotation block will be</span>
+<span class="sd">        added. If there is existing annotations, the given annotations will</span>
+<span class="sd">        be merged into them.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">old_anno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_issue</span><span class="p">(</span>
+            <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">parse_annotations</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">new_anno</span> <span class="o">=</span> <span class="n">deep_merge</span><span class="p">(</span><span class="n">old_anno</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">patch_issue</span><span class="p">(</span>
+            <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="n">new_anno</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">body</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.get_issue_comments"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_issue_comments">[docs]</a>    <span class="k">def</span> <span class="nf">get_issue_comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">parse_annotations</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve a repository issue&#39;s comments.&quot;&quot;&quot;</span>
+        <span class="n">comments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;get&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;issues&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">issue</span><span class="p">),</span> <span class="s1">&#39;comments&#39;</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">parse_annotations</span><span class="p">:</span>
+            <span class="n">annotated_comments</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># TODO: make this actually work...</span>
+            <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="n">comments</span><span class="p">:</span>
+                <span class="n">body</span><span class="p">,</span> <span class="n">annotations</span> <span class="o">=</span> <span class="n">extract_annotations</span><span class="p">(</span><span class="n">comment</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
+                <span class="n">annotated_comments</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="n">body</span><span class="p">,</span> <span class="n">annotations</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">comments</span><span class="p">,</span> <span class="n">annotated_comments</span>
+        <span class="k">return</span> <span class="n">comments</span></div>
+
+<div class="viewcode-block" id="GitHub.get_issues_page"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_issues_page">[docs]</a>    <span class="k">def</span> <span class="nf">get_issues_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve a repository&#39;s issues by page.&quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="c1"># get the page number or default to 1</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;page&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;get&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;issues&#39;</span><span class="p">]),</span>
+            <span class="n">parse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">params</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+<div class="viewcode-block" id="GitHub.get_all_issues"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_all_issues">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_issues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve all issues for a repository.&quot;&quot;&quot;</span>
+        <span class="n">all_issues</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_issues_page</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="n">page</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">max_page</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="s1">&#39;Link&#39;</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>
+            <span class="c1"># Link is only present if there are multiple pages</span>
+            <span class="n">link</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Link&#39;</span><span class="p">]</span>
+            <span class="n">urls</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">urls</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">))</span>
+            <span class="n">max_page</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parse_qs</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">query</span><span class="p">)[</span><span class="s1">&#39;page&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">while</span> <span class="n">response</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">():</span>
+                <span class="n">all_issues</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;number&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">page</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">page</span> <span class="o">&gt;</span> <span class="n">max_page</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_issues_page</span><span class="p">(</span>
+                    <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="n">page</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">all_issues</span></div>
+
+<div class="viewcode-block" id="GitHub.get_issue_template"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_issue_template">[docs]</a>    <span class="k">def</span> <span class="nf">get_issue_template</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">owner</span><span class="p">,</span>
+        <span class="n">repo</span><span class="p">,</span>
+        <span class="n">template_name</span><span class="p">,</span>
+        <span class="n">strip_annotations</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">strip_header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">render</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the contents of an issue template based on template name.</span>
+
+<span class="sd">        The .md extension and any numeric prefix) from the owner and repo</span>
+<span class="sd">        are ignored.  Both the header (the YAML section at the top), and any</span>
+<span class="sd">        defined annotations (the JSON code block inside the issue body) are</span>
+<span class="sd">        returned as dictionaries along with the body of the template. You can</span>
+<span class="sd">        pass ``strip_annotations`` or ``strip_header`` to remove these sections</span>
+<span class="sd">        from the body that&#39;s returned.  You can pass a dictionary as</span>
+<span class="sd">        ``annotations``, and the values will be merged with those extracted</span>
+<span class="sd">        from the template.</span>
+
+<span class="sd">        If ``render`` is ``True``, then all annotations will be substituted on</span>
+<span class="sd">        the body and header.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get a list of all templates in this repo</span>
+        <span class="n">path_elements</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;contents&#39;</span><span class="p">,</span> <span class="s1">&#39;.github&#39;</span><span class="p">,</span> <span class="s1">&#39;ISSUE_TEMPLATE&#39;</span>
+        <span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_elements</span><span class="p">))</span>
+        <span class="n">templates</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">response</span><span class="p">]</span>
+
+        <span class="c1"># find the required template, ignoring any numeric prefix</span>
+        <span class="n">template_file</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">templates</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(^[0-9]+\.)?(.*)\.md$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\2&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">==</span> <span class="n">template_name</span>
+            <span class="p">),</span>
+            <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">template_file</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Template </span><span class="si">{</span><span class="n">template_name</span><span class="si">}</span><span class="s1"> not found&#39;</span><span class="p">)</span>
+
+        <span class="c1"># get the template from .github/ISSUE_TEMPLATE in the</span>
+        <span class="c1"># repo (master branch)</span>
+        <span class="n">path_elements</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;repos&#39;</span><span class="p">,</span>
+            <span class="n">owner</span><span class="p">,</span>
+            <span class="n">repo</span><span class="p">,</span>
+            <span class="s1">&#39;contents&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;.github&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ISSUE_TEMPLATE&#39;</span><span class="p">,</span>
+            <span class="n">template_file</span>
+        <span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_elements</span><span class="p">))</span>
+
+        <span class="c1"># result is base64 encoded (and bytes in py3)</span>
+        <span class="k">assert</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;encoding&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;base64&#39;</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">])</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
+
+        <span class="c1"># extract header data structure (YAML)</span>
+        <span class="n">body_no_header</span><span class="p">,</span> <span class="n">extracted_header</span> <span class="o">=</span> <span class="n">extract_header</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
+
+        <span class="c1"># optionally strip off the leading header section</span>
+        <span class="k">if</span> <span class="n">strip_header</span><span class="p">:</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">body_no_header</span>
+
+        <span class="c1"># extract annotations (JSON)</span>
+        <span class="n">body_no_annotations</span><span class="p">,</span> <span class="n">extracted_annotations</span> <span class="o">=</span> <span class="n">extract_annotations</span><span class="p">(</span>
+            <span class="n">template</span>
+        <span class="p">)</span>
+
+        <span class="c1"># if we were passed some annotations,</span>
+        <span class="c1"># merge them into what&#39;s in the template</span>
+        <span class="k">if</span> <span class="n">annotations</span><span class="p">:</span>
+            <span class="n">deep_merge</span><span class="p">(</span><span class="n">extracted_annotations</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">render</span><span class="p">:</span>
+            <span class="n">body_no_annotations</span> <span class="o">=</span> <span class="n">body_no_annotations</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="o">**</span><span class="n">extracted_annotations</span>
+            <span class="p">)</span>
+            <span class="n">extracted_header</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">extracted_annotations</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span>
+                <span class="n">v</span> <span class="ow">in</span> <span class="n">extracted_header</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="c1"># optionally strip off the annotations section</span>
+        <span class="k">if</span> <span class="n">strip_annotations</span><span class="p">:</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">body_no_annotations</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_annotate_body</span><span class="p">(</span>
+                <span class="n">body_no_annotations</span><span class="p">,</span> <span class="n">extracted_annotations</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">template</span><span class="p">,</span> <span class="n">extracted_annotations</span><span class="p">,</span> <span class="n">extracted_header</span></div>
+
+<div class="viewcode-block" id="GitHub.search_issues"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.search_issues">[docs]</a>    <span class="k">def</span> <span class="nf">search_issues</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">repo</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform a search against all issues based on the query provided.</span>
+
+<span class="sd">        If an owner and repo are passed in, then restrict the results to</span>
+<span class="sd">        that repo. Note that this can also be done in the query directly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Must specify a query&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">owner</span> <span class="ow">and</span> <span class="n">repo</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; repo:</span><span class="si">{</span><span class="n">owner</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paginate_api</span><span class="p">(</span>
+            <span class="s1">&#39;search/issues&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="n">sort</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.add_issue_comment"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.add_issue_comment">[docs]</a>    <span class="k">def</span> <span class="nf">add_issue_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a comment for a repository issue.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">annotation</span><span class="p">:</span>
+            <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_annotate_body</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;issues&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">issue</span><span class="p">),</span> <span class="s1">&#39;comments&#39;</span><span class="p">]),</span>
+            <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span><span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.create_project"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.create_project">[docs]</a>    <span class="k">def</span> <span class="nf">create_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a repository project.&quot;&quot;&quot;</span>
+        <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">creates_for_project</span><span class="p">(</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;projects&#39;</span><span class="p">]),</span> <span class="p">{</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.create_column"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.create_column">[docs]</a>    <span class="k">def</span> <span class="nf">create_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a project column.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">creates_for_project</span><span class="p">(</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;projects&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span> <span class="s1">&#39;columns&#39;</span><span class="p">]),</span>
+            <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">column</span><span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.creates_for_project"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.creates_for_project">[docs]</a>    <span class="k">def</span> <span class="nf">creates_for_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a repository project based on a properly formed url.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">org</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;orgs not supported yet&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.rand_color"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.rand_color">[docs]</a>    <span class="k">def</span> <span class="nf">rand_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate a random color for labels.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="si">:</span><span class="s1">02X</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="si">:</span><span class="s1">02X</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="si">:</span><span class="s1">02X</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.create_label"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.create_label">[docs]</a>    <span class="k">def</span> <span class="nf">create_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a label within a repository.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">creates_for_project</span><span class="p">(</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;labels&#39;</span><span class="p">]),</span> <span class="p">{</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rand_color</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GitHub.apply_labels"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.apply_labels">[docs]</a>    <span class="k">def</span> <span class="nf">apply_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="o">*</span><span class="n">labels</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add label(s) to an issue.</span>
+
+<span class="sd">        repo looks like: my-gh-org/my-gh-repo</span>
+<span class="sd">        issue is an issue number (not id)</span>
+<span class="sd">        API takes a json list of labels</span>
+<span class="sd">        POST /repos/:owner/:repo/issues/:number/labels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;post&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;issues&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">issue</span><span class="p">),</span> <span class="s1">&#39;labels&#39;</span><span class="p">]),</span>
+            <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="n">labels</span><span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">response</span></div>
+
+<div class="viewcode-block" id="GitHub.remove_labels"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.remove_labels">[docs]</a>    <span class="k">def</span> <span class="nf">remove_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="o">*</span><span class="n">labels</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove label(s) from an issue.</span>
+
+<span class="sd">        repo looks like: my-gh-org/my-gh-repo</span>
+<span class="sd">        issue is an issue number (not id)</span>
+<span class="sd">        API takes a json list of labels</span>
+<span class="sd">        POST /repos/:owner/:repo/issues/:number/labels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+                <span class="s1">&#39;delete&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="p">[</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;issues&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">issue</span><span class="p">),</span> <span class="s1">&#39;labels&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="c1"># Each response has all the labels, so only return the last one</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+    <span class="k">def</span> <span class="nf">_make_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">parse</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">r</span>
+
+    <span class="k">def</span> <span class="nf">_annotate_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">annotation</span><span class="p">):</span>
+        <span class="n">anno_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;```application/json+utilitarian</span><span class="se">\n</span><span class="si">{</span><span class="n">anno_str</span><span class="si">}</span><span class="se">\n</span><span class="s1">```</span><span class="se">\n</span><span class="si">{</span><span class="n">body</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="k">def</span> <span class="nf">_paginate_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;page&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="n">api_url</span><span class="p">,</span> <span class="n">parse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span>
+        <span class="p">)</span>
+        <span class="n">max_page</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">all_items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s1">&#39;Link&#39;</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>
+            <span class="c1"># Link is only present if there are multiple pages</span>
+            <span class="n">link</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Link&#39;</span><span class="p">]</span>
+            <span class="n">urls</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">urls</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">))</span>
+            <span class="n">max_page</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parse_qs</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">query</span><span class="p">)[</span><span class="s1">&#39;page&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">while</span> <span class="n">response</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">api_url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;search/&#39;</span><span class="p">):</span>
+                <span class="n">all_items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;items&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">all_items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">&#39;page&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;page&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">max_page</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+                    <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="n">api_url</span><span class="p">,</span> <span class="n">parse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">all_items</span></div>
+
+
+<div class="viewcode-block" id="extract_annotations"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.extract_annotations">[docs]</a><span class="k">def</span> <span class="nf">extract_annotations</span><span class="p">(</span><span class="n">content</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieve JSON annotations from a string (issue body).</span>
+
+<span class="sd">    Returns the remaining content without the annotations,</span>
+<span class="sd">    and then the annotations themselves as a dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">annotations_json</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">started</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">stopped</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;```application/json+utilitarian&#39;</span><span class="p">:</span>
+            <span class="n">started</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;```&#39;</span> <span class="ow">and</span> <span class="n">started</span><span class="p">:</span>
+            <span class="n">stopped</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">started</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">started</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">stopped</span><span class="p">:</span>
+            <span class="n">annotations_json</span> <span class="o">+=</span> <span class="n">line</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="n">content_no_annotations</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">annotations_json</span><span class="p">:</span>
+        <span class="n">annotations</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span>
+            <span class="n">annotations_json</span><span class="p">,</span> <span class="n">object_pairs_hook</span><span class="o">=</span><span class="n">OrderedDict</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">annotations</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({})</span>
+
+    <span class="k">return</span> <span class="n">content_no_annotations</span><span class="p">,</span> <span class="n">annotations</span></div>
+
+
+<div class="viewcode-block" id="extract_header"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.extract_header">[docs]</a><span class="k">def</span> <span class="nf">extract_header</span><span class="p">(</span><span class="n">content</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieve header (YAML) from a string (issue body).</span>
+
+<span class="sd">    Returns the remaining content without the header,</span>
+<span class="sd">    and then the header fields themselves as a dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">header_yaml</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;---</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+        <span class="n">header_yaml</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lines</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">while</span> <span class="n">line</span> <span class="o">!=</span> <span class="s1">&#39;---</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">line</span> <span class="o">!=</span> <span class="s1">&#39;---</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+                <span class="n">header_yaml</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">content_no_header</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">header_yaml</span><span class="p">:</span>
+        <span class="n">header_fields</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">header_yaml</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">header_fields</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">return</span> <span class="n">content_no_header</span><span class="p">,</span> <span class="n">header_fields</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.utils.services.github</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

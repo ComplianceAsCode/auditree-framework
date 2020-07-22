@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>compliance.utils.services.pagerduty &#8212; Auditree Framework 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.utils.services.pagerduty</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for compliance.utils.services.pagerduty</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- mode:python; coding:utf-8 -*-</span>
+<span class="c1"># Copyright (c) 2020 IBM Corp. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;Compliance Pagerduty service helper.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+
+<span class="kn">from</span> <span class="nn">compliance.utils.credentials</span> <span class="kn">import</span> <span class="n">Config</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">PAGERDUTY_API_URL</span> <span class="o">=</span> <span class="s1">&#39;https://api.pagerduty.com&#39;</span>
+<span class="n">PD_EVENTS_V2_URL</span> <span class="o">=</span> <span class="s1">&#39;https://events.pagerduty.com/v2/enqueue&#39;</span>
+<span class="c1"># 100 is the maximum page size</span>
+<span class="n">PAGES_LIMIT</span> <span class="o">=</span> <span class="mi">100</span>
+
+
+<span class="k">def</span> <span class="nf">_init_request</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">creds</span><span class="p">):</span>
+    <span class="n">credentials</span> <span class="o">=</span> <span class="n">creds</span> <span class="ow">or</span> <span class="n">Config</span><span class="p">()</span>
+    <span class="n">hdrs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/vnd.pagerduty+json;version=2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;Token token=</span><span class="si">{</span><span class="n">credentials</span><span class="p">[</span><span class="s2">&quot;pagerduty&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">api_key</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">headers</span><span class="p">:</span>
+        <span class="n">hdrs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">params</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="n">PAGERDUTY_API_URL</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">hdrs</span>
+
+
+<div class="viewcode-block" id="get"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.pagerduty.get">[docs]</a><span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">creds</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform a GET operation.</span>
+
+<span class="sd">    Returns the pages wrapped as :py:class:`requests.Response` object.</span>
+<span class="sd">    This uses the PD API v2.</span>
+
+<span class="sd">    :param path: API endpoint to call (e.g. &#39;users&#39;)</span>
+<span class="sd">    :param params: a dictionary with parameters</span>
+<span class="sd">    :param headers: a dictionary with headers to include</span>
+<span class="sd">    :param creds: a Config object with PagerDuty credentials</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">hdrs</span> <span class="o">=</span> <span class="n">_init_request</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">creds</span><span class="p">)</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;limit&#39;</span><span class="p">:</span> <span class="n">PAGES_LIMIT</span><span class="p">,</span> <span class="s1">&#39;offset&#39;</span><span class="p">:</span> <span class="n">offset</span><span class="p">})</span>
+    <span class="n">more</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">while</span> <span class="n">more</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">r</span>
+        <span class="n">more</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;more&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">more</span><span class="p">:</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">PAGES_LIMIT</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;offset&#39;</span><span class="p">:</span> <span class="n">offset</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="delete"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.pagerduty.delete">[docs]</a><span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">creds</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform a DELETE operation.</span>
+
+<span class="sd">    Returns the result as :py:class:`requests.Response` object.</span>
+<span class="sd">    This uses the PD API v2.</span>
+
+<span class="sd">    :param path: API endpoint to call (e.g. &#39;users&#39;)</span>
+<span class="sd">    :param params: a dictionary with parameters</span>
+<span class="sd">    :param headers: a dictionary with headers to include</span>
+<span class="sd">    :param creds: a Config object with PagerDuty credentials</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">hdrs</span> <span class="o">=</span> <span class="n">_init_request</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">creds</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="put"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.pagerduty.put">[docs]</a><span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">creds</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform a PUT operation.</span>
+
+<span class="sd">    Return the result as :py:class:`requests.Response` object.</span>
+<span class="sd">    This uses the PD API v2.</span>
+
+<span class="sd">    :param path: API endpoint to call (e.g. &#39;users&#39;)</span>
+<span class="sd">    :param params: a dictionary with parameters</span>
+<span class="sd">    :param headers: a dictionary with headers to include</span>
+<span class="sd">    :param creds: a Config object with PagerDuty credentials</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">hdrs</span> <span class="o">=</span> <span class="n">_init_request</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">creds</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="post"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.pagerduty.post">[docs]</a><span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">creds</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform a POST operation.</span>
+
+<span class="sd">    Returns the result as :py:class:`requests.Response` objects.</span>
+<span class="sd">    This uses the PD API v2.</span>
+
+<span class="sd">    :param path: API endpoint to call (e.g. &#39;users&#39;)</span>
+<span class="sd">    :param params: a dictionary with parameters</span>
+<span class="sd">    :param headers: a dictionary with headers to include</span>
+<span class="sd">    :param creds: a Config object with PagerDuty credentials</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">hdrs</span> <span class="o">=</span> <span class="n">_init_request</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">creds</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="send_event"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.pagerduty.send_event">[docs]</a><span class="k">def</span> <span class="nf">send_event</span><span class="p">(</span>
+    <span class="n">action</span><span class="p">,</span>
+    <span class="n">check</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">,</span>
+    <span class="n">severity</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span>
+    <span class="n">details</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">links</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">creds</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Send an event to PD using the Events API.&quot;&quot;&quot;</span>
+    <span class="n">credentials</span> <span class="o">=</span> <span class="n">creds</span> <span class="ow">or</span> <span class="n">Config</span><span class="p">()</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;event_action&#39;</span><span class="p">:</span> <span class="n">action</span><span class="p">,</span>
+        <span class="s1">&#39;routing_key&#39;</span><span class="p">:</span> <span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;pagerduty&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">events_integration_key</span><span class="p">,</span>
+        <span class="s1">&#39;dedup_key&#39;</span><span class="p">:</span> <span class="n">check</span><span class="p">,</span>
+        <span class="s1">&#39;payload&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;summary&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+            <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="n">source</span><span class="p">,</span>
+            <span class="s1">&#39;severity&#39;</span><span class="p">:</span> <span class="n">severity</span><span class="p">,</span>
+            <span class="s1">&#39;custom_details&#39;</span><span class="p">:</span> <span class="n">details</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;links&#39;</span><span class="p">:</span> <span class="n">links</span> <span class="ow">or</span> <span class="p">[]</span>
+    <span class="p">}</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+        <span class="n">PD_EVENTS_V2_URL</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;success&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;PagerDuty Error: &#39;</span> <span class="o">+</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.utils.services.pagerduty</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

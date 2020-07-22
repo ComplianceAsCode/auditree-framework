@@ -1,0 +1,310 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running on Travis &#8212; Auditree Framework 1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Running on Tekton" href="running-on-tekton.html" />
+    <link rel="prev" title="Coding Standards" href="coding-standards.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="running-on-tekton.html" title="Running on Tekton"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="coding-standards.html" title="Coding Standards"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Running on Travis</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="running-on-travis">
+<span id="id1"></span><h1>Running on Travis<a class="headerlink" href="#running-on-travis" title="Permalink to this headline">¶</a></h1>
+<p>Running compliance tool from a CI like Travis can be really useful for
+executing your compliance checks periodically. Thus you can track the
+current level of compliance for different standards and also notify
+people whenever there is a failure, so it can be fixed in some way.</p>
+<p>This can be done in many different ways, so you don’t have to follow
+this guide if it does not fit your requirements. However, it always
+useful to know what it is required so you can adapt this guide to your
+needs.</p>
+<p>Basically, this will what you will need:</p>
+<ul class="simple">
+<li><p>A <code class="docutils literal notranslate"><span class="pre">.travis.yml</span></code>: this will define the Travis run which will run
+<code class="docutils literal notranslate"><span class="pre">travis/run.sh</span></code> script.</p></li>
+<li><p>A git repository for storing generated evidence. You can create a
+private GHE project for this.</p></li>
+<li><p>Credentials generator: for that, a python script can be used for
+generating the credentials files from environment variables defined
+in Travis.</p></li>
+<li><p>Results storage: check results are stored to the evidence locker as
+<code class="docutils literal notranslate"><span class="pre">check_results.json</span></code>.</p></li>
+</ul>
+<p>Bare in mind that a compliance check project is a bit tricky to
+configure since you will be pushing new code there and also running
+<strong>official</strong> compliance executions. You can resolve this issue by
+having 2 Git repositories: one for check development with a
+development Travis configuration and another one just for cloning it
+and run <code class="docutils literal notranslate"><span class="pre">compliance</span></code> with official parameters.</p>
+<p>However, this can be done in the same repository noting that there are
+<cite>development</cite> runs (they will not notify nor push any evidence to the
+evidence collector repository) and <cite>official</cite> runs (which will send
+notifications and push evidences to Git).</p>
+<p>You can have a look into <a class="reference external" href="https://github.ibm.com/cloumpose/cloudant-compliance-checks">Cloudant Compliance Checks</a>
+to get more details about what it is explained here.</p>
+<div class="section" id="travis-artifacts">
+<h2>Travis artifacts<a class="headerlink" href="#travis-artifacts" title="Permalink to this headline">¶</a></h2>
+<p>This is a typical <cite>.travis.yml</cite> file:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="nt">python</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="s">&quot;2.7&quot;</span>
+<span class="nt">group</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">bluezone</span>  <span class="c1"># if it needs to be run within IBM VPN</span>
+<span class="nt">install</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pip -r requirements.txt</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./travis/gen-credentials.py &gt; ~/.credentials</span>
+<span class="nt">script</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">make clean</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./travis/run.sh</span>
+<span class="nt">after_script</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">rm  ~/.credentials</span>
+</pre></div>
+</div>
+<p>Basically, this will firstly install the dependencies through <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">-r</span>
+<span class="pre">requirements.txt</span></code> and then generate the credentials file from using
+Travis environment variables.</p>
+<div class="section" id="credentials-generation">
+<h3>Credentials generation<a class="headerlink" href="#credentials-generation" title="Permalink to this headline">¶</a></h3>
+<p>This is an implementation you might want to use for your project of
+<code class="docutils literal notranslate"><span class="pre">gen-credentials.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding:utf-8; mode:python -*-</span>
+
+<span class="sd">&#39;&#39;&#39;This script generates a config file suitable to be used by</span>
+<span class="sd">`utilitarian.credentials.Config` from envvars. This is useful for</span>
+<span class="sd">Travis CI that allows to deploy credentials safely using envvars.</span>
+
+<span class="sd">Any new supported credential must be added to SUPPORTED_SECTIONS which</span>
+<span class="sd">includes a list of sections of `Config` supported by the script. For</span>
+<span class="sd">example, adding &#39;github&#39; will make the script to generate</span>
+<span class="sd">`github.username` from GITHUB_USERNAME and `github.password` from</span>
+<span class="sd">GITHUB_PASSWORD, if both envvars are defined.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">ConfigParser</span>
+
+
+<span class="n">SUPPORTED_SECTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;github_enterprise&#39;</span><span class="p">,</span> <span class="s1">&#39;slack&#39;</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">matched_keys</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="nb">any</span><span class="p">([</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">SUPPORTED_SECTIONS</span><span class="p">]),</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">matched_keys</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="n">cfg_parser</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">matched_keys</span><span class="p">:</span>
+        <span class="c1"># split the section name and option from this env var (max()</span>
+        <span class="c1"># to ensure the longest match)</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">SUPPORTED_SECTIONS</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">s</span><span class="p">)],</span>
+            <span class="n">key</span><span class="o">=</span><span class="nb">len</span>
+        <span class="p">)</span>
+        <span class="n">option</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">upper</span><span class="p">())[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="c1"># add to the config</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg_parser</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">section</span><span class="p">):</span>
+            <span class="n">cfg_parser</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+        <span class="n">cfg_parser</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+    <span class="n">cfg_parser</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mi">0</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>So, for instance, using the previous script you will be able to create
+the credentials required for <code class="docutils literal notranslate"><span class="pre">github_enterprise</span></code> and <code class="docutils literal notranslate"><span class="pre">slack</span></code> by
+defining the following environment variables in Travis:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">GITHUB_ENTERPRISE_TOKEN</span> <span class="pre">=</span> <span class="pre">XXX</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SLACK_WEBHOOK</span> <span class="pre">=</span> <span class="pre">YYY</span></code></p></li>
+</ul>
+<p>Using those variables, <code class="docutils literal notranslate"><span class="pre">./travis/gen-credentials.py</span> <span class="pre">&gt;</span>
+<span class="pre">~/.credentials</span></code> will generate:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">github_enterprise</span><span class="p">]</span>
+<span class="n">token</span><span class="o">=</span><span class="n">XXX</span>
+
+<span class="p">[</span><span class="n">slack</span><span class="p">]</span>
+<span class="n">webhook</span><span class="o">=</span><span class="n">YYY</span>
+</pre></div>
+</div>
+<p>This method has a few limitation:</p>
+<ul class="simple">
+<li><p>Do not use <code class="docutils literal notranslate"><span class="pre">$</span></code> as part of the value of any variable as they will
+be evaluated by bash.</p></li>
+<li><p>You will need to add a new service into the
+<code class="docutils literal notranslate"><span class="pre">SUPPORTED_SECTIONS</span></code>. This is actually good since a manual
+addition requires a code change (so new credentials are
+tracked).</p></li>
+</ul>
+</div>
+<div class="section" id="travis-run-sh">
+<h3><code class="docutils literal notranslate"><span class="pre">travis/run.sh</span></code><a class="headerlink" href="#travis-run-sh" title="Permalink to this headline">¶</a></h3>
+<p>Travis will call this script in two different ways:</p>
+<ul class="simple">
+<li><p>As part of a change in the repo, so it would be considered a
+development run.</p></li>
+<li><p>A call through Travis API, made by a cron job (or a robot)
+periodically. This will be considered the <cite>official</cite> run.</p></li>
+</ul>
+<p>This is an example of a <code class="docutils literal notranslate"><span class="pre">travis/run.sh</span></code> file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="nv">NON_OFFICIAL</span><span class="o">=</span><span class="s2">&quot;--evidence no-push --notify stdout&quot;</span>
+<span class="nv">OFFICIAL</span><span class="o">=</span><span class="s2">&quot;--evidence full-remote --notify slack&quot;</span>
+
+<span class="c1"># is this an official run or not?</span>
+<span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$TRAVIS_BRANCH</span><span class="s2">&quot;</span> <span class="o">==</span> <span class="s2">&quot;master&quot;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">[</span> -z <span class="nv">$TRAVIS_COMMIT_RANGE</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+  <span class="c1"># this is official as it has been run by an external call</span>
+  <span class="c1"># GHE does not support cron jobs yet, so this hack is needed.</span>
+  <span class="nv">OPTIONS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$OFFICIAL</span><span class="s2">&quot;</span>
+<span class="k">else</span>
+  <span class="nv">OPTIONS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$NON_OFFICIAL</span><span class="s2">&quot;</span>
+<span class="k">fi</span>
+
+<span class="c1"># run fetchers</span>
+compliance --fetch <span class="nv">$OPTIONS</span> -C official.json
+
+<span class="c1"># run checks</span>
+compliance --check <span class="nv">$ACCREDITATIONS</span> <span class="nv">$OPTIONS</span> -C official.json
+<span class="nv">retval</span><span class="o">=</span><span class="nv">$?</span>
+
+<span class="nb">exit</span> <span class="nv">$retval</span>
+</pre></div>
+</div>
+<p>Note that the arguments used in the <code class="docutils literal notranslate"><span class="pre">compliance</span></code> invocation depend
+on whether this is an official run or not. This script assumes you
+have stored the official configuration into <code class="docutils literal notranslate"><span class="pre">official.json</span></code> file:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.ibm.com/YOUR-ORG/evidence-collector&quot;</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;notify&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;slack&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;demo.hipaa&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;#security-team&quot;</span><span class="p">,</span> <span class="s2">&quot;#hipaa-compliance&quot;</span><span class="p">],</span>
+      <span class="nt">&quot;demo.soc2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;#soc2-compliance&quot;</span><span class="p">,</span> <span class="s2">&quot;#operations&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Running on Travis</a><ul>
+<li><a class="reference internal" href="#travis-artifacts">Travis artifacts</a><ul>
+<li><a class="reference internal" href="#credentials-generation">Credentials generation</a></li>
+<li><a class="reference internal" href="#travis-run-sh"><code class="docutils literal notranslate"><span class="pre">travis/run.sh</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="coding-standards.html"
+                        title="previous chapter">Coding Standards</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="running-on-tekton.html"
+                        title="next chapter">Running on Tekton</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/running-on-travis.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="running-on-tekton.html" title="Running on Tekton"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="coding-standards.html" title="Coding Standards"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Running on Travis</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>
