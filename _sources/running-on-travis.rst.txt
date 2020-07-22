@@ -43,10 +43,6 @@ However, this can be done in the same repository noting that there are
 evidence collector repository) and `official` runs (which will send
 notifications and push evidences to Git).
 
-You can have a look into `Cloudant Compliance Checks
-<https://github.ibm.com/cloumpose/cloudant-compliance-checks>`_
-to get more details about what it is explained here.
-
 
 
 Travis artifacts
@@ -207,7 +203,7 @@ have stored the official configuration into ``official.json`` file:
 
    {
      "locker": {
-       "repo_url": "https://github.ibm.com/YOUR-ORG/evidence-collector"
+       "repo_url": "https://github.com/YOUR-ORG/evidence-collector"
      },
      "notify": {
        "slack": {

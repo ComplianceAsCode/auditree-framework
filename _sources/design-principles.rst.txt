@@ -62,13 +62,13 @@ for:
 
     {
       "locker": {
-        "repo_url": "https://github.ibm.com/my-org/my-evidence",
+        "repo_url": "https://github.com/my-org/my-evidence",
         "gitconfig": {
           "commit": {"gpgsign": true},
           "gpg": {"program": "gpg2"},
           "user": {
             "signingKey": "AABBCCDD",
-            "email": "compliance-robot@ibm.com",
+            "email": "compliance-robot@my-org.com",
             "name": "compliance-robot"
           }
         }
@@ -93,7 +93,7 @@ for:
 
    {
      "locker": {
-       "repo_url": "https://github.ibm.com/my-org/my-evidence",
+       "repo_url": "https://github.com/my-org/my-evidence",
        "ttl_tolerance": 3600
      }
    }
@@ -425,15 +425,7 @@ levels:
 Credentials
 ~~~~~~~~~~~
 
-The compliance tool uses the `utilitarian
-<https://github.ibm.com/cloudant/utilitarian>`_ library for managing
-credentials. Fetchers and checks might need to use credentials in
-order to access different resources on different locations. The tool
-assumes that there is a file at ``~/.credentials`` and the sections and
-fields supported are defined by
-:py:class:`utilitarian.crendentials.Config`.
-
-If you want to configure your credentials locally, the compliance tool
+If you want to configure your credentials locally, the framework
 will look for a credentials file at ``~/.credentials`` by default. This
 file should be similar to this:
 

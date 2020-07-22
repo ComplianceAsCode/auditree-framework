@@ -77,8 +77,6 @@ and run <code class="docutils literal notranslate"><span class="pre">compliance<
 <cite>development</cite> runs (they will not notify nor push any evidence to the
 evidence collector repository) and <cite>official</cite> runs (which will send
 notifications and push evidences to Git).</p>
-<p>You can have a look into <a class="reference external" href="https://github.ibm.com/cloumpose/cloudant-compliance-checks">Cloudant Compliance Checks</a>
-to get more details about what it is explained here.</p>
 <div class="section" id="travis-artifacts">
 <h2>Travis artifacts<a class="headerlink" href="#travis-artifacts" title="Permalink to this headline">¶</a></h2>
 <p>This is a typical <cite>.travis.yml</cite> file:</p>
@@ -222,7 +220,7 @@ on whether this is an official run or not. This script assumes you
 have stored the official configuration into <code class="docutils literal notranslate"><span class="pre">official.json</span></code> file:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.ibm.com/YOUR-ORG/evidence-collector&quot;</span>
+    <span class="nt">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/YOUR-ORG/evidence-collector&quot;</span>
   <span class="p">},</span>
   <span class="nt">&quot;notify&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="nt">&quot;slack&quot;</span><span class="p">:</span> <span class="p">{</span>

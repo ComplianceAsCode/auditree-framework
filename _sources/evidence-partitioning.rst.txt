@@ -44,7 +44,7 @@ where the evidence will be partitioned.  For example::
 
   {
     "locker": {
-      "repo_url": "https://github.ibm.com/my-org/my-repo",
+      "repo_url": "https://github.com/my-org/my-repo",
       "partitions": {
         "foo/evidence_bar.json": {
           "fields": ["location.country", "location.region"],
@@ -58,7 +58,7 @@ or::
 
   {
     "locker": {
-      "repo_url": "https://github.ibm.com/my-org/my-repo",
+      "repo_url": "https://github.com/my-org/my-repo",
       "partitions": {
         "foo/evidence_bar.json": {
           "fields": ["location.country", "location.region"]
@@ -120,7 +120,7 @@ Default Partition Root
 
     {
       "locker": {
-        "repo_url": "https://github.ibm.com/my-org/my-repo",
+        "repo_url": "https://github.com/my-org/my-repo",
         "partitions": {
           "foo/evidence_bar.json": {
             "fields": ["country", "region"]
@@ -174,7 +174,7 @@ Explicit Partition Root
 
     {
       "locker": {
-        "repo_url": "https://github.ibm.com/my-org/my-repo",
+        "repo_url": "https://github.com/my-org/my-repo",
         "partitions": {
           "foo/evidence_bar.json": {
             "fields": ["country", "region"],

@@ -96,13 +96,13 @@ activate commit GPG siging (which is the recommended way). As an
 example of this, your config file might look like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.ibm.com/my-org/my-evidence&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence&quot;</span><span class="p">,</span>
     <span class="s2">&quot;gitconfig&quot;</span><span class="p">:</span> <span class="p">{</span>
       <span class="s2">&quot;commit&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpgsign&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">},</span>
       <span class="s2">&quot;gpg&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;program&quot;</span><span class="p">:</span> <span class="s2">&quot;gpg2&quot;</span><span class="p">},</span>
       <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;signingKey&quot;</span><span class="p">:</span> <span class="s2">&quot;AABBCCDD&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;compliance-robot@ibm.com&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;compliance-robot@my-org.com&quot;</span><span class="p">,</span>
         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;compliance-robot&quot;</span>
       <span class="p">}</span>
     <span class="p">}</span>
@@ -126,7 +126,7 @@ your configuration JSON file like so:</p></li>
 </ul>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.ibm.com/my-org/my-evidence&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence&quot;</span><span class="p">,</span>
     <span class="nt">&quot;ttl_tolerance&quot;</span><span class="p">:</span> <span class="mi">3600</span>
   <span class="p">}</span>
 <span class="p">}</span>
@@ -436,19 +436,13 @@ example.</p></li>
 </div>
 <div class="section" id="credentials">
 <span id="id3"></span><h2>Credentials<a class="headerlink" href="#credentials" title="Permalink to this headline">¶</a></h2>
-<p>The compliance tool uses the <a class="reference external" href="https://github.ibm.com/cloudant/utilitarian">utilitarian</a> library for managing
-credentials. Fetchers and checks might need to use credentials in
-order to access different resources on different locations. The tool
-assumes that there is a file at <code class="docutils literal notranslate"><span class="pre">~/.credentials</span></code> and the sections and
-fields supported are defined by
-<code class="xref py py-class docutils literal notranslate"><span class="pre">utilitarian.crendentials.Config</span></code>.</p>
-<p>If you want to configure your credentials locally, the compliance tool
+<p>If you want to configure your credentials locally, the framework
 will look for a credentials file at <code class="docutils literal notranslate"><span class="pre">~/.credentials</span></code> by default. This
 file should be similar to this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- mode:conf -*-</span>
 
-<span class="c1"># Token for github.ibm.com to be used by the Locker</span>
-<span class="p">[</span><span class="n">github_enterprise</span><span class="p">]</span>
+<span class="c1"># Token for github.com to be used by the Locker</span>
+<span class="p">[</span><span class="n">github</span><span class="p">]</span>
 <span class="n">token</span><span class="o">=</span><span class="n">XXX</span>
 
 <span class="c1"># Webhook for Slack notifications</span>
