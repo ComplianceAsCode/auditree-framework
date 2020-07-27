@@ -147,5 +147,5 @@ We have a tool called [Plant](https://github.com/ComplianceAsCode/auditree-plant
 [python]: https://www.python.org/downloads/
 [quick start guide]: https://github.com/ComplianceAsCode/auditree-framework/blob/master/doc-source/quick-start.rst
 [yapf]: https://github.com/google/yapf
-[lint-test]: https://github.com/ComplianceAsCode/auditree-framework/actions?query=workflow%3A%22Test+python+code+%26+lint%22
-[pypi-upload]: https://github.com/ComplianceAsCode/auditree-framework/actions?query=workflow%3A%22Upload+Python+Package%22
+[lint-test]: https://github.com/ComplianceAsCode/auditree-framework/actions?query=workflow%3A%22format+%7C+lint+%7C+test%22
+[pypi-upload]: https://github.com/ComplianceAsCode/auditree-framework/actions?query=workflow%3A%22PyPI+upload%22
