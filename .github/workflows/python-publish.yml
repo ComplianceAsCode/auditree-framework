@@ -23,6 +23,8 @@ jobs:
         make develop
     - name: Test & lint
       run: |
+        git config --global user.email "you@example.com"
+        git config --global user.name "A. Name"
         make code-lint
         make test
 
