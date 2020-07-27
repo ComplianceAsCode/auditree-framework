@@ -478,7 +478,8 @@ __init_map = {
     'tmp': TmpEvidence,
     'reports': ReportEvidence,
     'derived': DerivedEvidence,
-    'raw': RawEvidence
+    'raw': RawEvidence,
+    'external': ExternalEvidence
 }
 
 
