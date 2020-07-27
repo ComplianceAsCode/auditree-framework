@@ -124,15 +124,17 @@ See a more detailed [quick start guide][].
 
 ## Contribute
 
-Help us to improve the compliance-tool. See [CONTRIBUTING][].
+Help us to improve the Auditree framework. See [CONTRIBUTING][].
 
 ## Ecosystem
 
 We are building a set of common fetchers/checks in [Arboretum](https://github.com/ComplianceAsCode/auditree-arboretum). If you have a library of checks, please let us know & we'll link here.
 
-We have a reporting tool called [Harvest](https://github.com/ComplianceAsCode/auditree-harvest) which lets you process your evidence locker and generate reports over the data held.
+We have a data gathering and reporting tool called [Harvest](https://github.com/ComplianceAsCode/auditree-harvest) which lets you process your evidence locker and generate reports over the data held.
 
 We have a tool called [Prune](https://github.com/ComplianceAsCode/auditree-prune) which lets you mark evidence as no longer being collected, in a suitably tracked manner.
+
+We have a tool called [Plant](https://github.com/ComplianceAsCode/auditree-plant) which lets you add evidence to evidence lockers without the use of fetchers or checks.
 
 [CONTRIBUTING]: https://github.com/ComplianceAsCode/auditree-framework/blob/master/CONTRIBUTING.md
 [credentials file]: https://github.com/ComplianceAsCode/auditree-framework/blob/master/doc/design-principles.rst#credentials
