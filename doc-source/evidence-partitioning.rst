@@ -6,10 +6,10 @@ Partitioned Evidence
 ====================
 
 Depending on the repository hosting service being used, it may be necessary to
-manage evidence more effectively.  For example Github Enterprise will not allow
-pushing files larger than 100MB.  In cases like this it is possible to
-partition evidence into smaller, more manageable chunks if that evidence
-satisfies the following conditions:
+manage evidence more effectively.  For example Github has limits on individual
+file sizes.  In cases like this it is possible to partition evidence into
+smaller, more manageable chunks if that evidence satisfies the following
+conditions:
 
 * Evidence is of the type :py:class:`~compliance.evidence.RawEvidence` or a
   sub-class of :py:class:`~compliance.evidence.RawEvidence`.
@@ -44,7 +44,7 @@ where the evidence will be partitioned.  For example::
 
   {
     "locker": {
-      "repo_url": "https://github.ibm.com/my-org/my-repo",
+      "repo_url": "https://github.com/my-org/my-evidence-repo",
       "partitions": {
         "foo/evidence_bar.json": {
           "fields": ["location.country", "location.region"],
@@ -58,7 +58,7 @@ or::
 
   {
     "locker": {
-      "repo_url": "https://github.ibm.com/my-org/my-repo",
+      "repo_url": "https://github.com/my-org/my-evidence-repo",
       "partitions": {
         "foo/evidence_bar.json": {
           "fields": ["location.country", "location.region"]
@@ -120,7 +120,7 @@ Default Partition Root
 
     {
       "locker": {
-        "repo_url": "https://github.ibm.com/my-org/my-repo",
+        "repo_url": "https://github.com/my-org/my-evidence-repo",
         "partitions": {
           "foo/evidence_bar.json": {
             "fields": ["country", "region"]
@@ -174,7 +174,7 @@ Explicit Partition Root
 
     {
       "locker": {
-        "repo_url": "https://github.ibm.com/my-org/my-repo",
+        "repo_url": "https://github.com/my-org/my-evidence-repo",
         "partitions": {
           "foo/evidence_bar.json": {
             "fields": ["country", "region"],

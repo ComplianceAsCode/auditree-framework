@@ -1,11 +1,9 @@
 .. -*- mode:rst; coding:utf-8 -*-
 
-compliance-tool's documentation
-===============================
+Auditree framework documentation
+================================
 
 Tool to run compliance control checks as unit tests.
-
-`#compliance-tooling <https://ibm-cloudplatform.slack.com/messages/C3X0P7CUB>`_
 
 Installation
 ------------
@@ -13,16 +11,12 @@ Installation
 For users
 ~~~~~~~~~
 
-You can use the following ``pip`` command for installing
-``compliance-tool`` in your environment. The URL is also suitable for
-``requirements.txt`` and ``setup.py`` (using ``setuptools``)::
+The framework is uploaded to `pypi <https://pypi.org/project/auditree-framework/>`_.
+You can install it via:
 
-  $ pip install git+ssh://git@github.ibm.com/clouddataservices/compliance-tool.git#egg=compliance-tool
+.. code-block:: bash
 
-
-You can specify a specific version. For example ``v0.0.1``::
-
-  $ pip install git+ssh://git@github.ibm.com/clouddataservices/compliance-tool.git@v0.0.1#egg=compliance-tool
+   $ pip install auditree-framework
 
 See the :ref:`quick-start` section for a brief introduction to the
 tool usage. Also, see :ref:`running-on-travis` section for getting
@@ -33,12 +27,11 @@ For developers
 
 .. code-block:: bash
 
-   $ git clone git@github.ibm.com:cloumpose/compliance-tool
-   $ cd compliance-tool
-   $ git submodule update --init --recursive
-   $ virtualenv --no-site-packages venv
+   $ git clone git@github.com:ComplianceAsCode/auditree-framework.git
+   $ cd auditree-framework
+   $ python3 -m venv venv
    $ . venv/bin/activate
-   $ make develop
+   $ make install && make develop
 
 Guides
 ------

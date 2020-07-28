@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+DOC_TARGET?=doc
+
 develop:
 	pip install -q -e .[dev] --upgrade --upgrade-strategy eager
 	pre-commit install
@@ -38,4 +40,4 @@ test::
 docs:
 	# Build the API docs from the source code - overwrites those files, which are ignored by git
 	sphinx-apidoc -o doc-source compliance
-	sphinx-build doc-source doc
+	sphinx-build doc-source $(DOC_TARGET)
