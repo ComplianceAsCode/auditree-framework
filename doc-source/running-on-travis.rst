@@ -21,8 +21,8 @@ Basically, this will what you will need:
 * A ``.travis.yml``: this will define the Travis run which will run
   ``travis/run.sh`` script.
 
-* A git repository for storing generated evidence. You can create a
-  private GHE project for this.
+* A git repository for storing generated evidence. You should create a
+  private project/org for this.
 
 * Credentials generator: for that, a python script can be used for
   generating the credentials files from environment variables defined
@@ -43,10 +43,6 @@ However, this can be done in the same repository noting that there are
 evidence collector repository) and `official` runs (which will send
 notifications and push evidences to Git).
 
-You can have a look into `Cloudant Compliance Checks
-<https://github.ibm.com/cloumpose/cloudant-compliance-checks>`_
-to get more details about what it is explained here.
-
 
 
 Travis artifacts
@@ -58,8 +54,7 @@ This is a typical `.travis.yml` file:
 
    language: python
    python:
-     - "2.7"
-   group: bluezone  # if it needs to be run within IBM VPN
+     - "3.7"
    install:
      - pip -r requirements.txt
      - ./travis/gen-credentials.py > ~/.credentials
@@ -100,7 +95,7 @@ This is an implementation you might want to use for your project of
    import ConfigParser
 
 
-   SUPPORTED_SECTIONS = ['github_enterprise', 'slack']
+   SUPPORTED_SECTIONS = ['github', 'slack']
 
 
    def main():
@@ -135,17 +130,17 @@ This is an implementation you might want to use for your project of
        exit(main())
 
 So, for instance, using the previous script you will be able to create
-the credentials required for ``github_enterprise`` and ``slack`` by
+the credentials required for ``github`` and ``slack`` by
 defining the following environment variables in Travis:
 
-* ``GITHUB_ENTERPRISE_TOKEN = XXX``
+* ``GITHUB_TOKEN = XXX``
 
 * ``SLACK_WEBHOOK = YYY``
 
 Using those variables, ``./travis/gen-credentials.py >
 ~/.credentials`` will generate::
 
-  [github_enterprise]
+  [github]
   token=XXX
 
   [slack]
@@ -184,7 +179,6 @@ This is an example of a ``travis/run.sh`` file:
    # is this an official run or not?
    if [ "$TRAVIS_BRANCH" == "master" ] && [ -z $TRAVIS_COMMIT_RANGE ]; then
      # this is official as it has been run by an external call
-     # GHE does not support cron jobs yet, so this hack is needed.
      OPTIONS="$OFFICIAL"
    else
      OPTIONS="$NON_OFFICIAL"
@@ -207,7 +201,7 @@ have stored the official configuration into ``official.json`` file:
 
    {
      "locker": {
-       "repo_url": "https://github.ibm.com/YOUR-ORG/evidence-collector"
+       "repo_url": "https://github.com/my-org/my-evidence-repo"
      },
      "notify": {
        "slack": {
