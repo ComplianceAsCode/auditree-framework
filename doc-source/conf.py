@@ -3,14 +3,12 @@
 import os
 import sys
 import datetime
+
+new_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, new_path)
+
 import compliance
-
-sys.path.insert(
-    0,
-    os.path.abspath(os.path.join(os.path.dirname(__file__), '../compliance'))
-)
-
-print(os.path.abspath(os.path.join(os.path.dirname(__file__), '../compliance')))
+print(new_path)
 
 # -- General configuration ------------------------------------------------
 

@@ -1,0 +1,33 @@
+name: docs
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build_documentation:
+    name: Generate documentation
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.7'
+    - name: Install dependencies
+      run: |
+        make install
+        make develop
+    - name: Prep branch
+      run: git worktree add $TMPDIR/af-gh-pages gh-pages
+    - name: Build documentation
+      run: |
+        make docs DOC_TARGET=$TMPDIR/af-gh-pages
+    - name: Commit docs
+      run: |
+        cd $TMPDIR/af-gh-pages
+        git add *
+        git commit -a -m 'Documentation update for release' --no-verify
+        git push origin gh-pages
