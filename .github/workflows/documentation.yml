@@ -1,9 +1,7 @@
 name: docs
-
 on:
   release:
     types: [created]
-
 jobs:
   build_documentation:
     name: Generate documentation
@@ -11,23 +9,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Check out
+      uses: actions/checkout@v2
+      with:
+        path: source
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.7'
     - name: Install dependencies
+      working-directory: ./source
       run: |
         make install
         make develop
-    - name: Prep branch
-      run: git worktree add $TMPDIR/af-gh-pages gh-pages
+    - name: Prep pages branch
+      working-directory: ./source
+      run: |
+        git worktree prune
+        git fetch origin
+        git branch -l
+        git worktree add ../build gh-pages
+        git worktree list
     - name: Build documentation
+      working-directory: ./source
       run: |
-        make docs DOC_TARGET=$TMPDIR/af-gh-pages
+        make docs DOC_TARGET=../build
     - name: Commit docs
+      working-directory: build
       run: |
-        cd $TMPDIR/af-gh-pages
+        git config user.name github-actions
+        git config user.email github-actions@github.com
         git add *
         git commit -a -m 'Documentation update for release' --no-verify
         git push origin gh-pages
