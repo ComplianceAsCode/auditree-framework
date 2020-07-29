@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifiers &#8212; Auditree Framework 1.0.0 documentation</title>
+    <title>Notifiers &#8212; Auditree Framework 1.0.2 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>  
@@ -50,9 +50,10 @@
 <p>The last phase in a typical framework check run is the notification
 system.  Multiple notifiers can be targeted as part of this phase  by using
 the <code class="docutils literal notranslate"><span class="pre">--notify</span></code> option on the <code class="docutils literal notranslate"><span class="pre">compliance</span> <span class="pre">--check</span></code> command.  Valid
-notifier options are <code class="docutils literal notranslate"><span class="pre">stdout</span></code>, <code class="docutils literal notranslate"><span class="pre">slack</span></code>, <code class="docutils literal notranslate"><span class="pre">pagerduty</span></code>, <code class="docutils literal notranslate"><span class="pre">ghe_issues</span></code> and,
-<code class="docutils literal notranslate"><span class="pre">locker</span></code>.  The general idea behind the notification system is that each
-<code class="docutils literal notranslate"><span class="pre">test_</span></code> can generate a short notification that has the following components:</p>
+notifier options are <code class="docutils literal notranslate"><span class="pre">stdout</span></code>, <code class="docutils literal notranslate"><span class="pre">slack</span></code>, <code class="docutils literal notranslate"><span class="pre">pagerduty</span></code>, <code class="docutils literal notranslate"><span class="pre">findings</span></code>,
+<code class="docutils literal notranslate"><span class="pre">gh_issues</span></code> and, <code class="docutils literal notranslate"><span class="pre">locker</span></code>.  The general idea behind the notification
+system is that each <code class="docutils literal notranslate"><span class="pre">test_</span></code> can generate a short notification that has the
+following components:</p>
 <ul>
 <li><p>title (mandatory): should be a <code class="docutils literal notranslate"><span class="pre">property</span></code> of the
 <code class="docutils literal notranslate"><span class="pre">ComplianceCheck</span></code>:</p>
@@ -177,24 +178,24 @@ specify the channel ID:</p>
 message of the target private channel. Of course, the Slack App needs
 to be part of the private channel.</p>
 </div>
-<div class="section" id="github-enterprise-issue">
-<h2>GitHub Enterprise Issue<a class="headerlink" href="#github-enterprise-issue" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="github-issue">
+<h2>GitHub Issue<a class="headerlink" href="#github-issue" title="Permalink to this headline">¶</a></h2>
 <p>Depending on the configuration this notifier will create or update a GitHub
 issue per check or as a summary issue per accreditation. If an open issue
 already exists then the notification will be added to the existing issue as
 an issue comment otherwise a new issue will be created.</p>
 <p>This notifier needs to know the credentials for interacting with the provided
-GitHub Enterprise repositories.  Your credentials should, at a minimum, have
+GitHub repositories.  Your credentials should, at a minimum, have
 <code class="docutils literal notranslate"><span class="pre">write</span></code> access to all repositories specified for notifications to function
-correctly. Provide your GitHub Enterprise id and personal access token in your
+correctly. Provide your GitHub id and personal access token in your
 credentials file as shown below:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">github_enterprise</span><span class="p">]</span>
-<span class="n">username</span><span class="o">=</span><span class="n">my</span><span class="o">-</span><span class="n">ghe</span><span class="o">-</span><span class="nb">id</span>
-<span class="n">token</span><span class="o">=</span><span class="n">my</span><span class="o">-</span><span class="n">ghe</span><span class="o">-</span><span class="n">personal</span><span class="o">-</span><span class="n">access</span><span class="o">-</span><span class="n">token</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">github</span><span class="p">]</span>
+<span class="n">username</span><span class="o">=</span><span class="n">my</span><span class="o">-</span><span class="n">gh</span><span class="o">-</span><span class="nb">id</span>
+<span class="n">token</span><span class="o">=</span><span class="n">my</span><span class="o">-</span><span class="n">gh</span><span class="o">-</span><span class="n">personal</span><span class="o">-</span><span class="n">access</span><span class="o">-</span><span class="n">token</span>
 </pre></div>
 </div>
-<div class="section" id="ghe-summary-issue-by-accreditation">
-<h3>GHE Summary Issue by Accreditation<a class="headerlink" href="#ghe-summary-issue-by-accreditation" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="gh-summary-issue-by-accreditation">
+<h3>GH Summary Issue by Accreditation<a class="headerlink" href="#gh-summary-issue-by-accreditation" title="Permalink to this headline">¶</a></h3>
 <p>A configuration element for each accreditation is necessary to send summary
 issue notifications using this notifier. Summary notifications send all
 result statuses for checks within the accreditation.  Each accreditation
@@ -202,8 +203,8 @@ configuration should consist of a list of repositories to send the notifications
 to, optionally a project and column to assign your notification to, along
 with a “summary_issue” sub-document dictionary that is used by the notifier to
 configure the summary issue.  To specify a repository provide the GitHub
-Enterprise “owner” and “repository” in the form of <code class="docutils literal notranslate"><span class="pre">owner/repository</span></code>.
-The “summary_issue” can be configured with the following fields:</p>
+“owner” and “repository” in the form of <code class="docutils literal notranslate"><span class="pre">owner/repository</span></code>. The “summary_issue”
+can be configured with the following fields:</p>
 <ul class="simple">
 <li><dl class="simple">
 <dt>“title”</dt><dd><ul>
@@ -282,7 +283,7 @@ upon creation</p></li>
 <li><dl class="simple">
 <dt>“assignees”</dt><dd><ul>
 <li><p>Optional</p></li>
-<li><p>List of strings (GHE user IDs)</p></li>
+<li><p>List of strings (GH user IDs)</p></li>
 <li><p>Assigns the issue to the list of users</p></li>
 </ul>
 </dd>
@@ -291,7 +292,7 @@ upon creation</p></li>
 <li><dl class="simple">
 <dt>“rotation”</dt><dd><ul>
 <li><p>Optional</p></li>
-<li><p>List of lists of strings (GHE user IDs)</p></li>
+<li><p>List of lists of strings (GH user IDs)</p></li>
 <li><p>The “frequency” is required when setting a rotation</p></li>
 <li><p>When present with “frequency”, overrides the “assignees” setting</p></li>
 <li><p>Assigns the issue to the list of users based on the frequency and order
@@ -306,7 +307,7 @@ configuration file and used with the <code class="docutils literal notranslate">
 compliance checks:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;notify&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;ghe_issues&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;gh_issues&quot;</span><span class="p">:</span> <span class="p">{</span>
       <span class="s2">&quot;accr1&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;repo&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;my-org/accr1-repo&quot;</span><span class="p">],</span>
         <span class="s2">&quot;project&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Super cool project&quot;</span><span class="p">:</span> <span class="s2">&quot;Triage&quot;</span><span class="p">},</span>
@@ -328,14 +329,14 @@ compliance checks:</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="ghe-issue-per-check">
-<h3>GHE Issue Per Check<a class="headerlink" href="#ghe-issue-per-check" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="gh-issue-per-check">
+<h3>GH Issue Per Check<a class="headerlink" href="#gh-issue-per-check" title="Permalink to this headline">¶</a></h3>
 <p>A configuration element for each accreditation is necessary to send
 notifications per check using this notifier.  Each accreditation configuration
 should consist of a list of repositories to send the notifications to, a
 list of check execution statuses to send notifications for, and optionally a
 list of projects boards and project columns to add the notification issues to.
-To specify a repository provide the GitHub Enterprise “owner” and “repository”
+To specify a repository provide the GitHub “owner” and “repository”
 in the form of <code class="docutils literal notranslate"><span class="pre">owner/repository</span></code>.  Valid status values include “pass”,
 “warn”, “fail”, and “error”.  If no status configuration is provided then the
 “fail” status is used as the default.  Finally to specify project boards to
@@ -345,7 +346,7 @@ configuration for this notifier to be added to a configuration file and used
 with the <code class="docutils literal notranslate"><span class="pre">-C</span></code> option when executing your compliance checks:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;notify&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;ghe_issues&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;gh_issues&quot;</span><span class="p">:</span> <span class="p">{</span>
       <span class="s2">&quot;accr1&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;repo&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;my-org/accr1-repo&quot;</span><span class="p">],</span>
         <span class="s2">&quot;project&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Super cool project&quot;</span><span class="p">:</span> <span class="s2">&quot;Triage&quot;</span><span class="p">},</span>
@@ -418,9 +419,9 @@ file:</p>
 <li><a class="reference internal" href="#">Notifiers</a><ul>
 <li><a class="reference internal" href="#file-descriptor">File descriptor</a></li>
 <li><a class="reference internal" href="#slack">Slack</a></li>
-<li><a class="reference internal" href="#github-enterprise-issue">GitHub Enterprise Issue</a><ul>
-<li><a class="reference internal" href="#ghe-summary-issue-by-accreditation">GHE Summary Issue by Accreditation</a></li>
-<li><a class="reference internal" href="#ghe-issue-per-check">GHE Issue Per Check</a></li>
+<li><a class="reference internal" href="#github-issue">GitHub Issue</a><ul>
+<li><a class="reference internal" href="#gh-summary-issue-by-accreditation">GH Summary Issue by Accreditation</a></li>
+<li><a class="reference internal" href="#gh-issue-per-check">GH Issue Per Check</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#evidence-locker">Evidence Locker</a></li>
@@ -471,7 +472,7 @@ file:</p>
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>

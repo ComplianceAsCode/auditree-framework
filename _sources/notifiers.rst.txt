@@ -8,9 +8,10 @@ Notifiers
 The last phase in a typical framework check run is the notification
 system.  Multiple notifiers can be targeted as part of this phase  by using
 the ``--notify`` option on the ``compliance --check`` command.  Valid
-notifier options are ``stdout``, ``slack``, ``pagerduty``, ``ghe_issues`` and,
-``locker``.  The general idea behind the notification system is that each
-``test_`` can generate a short notification that has the following components:
+notifier options are ``stdout``, ``slack``, ``pagerduty``, ``findings``,
+``gh_issues`` and, ``locker``.  The general idea behind the notification
+system is that each ``test_`` can generate a short notification that has the
+following components:
 
 * title (mandatory): should be a ``property`` of the
   ``ComplianceCheck``:
@@ -144,8 +145,8 @@ Channel ID ``11223344`` can be obtained quickly from the URL to a
 message of the target private channel. Of course, the Slack App needs
 to be part of the private channel.
 
-GitHub Enterprise Issue
------------------------
+GitHub Issue
+------------
 
 Depending on the configuration this notifier will create or update a GitHub
 issue per check or as a summary issue per accreditation. If an open issue
@@ -153,17 +154,17 @@ already exists then the notification will be added to the existing issue as
 an issue comment otherwise a new issue will be created.
 
 This notifier needs to know the credentials for interacting with the provided
-GitHub Enterprise repositories.  Your credentials should, at a minimum, have
+GitHub repositories.  Your credentials should, at a minimum, have
 ``write`` access to all repositories specified for notifications to function
-correctly. Provide your GitHub Enterprise id and personal access token in your
+correctly. Provide your GitHub id and personal access token in your
 credentials file as shown below::
 
-  [github_enterprise]
-  username=my-ghe-id
-  token=my-ghe-personal-access-token
+  [github]
+  username=my-gh-id
+  token=my-gh-personal-access-token
 
-GHE Summary Issue by Accreditation
-**********************************
+GH Summary Issue by Accreditation
+*********************************
 
 A configuration element for each accreditation is necessary to send summary
 issue notifications using this notifier. Summary notifications send all
@@ -172,8 +173,8 @@ configuration should consist of a list of repositories to send the notifications
 to, optionally a project and column to assign your notification to, along
 with a "summary_issue" sub-document dictionary that is used by the notifier to
 configure the summary issue.  To specify a repository provide the GitHub
-Enterprise "owner" and "repository" in the form of ``owner/repository``.
-The "summary_issue" can be configured with the following fields:
+"owner" and "repository" in the form of ``owner/repository``. The "summary_issue"
+can be configured with the following fields:
 
 - "title"
    - Required
@@ -206,11 +207,11 @@ The "summary_issue" can be configured with the following fields:
      upon creation
 - "assignees"
    - Optional
-   - List of strings (GHE user IDs)
+   - List of strings (GH user IDs)
    - Assigns the issue to the list of users
 - "rotation"
    - Optional
-   - List of lists of strings (GHE user IDs)
+   - List of lists of strings (GH user IDs)
    - The "frequency" is required when setting a rotation
    - When present with "frequency", overrides the "assignees" setting
    - Assigns the issue to the list of users based on the frequency and order
@@ -222,7 +223,7 @@ compliance checks::
 
   {
     "notify": {
-      "ghe_issues": {
+      "gh_issues": {
         "accr1": {
           "repo": ["my-org/accr1-repo"],
           "project": {"Super cool project": "Triage"},
@@ -242,15 +243,15 @@ compliance checks::
     }
   }
 
-GHE Issue Per Check
-*******************
+GH Issue Per Check
+******************
 
 A configuration element for each accreditation is necessary to send
 notifications per check using this notifier.  Each accreditation configuration
 should consist of a list of repositories to send the notifications to, a
 list of check execution statuses to send notifications for, and optionally a
 list of projects boards and project columns to add the notification issues to.
-To specify a repository provide the GitHub Enterprise "owner" and "repository"
+To specify a repository provide the GitHub "owner" and "repository"
 in the form of ``owner/repository``.  Valid status values include "pass",
 "warn", "fail", and "error".  If no status configuration is provided then the
 "fail" status is used as the default.  Finally to specify project boards to
@@ -261,7 +262,7 @@ with the ``-C`` option when executing your compliance checks::
 
   {
     "notify": {
-      "ghe_issues": {
+      "gh_issues": {
         "accr1": {
           "repo": ["my-org/accr1-repo"],
           "project": {"Super cool project": "Triage"},

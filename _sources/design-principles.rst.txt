@@ -62,7 +62,7 @@ for:
 
     {
       "locker": {
-        "repo_url": "https://github.com/my-org/my-evidence",
+        "repo_url": "https://github.com/my-org/my-evidence-repo",
         "gitconfig": {
           "commit": {"gpgsign": true},
           "gpg": {"program": "gpg2"},
@@ -93,7 +93,7 @@ for:
 
    {
      "locker": {
-       "repo_url": "https://github.com/my-org/my-evidence",
+       "repo_url": "https://github.com/my-org/my-evidence-repo",
        "ttl_tolerance": 3600
      }
    }

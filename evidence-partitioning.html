@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partitioned Evidence &#8212; Auditree Framework 1.0.0 documentation</title>
+    <title>Partitioned Evidence &#8212; Auditree Framework 1.0.2 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="oscal.html" title="OSCAL Support"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Partitioned Evidence</a></li> 
       </ul>
     </div>  
@@ -48,10 +48,10 @@
   <div class="section" id="partitioned-evidence">
 <span id="evidence-partitioning"></span><h1>Partitioned Evidence<a class="headerlink" href="#partitioned-evidence" title="Permalink to this headline">¶</a></h1>
 <p>Depending on the repository hosting service being used, it may be necessary to
-manage evidence more effectively.  For example Github Enterprise will not allow
-pushing files larger than 100MB.  In cases like this it is possible to
-partition evidence into smaller, more manageable chunks if that evidence
-satisfies the following conditions:</p>
+manage evidence more effectively.  For example Github has limits on individual
+file sizes.  In cases like this it is possible to partition evidence into
+smaller, more manageable chunks if that evidence satisfies the following
+conditions:</p>
 <ul class="simple">
 <li><p>Evidence is of the type <a class="reference internal" href="compliance.html#compliance.evidence.RawEvidence" title="compliance.evidence.RawEvidence"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawEvidence</span></code></a> or a
 sub-class of <a class="reference internal" href="compliance.html#compliance.evidence.RawEvidence" title="compliance.evidence.RawEvidence"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawEvidence</span></code></a>.</p></li>
@@ -83,7 +83,7 @@ Parameters include the relative repository path to the raw evidence (sans the
 where the evidence will be partitioned.  For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-repo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence-repo&quot;</span><span class="p">,</span>
     <span class="s2">&quot;partitions&quot;</span><span class="p">:</span> <span class="p">{</span>
       <span class="s2">&quot;foo/evidence_bar.json&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;location.country&quot;</span><span class="p">,</span> <span class="s2">&quot;location.region&quot;</span><span class="p">],</span>
@@ -97,7 +97,7 @@ where the evidence will be partitioned.  For example:</p>
 <p>or:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-repo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence-repo&quot;</span><span class="p">,</span>
     <span class="s2">&quot;partitions&quot;</span><span class="p">:</span> <span class="p">{</span>
       <span class="s2">&quot;foo/evidence_bar.json&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;location.country&quot;</span><span class="p">,</span> <span class="s2">&quot;location.region&quot;</span><span class="p">]</span>
@@ -159,7 +159,7 @@ object overrides partitioning by configuration.</p>
 <li><p>Partitioned configuration:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-repo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence-repo&quot;</span><span class="p">,</span>
     <span class="s2">&quot;partitions&quot;</span><span class="p">:</span> <span class="p">{</span>
       <span class="s2">&quot;foo/evidence_bar.json&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">]</span>
@@ -222,7 +222,7 @@ object overrides partitioning by configuration.</p>
 <li><p>Partitioned configuration:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-repo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence-repo&quot;</span><span class="p">,</span>
     <span class="s2">&quot;partitions&quot;</span><span class="p">:</span> <span class="p">{</span>
       <span class="s2">&quot;foo/evidence_bar.json&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">],</span>
@@ -347,7 +347,7 @@ object overrides partitioning by configuration.</p>
         <li class="right" >
           <a href="oscal.html" title="OSCAL Support"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.0.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Partitioned Evidence</a></li> 
       </ul>
     </div>
