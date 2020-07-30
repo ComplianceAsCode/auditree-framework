@@ -20,3 +20,5 @@ The following IBMers have all contributed to this code base:
 - Oliver Koeth
 - Vasileios Gkoumplias
 - Andrew Toolan
+
+Graham Thackrah was intrinsically involved in its design.
