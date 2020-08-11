@@ -1,3 +1,7 @@
+# 1.2.0
+
+- [NEW] Added branch option to retrieving commit details from the Github service.
+
 # 1.1.0
 
 - [NEW] Added repository details retrieval to Github service class.
