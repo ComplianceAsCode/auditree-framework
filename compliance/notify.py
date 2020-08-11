@@ -25,7 +25,7 @@ from urllib.parse import urlparse
 
 from compliance.config import get_config
 from compliance.utils.services import pagerduty
-from compliance.utils.services.github import GitHub
+from compliance.utils.services.github import Github
 from compliance.utils.test import parse_test_id
 
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
@@ -413,7 +413,7 @@ class GHIssuesNotifier(_BaseMDNotifier):
         # Using the locker repo url to define the base url.  The expectation
         # is that the Github issues repository will share the base url.
         parsed_locker_url = urlparse(get_config().get('locker.repo_url'))
-        self._github = GitHub(
+        self._github = Github(
             get_config().creds,
             f'{parsed_locker_url.scheme}://{parsed_locker_url.hostname}'
         )

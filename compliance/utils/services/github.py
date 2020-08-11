@@ -29,7 +29,7 @@ from compliance.utils.http import BaseSession
 import yaml
 
 
-class GitHub(object):
+class Github(object):
     """Github service helper class."""
 
     def __init__(self, config=None, base_url='https://github.com'):
@@ -483,6 +483,53 @@ class GitHub(object):
             )
         # Each response has all the labels, so only return the last one
         return response
+
+    def get_repo_details(self, repo):
+        """
+        Retrieve a repository's metadata.
+
+        :param repo: the organization/repository as a string.
+
+        :returns: the repository's metadata details.
+        """
+        self.session.headers.update(
+            {'Accept': 'application/vnd.github.v3+json'}
+        )
+        return self._make_request('get', f'repos/{repo}')
+
+    def get_commit_details(self, repo, since):
+        """
+        Retrieve a repository's commit details since a given date/time.
+
+        :param repo: the organization/repository as a string.
+        :param since: the starting date/time as a datetime.
+
+        :returns: the repository's commit details since a given date/time.
+        """
+        self.session.headers.update(
+            {'Accept': 'application/vnd.github.v3+json'}
+        )
+        return self._make_request(
+            'get',
+            f'repos/{repo}/commits',
+            params={'since': since.strftime('%Y-%m-%dT%H:%M:%SZ')}
+        )
+
+    def get_branch_protection_details(self, repo, branch='master'):
+        """
+        Retrieve a repository branch's branch protection details.
+
+        :param repo: the organization/repository as a string.
+        :param branch: the branch as a string.
+
+        :returns: the repository branch's branch protection details.
+        """
+        self.session.headers.update(
+            {'Accept': 'application/vnd.github.luke-cage-preview+json'}
+        )
+        return self._make_request(
+            'get', f'repos/{repo}/branches/{branch}/protection'
+        )
 
     def _make_request(self, method, url, parse=True, **kwargs):
         r = self.session.request(method, url, **kwargs)
