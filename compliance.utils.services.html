@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.utils.services package &#8212; Auditree Framework 1.1.0 documentation</title>
+    <title>compliance.utils.services package &#8212; Auditree Framework 1.2.0 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="compliance.utils.html" title="compliance.utils package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="compliance.utils.html" accesskey="U">compliance.utils package</a> &#187;</li>
@@ -183,17 +183,18 @@ POST /repos/:owner/:repo/issues/:number/labels</p>
 
 <dl class="py method">
 <dt id="compliance.utils.services.github.Github.get_commit_details">
-<code class="sig-name descname">get_commit_details</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">since</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.get_commit_details"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.Github.get_commit_details" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_commit_details</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">since</span></em>, <em class="sig-param"><span class="n">branch</span><span class="o">=</span><span class="default_value">'master'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.get_commit_details"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.Github.get_commit_details" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a repository’s commit details since a given date/time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>repo</strong> – the organization/repository as a string.</p></li>
 <li><p><strong>since</strong> – the starting date/time as a datetime.</p></li>
+<li><p><strong>branch</strong> – the branch as a string.  Defaults to master.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the repository’s commit details since a given date/time.</p>
+<dd class="field-even"><p>the repo branch’s commit details since a given date/time.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -474,7 +475,7 @@ This uses the PD API v2.</p>
         <li class="right" >
           <a href="compliance.utils.html" title="compliance.utils package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="compliance.utils.html" >compliance.utils package</a> &#187;</li>
