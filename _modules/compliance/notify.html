@@ -4,8 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>compliance.notify &#8212; Auditree Framework 1.0.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>compliance.notify &#8212; Auditree Framework 1.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.notify</a></li> 
       </ul>
@@ -66,7 +66,7 @@
 
 <span class="kn">from</span> <span class="nn">compliance.config</span> <span class="kn">import</span> <span class="n">get_config</span>
 <span class="kn">from</span> <span class="nn">compliance.utils.services</span> <span class="kn">import</span> <span class="n">pagerduty</span>
-<span class="kn">from</span> <span class="nn">compliance.utils.services.github</span> <span class="kn">import</span> <span class="n">GitHub</span>
+<span class="kn">from</span> <span class="nn">compliance.utils.services.github</span> <span class="kn">import</span> <span class="n">Github</span>
 <span class="kn">from</span> <span class="nn">compliance.utils.test</span> <span class="kn">import</span> <span class="n">parse_test_id</span>
 
 <span class="kn">from</span> <span class="nn">ibm_cloud_sdk_core.authenticators</span> <span class="kn">import</span> <span class="n">IAMAuthenticator</span>
@@ -454,7 +454,7 @@
         <span class="c1"># Using the locker repo url to define the base url.  The expectation</span>
         <span class="c1"># is that the Github issues repository will share the base url.</span>
         <span class="n">parsed_locker_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;locker.repo_url&#39;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_github</span> <span class="o">=</span> <span class="n">GitHub</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_github</span> <span class="o">=</span> <span class="n">Github</span><span class="p">(</span>
             <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">creds</span><span class="p">,</span>
             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">parsed_locker_url</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s1">://</span><span class="si">{</span><span class="n">parsed_locker_url</span><span class="o">.</span><span class="n">hostname</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="p">)</span>
@@ -1180,14 +1180,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.notify</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.0.
     </div>
   </body>
 </html>

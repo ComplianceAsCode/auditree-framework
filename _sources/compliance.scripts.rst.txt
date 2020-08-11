@@ -12,7 +12,6 @@ compliance.scripts.compliance\_cli module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

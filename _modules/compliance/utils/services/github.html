@@ -4,8 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>compliance.utils.services.github &#8212; Auditree Framework 1.0.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>compliance.utils.services.github &#8212; Auditree Framework 1.1.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils.services.github</a></li> 
       </ul>
@@ -70,7 +70,7 @@
 <span class="kn">import</span> <span class="nn">yaml</span>
 
 
-<div class="viewcode-block" id="GitHub"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub">[docs]</a><span class="k">class</span> <span class="nc">GitHub</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Github"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github">[docs]</a><span class="k">class</span> <span class="nc">Github</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Github service helper class.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="s1">&#39;https://github.com&#39;</span><span class="p">):</span>
@@ -95,7 +95,7 @@
             <span class="p">{</span><span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/vnd.github.inertia-preview+json&#39;</span><span class="p">}</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="GitHub.extract_path_chunks"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.extract_path_chunks">[docs]</a>    <span class="k">def</span> <span class="nf">extract_path_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.extract_path_chunks"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.extract_path_chunks">[docs]</a>    <span class="k">def</span> <span class="nf">extract_path_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve the path from the url.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -104,7 +104,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.extract_owner_repo"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.extract_owner_repo">[docs]</a>    <span class="k">def</span> <span class="nf">extract_owner_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.extract_owner_repo"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.extract_owner_repo">[docs]</a>    <span class="k">def</span> <span class="nf">extract_owner_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve the owner (org) and repo from the url.&quot;&quot;&quot;</span>
         <span class="n">path_chunks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_path_chunks</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path_chunks</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
@@ -113,7 +113,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">path_chunks</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="GitHub.extract_owner_repo_issue"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.extract_owner_repo_issue">[docs]</a>    <span class="k">def</span> <span class="nf">extract_owner_repo_issue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.extract_owner_repo_issue"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.extract_owner_repo_issue">[docs]</a>    <span class="k">def</span> <span class="nf">extract_owner_repo_issue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve the owner (org), repo and issue number from the url.&quot;&quot;&quot;</span>
         <span class="n">path_chunks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_path_chunks</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path_chunks</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span> <span class="ow">or</span> <span class="n">path_chunks</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;issues&#39;</span><span class="p">:</span>
@@ -124,7 +124,7 @@
         <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">issue_number</span> <span class="o">=</span> <span class="n">path_chunks</span>
         <span class="k">return</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue_number</span></div>
 
-<div class="viewcode-block" id="GitHub.get_all_projects"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_all_projects">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_projects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_path</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.get_all_projects"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_all_projects">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_projects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve all GH repo projects.</span>
 
@@ -137,7 +137,7 @@
             <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;projects&#39;</span><span class="p">])</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.get_project"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_project">[docs]</a>    <span class="k">def</span> <span class="nf">get_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.get_project"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_project">[docs]</a>    <span class="k">def</span> <span class="nf">get_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve the GH org or org/repo project.</span>
 
@@ -160,26 +160,26 @@
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pieces</span><span class="p">))</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">r</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;number&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="GitHub.get_columns"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_columns">[docs]</a>    <span class="k">def</span> <span class="nf">get_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.get_columns"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_columns">[docs]</a>    <span class="k">def</span> <span class="nf">get_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve the columns for a project.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
             <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;projects&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span> <span class="s1">&#39;columns&#39;</span><span class="p">])</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.get_all_cards"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_all_cards">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_cards</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.get_all_cards"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_all_cards">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_cards</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve all cards for a given list of project columns.&quot;&quot;&quot;</span>
         <span class="n">cards</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">column_id</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
             <span class="n">cards</span><span class="p">[</span><span class="n">column_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cards</span><span class="p">(</span><span class="n">column_id</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cards</span></div>
 
-<div class="viewcode-block" id="GitHub.get_cards"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_cards">[docs]</a>    <span class="k">def</span> <span class="nf">get_cards</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_id</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.get_cards"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_cards">[docs]</a>    <span class="k">def</span> <span class="nf">get_cards</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve all cards for a given project column.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paginate_api</span><span class="p">(</span>
             <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;projects&#39;</span><span class="p">,</span> <span class="s1">&#39;columns&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">column_id</span><span class="p">),</span> <span class="s1">&#39;cards&#39;</span><span class="p">])</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.move_card"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.move_card">[docs]</a>    <span class="k">def</span> <span class="nf">move_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">card</span><span class="p">,</span> <span class="n">to_column_id</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.move_card"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.move_card">[docs]</a>    <span class="k">def</span> <span class="nf">move_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">card</span><span class="p">,</span> <span class="n">to_column_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Move a card from one project column to another.&quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="s1">&#39;bottom&#39;</span><span class="p">,</span> <span class="s1">&#39;column_id&#39;</span><span class="p">:</span> <span class="n">to_column_id</span><span class="p">}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
@@ -188,7 +188,7 @@
             <span class="n">json</span><span class="o">=</span><span class="n">data</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.add_card"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.add_card">[docs]</a>    <span class="k">def</span> <span class="nf">add_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_id</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">issue</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.add_card"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.add_card">[docs]</a>    <span class="k">def</span> <span class="nf">add_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_id</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">issue</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a card in a project column.&quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">issue</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -201,7 +201,7 @@
             <span class="n">json</span><span class="o">=</span><span class="n">data</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.add_milestone"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.add_milestone">[docs]</a>    <span class="k">def</span> <span class="nf">add_milestone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">milestone</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.add_milestone"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.add_milestone">[docs]</a>    <span class="k">def</span> <span class="nf">add_milestone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">milestone</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a repository milestone.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
             <span class="s1">&#39;post&#39;</span><span class="p">,</span>
@@ -209,7 +209,7 @@
             <span class="n">json</span><span class="o">=</span><span class="n">milestone</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.list_milestones"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.list_milestones">[docs]</a>    <span class="k">def</span> <span class="nf">list_milestones</span><span class="p">(</span>
+<div class="viewcode-block" id="Github.list_milestones"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.list_milestones">[docs]</a>    <span class="k">def</span> <span class="nf">list_milestones</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s1">&#39;open&#39;</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="s1">&#39;due_on&#39;</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;asc&#39;</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve a repository&#39;s milestones.&quot;&quot;&quot;</span>
@@ -220,7 +220,7 @@
             <span class="p">}</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.add_issue"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.add_issue">[docs]</a>    <span class="k">def</span> <span class="nf">add_issue</span><span class="p">(</span>
+<div class="viewcode-block" id="Github.add_issue"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.add_issue">[docs]</a>    <span class="k">def</span> <span class="nf">add_issue</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a repository issue.&quot;&quot;&quot;</span>
@@ -232,7 +232,7 @@
             <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;issues&#39;</span><span class="p">]),</span> <span class="n">json</span><span class="o">=</span><span class="n">issue</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.patch_issue"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.patch_issue">[docs]</a>    <span class="k">def</span> <span class="nf">patch_issue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.patch_issue"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.patch_issue">[docs]</a>    <span class="k">def</span> <span class="nf">patch_issue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Edit a repository issue.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">annotation</span> <span class="ow">and</span> <span class="s1">&#39;body&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">params</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_annotate_body</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">],</span> <span class="n">annotation</span><span class="p">)</span>
@@ -242,7 +242,7 @@
             <span class="n">json</span><span class="o">=</span><span class="n">params</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.get_issue"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_issue">[docs]</a>    <span class="k">def</span> <span class="nf">get_issue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">parse_annotations</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.get_issue"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_issue">[docs]</a>    <span class="k">def</span> <span class="nf">get_issue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">parse_annotations</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve the content and metadata for a repository issue.</span>
 
@@ -259,7 +259,7 @@
             <span class="k">return</span> <span class="n">issue</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">annotations</span>
         <span class="k">return</span> <span class="n">issue</span></div>
 
-<div class="viewcode-block" id="GitHub.update_annotations"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.update_annotations">[docs]</a>    <span class="k">def</span> <span class="nf">update_annotations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">annotations</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.update_annotations"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.update_annotations">[docs]</a>    <span class="k">def</span> <span class="nf">update_annotations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">annotations</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the body of an existing issue, only changing the annotations.</span>
 
@@ -275,7 +275,7 @@
             <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="n">new_anno</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">body</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.get_issue_comments"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_issue_comments">[docs]</a>    <span class="k">def</span> <span class="nf">get_issue_comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">parse_annotations</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.get_issue_comments"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_issue_comments">[docs]</a>    <span class="k">def</span> <span class="nf">get_issue_comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">parse_annotations</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve a repository issue&#39;s comments.&quot;&quot;&quot;</span>
         <span class="n">comments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
             <span class="s1">&#39;get&#39;</span><span class="p">,</span>
@@ -290,7 +290,7 @@
             <span class="k">return</span> <span class="n">comments</span><span class="p">,</span> <span class="n">annotated_comments</span>
         <span class="k">return</span> <span class="n">comments</span></div>
 
-<div class="viewcode-block" id="GitHub.get_issues_page"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_issues_page">[docs]</a>    <span class="k">def</span> <span class="nf">get_issues_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.get_issues_page"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_issues_page">[docs]</a>    <span class="k">def</span> <span class="nf">get_issues_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve a repository&#39;s issues by page.&quot;&quot;&quot;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">kwargs</span>
         <span class="c1"># get the page number or default to 1</span>
@@ -303,7 +303,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">response</span></div>
 
-<div class="viewcode-block" id="GitHub.get_all_issues"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_all_issues">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_issues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.get_all_issues"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_all_issues">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_issues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve all issues for a repository.&quot;&quot;&quot;</span>
         <span class="n">all_issues</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">page</span> <span class="o">=</span> <span class="mi">1</span>
@@ -327,7 +327,7 @@
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">all_issues</span></div>
 
-<div class="viewcode-block" id="GitHub.get_issue_template"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.get_issue_template">[docs]</a>    <span class="k">def</span> <span class="nf">get_issue_template</span><span class="p">(</span>
+<div class="viewcode-block" id="Github.get_issue_template"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_issue_template">[docs]</a>    <span class="k">def</span> <span class="nf">get_issue_template</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">owner</span><span class="p">,</span>
         <span class="n">repo</span><span class="p">,</span>
@@ -424,7 +424,7 @@
 
         <span class="k">return</span> <span class="n">template</span><span class="p">,</span> <span class="n">extracted_annotations</span><span class="p">,</span> <span class="n">extracted_header</span></div>
 
-<div class="viewcode-block" id="GitHub.search_issues"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.search_issues">[docs]</a>    <span class="k">def</span> <span class="nf">search_issues</span><span class="p">(</span>
+<div class="viewcode-block" id="Github.search_issues"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.search_issues">[docs]</a>    <span class="k">def</span> <span class="nf">search_issues</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">repo</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -441,7 +441,7 @@
             <span class="s1">&#39;search/issues&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="n">sort</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.add_issue_comment"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.add_issue_comment">[docs]</a>    <span class="k">def</span> <span class="nf">add_issue_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.add_issue_comment"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.add_issue_comment">[docs]</a>    <span class="k">def</span> <span class="nf">add_issue_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a comment for a repository issue.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">annotation</span><span class="p">:</span>
             <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_annotate_body</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span>
@@ -451,7 +451,7 @@
             <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span><span class="p">}</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.create_project"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.create_project">[docs]</a>    <span class="k">def</span> <span class="nf">create_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.create_project"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.create_project">[docs]</a>    <span class="k">def</span> <span class="nf">create_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a repository project.&quot;&quot;&quot;</span>
         <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">creates_for_project</span><span class="p">(</span>
@@ -460,20 +460,20 @@
             <span class="p">}</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.create_column"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.create_column">[docs]</a>    <span class="k">def</span> <span class="nf">create_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.create_column"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.create_column">[docs]</a>    <span class="k">def</span> <span class="nf">create_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a project column.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">creates_for_project</span><span class="p">(</span>
             <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;projects&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span> <span class="s1">&#39;columns&#39;</span><span class="p">]),</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">column</span><span class="p">}</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.creates_for_project"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.creates_for_project">[docs]</a>    <span class="k">def</span> <span class="nf">creates_for_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.creates_for_project"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.creates_for_project">[docs]</a>    <span class="k">def</span> <span class="nf">creates_for_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a repository project based on a properly formed url.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">org</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;orgs not supported yet&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">data</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.rand_color"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.rand_color">[docs]</a>    <span class="k">def</span> <span class="nf">rand_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.rand_color"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.rand_color">[docs]</a>    <span class="k">def</span> <span class="nf">rand_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate a random color for labels.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="si">:</span><span class="s1">02X</span><span class="si">}</span><span class="s1">&#39;</span>
@@ -481,7 +481,7 @@
             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="si">:</span><span class="s1">02X</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.create_label"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.create_label">[docs]</a>    <span class="k">def</span> <span class="nf">create_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.create_label"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.create_label">[docs]</a>    <span class="k">def</span> <span class="nf">create_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a label within a repository.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">creates_for_project</span><span class="p">(</span>
             <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;labels&#39;</span><span class="p">]),</span> <span class="p">{</span>
@@ -489,7 +489,7 @@
             <span class="p">}</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GitHub.apply_labels"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.apply_labels">[docs]</a>    <span class="k">def</span> <span class="nf">apply_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="o">*</span><span class="n">labels</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.apply_labels"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.apply_labels">[docs]</a>    <span class="k">def</span> <span class="nf">apply_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="o">*</span><span class="n">labels</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add label(s) to an issue.</span>
 
@@ -506,7 +506,7 @@
 
         <span class="k">return</span> <span class="n">response</span></div>
 
-<div class="viewcode-block" id="GitHub.remove_labels"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.GitHub.remove_labels">[docs]</a>    <span class="k">def</span> <span class="nf">remove_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="o">*</span><span class="n">labels</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.remove_labels"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.remove_labels">[docs]</a>    <span class="k">def</span> <span class="nf">remove_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="o">*</span><span class="n">labels</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove label(s) from an issue.</span>
 
@@ -524,6 +524,53 @@
             <span class="p">)</span>
         <span class="c1"># Each response has all the labels, so only return the last one</span>
         <span class="k">return</span> <span class="n">response</span></div>
+
+<div class="viewcode-block" id="Github.get_repo_details"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_repo_details">[docs]</a>    <span class="k">def</span> <span class="nf">get_repo_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve a repository&#39;s metadata.</span>
+
+<span class="sd">        :param repo: the organization/repository as a string.</span>
+
+<span class="sd">        :returns: the repository&#39;s metadata details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/vnd.github.v3+json&#39;</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;repos/</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Github.get_commit_details"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_commit_details">[docs]</a>    <span class="k">def</span> <span class="nf">get_commit_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">since</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve a repository&#39;s commit details since a given date/time.</span>
+
+<span class="sd">        :param repo: the organization/repository as a string.</span>
+<span class="sd">        :param since: the starting date/time as a datetime.</span>
+
+<span class="sd">        :returns: the repository&#39;s commit details since a given date/time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/vnd.github.v3+json&#39;</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;get&#39;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s1">&#39;repos/</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s1">/commits&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;since&#39;</span><span class="p">:</span> <span class="n">since</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Github.get_branch_protection_details"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_branch_protection_details">[docs]</a>    <span class="k">def</span> <span class="nf">get_branch_protection_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">branch</span><span class="o">=</span><span class="s1">&#39;master&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve a repository branch&#39;s branch protection details.</span>
+
+<span class="sd">        :param repo: the organization/repository as a string.</span>
+<span class="sd">        :param branch: the branch as a string.</span>
+
+<span class="sd">        :returns: the repository branch&#39;s branch protection details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/vnd.github.luke-cage-preview+json&#39;</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
+            <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;repos/</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s1">/branches/</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s1">/protection&#39;</span>
+        <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_make_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -657,14 +704,14 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils.services.github</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.0.
     </div>
   </body>
 </html>
