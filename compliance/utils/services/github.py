@@ -497,14 +497,15 @@ class Github(object):
         )
         return self._make_request('get', f'repos/{repo}')
 
-    def get_commit_details(self, repo, since):
+    def get_commit_details(self, repo, since, branch='master'):
         """
         Retrieve a repository's commit details since a given date/time.
 
         :param repo: the organization/repository as a string.
         :param since: the starting date/time as a datetime.
+        :param branch: the branch as a string.  Defaults to master.
 
-        :returns: the repository's commit details since a given date/time.
+        :returns: the repo branch's commit details since a given date/time.
         """
         self.session.headers.update(
             {'Accept': 'application/vnd.github.v3+json'}
@@ -512,7 +513,9 @@ class Github(object):
         return self._make_request(
             'get',
             f'repos/{repo}/commits',
-            params={'since': since.strftime('%Y-%m-%dT%H:%M:%SZ')}
+            params={
+                'since': since.strftime('%Y-%m-%dT%H:%M:%SZ'), 'sha': branch
+            }
         )
 
     def get_branch_protection_details(self, repo, branch='master'):
