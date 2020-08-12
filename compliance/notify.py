@@ -62,7 +62,7 @@ class _BaseNotifier(object):
 
             msg_method = 'get_notification_message'
             if len(test_obj.tests) > 1:
-                candidate = method_name.replace('test_', 'msg_')
+                candidate = method_name.replace('test_', 'msg_', 1)
                 if hasattr(test_obj, candidate):
                     msg_method = candidate
 
