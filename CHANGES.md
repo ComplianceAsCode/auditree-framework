@@ -1,3 +1,7 @@
+# 1.2.1
+
+- [FIXED] Notifier `msg_` methods are now accurately found based on check `test_` method names.
+
 # 1.2.0
 
 - [NEW] Added branch option to retrieving commit details from the Github service.
