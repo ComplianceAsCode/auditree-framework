@@ -1,3 +1,7 @@
+# 1.2.2
+
+- [FIXED] Github service branch protection method now returns "required_signatures" content.
+
 # 1.2.1
 
 - [FIXED] Notifier `msg_` methods are now accurately found based on check `test_` method names.

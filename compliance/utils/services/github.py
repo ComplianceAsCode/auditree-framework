@@ -528,7 +528,7 @@ class Github(object):
         :returns: the repository branch's branch protection details.
         """
         self.session.headers.update(
-            {'Accept': 'application/vnd.github.luke-cage-preview+json'}
+            {'Accept': 'application/vnd.github.zzzax-preview+json'}
         )
         return self._make_request(
             'get', f'repos/{repo}/branches/{branch}/protection'
