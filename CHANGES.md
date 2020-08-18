@@ -1,3 +1,7 @@
+# 1.2.3
+
+- [IMPROVED] Github service `get_commit_details` now take `path` as an optional argument.
+
 # 1.2.2
 
 - [FIXED] Github service branch protection method now returns "required_signatures" content.
