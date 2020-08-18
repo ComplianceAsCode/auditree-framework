@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.utils.services.github &#8212; Auditree Framework 1.2.2 documentation</title>
+    <title>compliance.utils.services.github &#8212; Auditree Framework 1.2.3 documentation</title>
     <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.2.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.2.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils.services.github</a></li> 
       </ul>
@@ -538,26 +538,24 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;repos/</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Github.get_commit_details"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_commit_details">[docs]</a>    <span class="k">def</span> <span class="nf">get_commit_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">since</span><span class="p">,</span> <span class="n">branch</span><span class="o">=</span><span class="s1">&#39;master&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Github.get_commit_details"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_commit_details">[docs]</a>    <span class="k">def</span> <span class="nf">get_commit_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">since</span><span class="p">,</span> <span class="n">branch</span><span class="o">=</span><span class="s1">&#39;master&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieve a repository&#39;s commit details since a given date/time.</span>
+<span class="sd">        Retrieve a repository branch&#39;s commit details since a given date/time.</span>
 
 <span class="sd">        :param repo: the organization/repository as a string.</span>
 <span class="sd">        :param since: the starting date/time as a datetime.</span>
 <span class="sd">        :param branch: the branch as a string.  Defaults to master.</span>
+<span class="sd">        :param path: if provided, only commits for the path will be returned.</span>
 
 <span class="sd">        :returns: the repo branch&#39;s commit details since a given date/time.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
             <span class="p">{</span><span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/vnd.github.v3+json&#39;</span><span class="p">}</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
-            <span class="s1">&#39;get&#39;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s1">&#39;repos/</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s1">/commits&#39;</span><span class="p">,</span>
-            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
-                <span class="s1">&#39;since&#39;</span><span class="p">:</span> <span class="n">since</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">),</span> <span class="s1">&#39;sha&#39;</span><span class="p">:</span> <span class="n">branch</span>
-            <span class="p">}</span>
-        <span class="p">)</span></div>
+        <span class="n">opts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;since&#39;</span><span class="p">:</span> <span class="n">since</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">),</span> <span class="s1">&#39;sha&#39;</span><span class="p">:</span> <span class="n">branch</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">opts</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;repos/</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s1">/commits&#39;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">opts</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Github.get_branch_protection_details"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_branch_protection_details">[docs]</a>    <span class="k">def</span> <span class="nf">get_branch_protection_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">branch</span><span class="o">=</span><span class="s1">&#39;master&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -707,7 +705,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.2.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.2.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils.services.github</a></li> 
       </ul>
