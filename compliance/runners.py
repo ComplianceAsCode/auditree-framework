@@ -16,6 +16,7 @@
 
 import inspect
 import os
+import re
 import sys
 import time
 import unittest
@@ -40,6 +41,7 @@ class _BaseRunner(object):
     def __init__(self, opts, extra_opts):
         self.opts = opts
         self.extra_opts = extra_opts
+        self.load_errors = set()
 
     def __enter__(self):
         self.init_config()
@@ -168,6 +170,15 @@ class FetchMode(_BaseRunner):
             for candidate in candidates:
                 if issubclass(candidate.__class__, ComplianceFetcher):
                     fetchers.add(candidate.__class__)
+            for load_err in tl.errors:
+                try:
+                    locate = re.search(
+                        '^Failed to import test module: (.+?)\n.*?', load_err
+                    )
+                    if locate.group(1).split('.')[-1].startswith(FETCH_PREFIX):
+                        self.load_errors.add(load_err)
+                except AttributeError:
+                    pass
         return fetchers
 
     def run_fetchers(self, reruns=None):
@@ -243,6 +254,7 @@ class CheckMode(_BaseRunner):
     def get_checks(self):
         """Provide the appropriate compliance framework check classes."""
         checks = set()
+        tests_found = set()
         for loc in self.dirs:
             tl = unittest.TestLoader()
             tl.testMethodPrefix = CHECK_PREFIX
@@ -251,6 +263,7 @@ class CheckMode(_BaseRunner):
             )
             for test in [c.__class__ for c in candidates]:
                 path = f'{test.__module__}.{test.__name__}'
+                tests_found.add(path)
                 in_accred_grouping = self.controls.is_test_included(
                     path, self.accreds
                 )
@@ -264,6 +277,32 @@ class CheckMode(_BaseRunner):
                         )
                     ]
                     checks.add(test)
+            for load_err in tl.errors:
+                try:
+                    locate = re.search(
+                        '^Failed to import test module: (.+?)\n.*?', load_err
+                    )
+                    for accred in self.accreds:
+                        for check in self.controls.accred_checks[accred]:
+                            if check.startswith(locate.group(1)):
+                                self.load_errors.add(
+                                    f'Unable to load {check}\n\n{load_err}'
+                                )
+                                tests_found.add(check)
+                except AttributeError:
+                    pass
+        expected_checks = set()
+        for accred, checks_in_accred in self.controls.accred_checks.items():
+            if accred in self.accreds:
+                expected_checks.update(checks_in_accred)
+        for check_not_found in expected_checks - tests_found:
+            self.load_errors.add(
+                (
+                    f'Unable to load {check_not_found}\n\n'
+                    f'The check {check_not_found} was not found.  '
+                    'Please validate that the path provided is correct.'
+                )
+            )
         return checks
 
     def run_checks(self):
