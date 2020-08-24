@@ -1,3 +1,7 @@
+# 1.2.4
+
+- [IMPROVED] Fetchers and checks that failed to load appear as errors in STDERR now.
+
 # 1.2.3
 
 - [IMPROVED] Github service `get_commit_details` now take `path` as an optional argument.

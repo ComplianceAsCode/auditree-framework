@@ -157,11 +157,15 @@ class ComplianceCLI(Command):
                         '\nUnable to resolve dependency issues with %s.\n',
                         ', '.join(reruns)
                     )
+                for fetch_load_error in fetch.load_errors:
+                    self.err(f'\nERROR: {fetch_load_error}\n')
         if args.check:
             with CheckMode(args, self.extra_args) as check:
                 accreds = ', '.join(check.accreds)
-                self.out(f'\nCheck Run - Accreditations: {accreds} \n')
+                self.out(f'\nCheck Run - Accreditations: {accreds}\n')
                 success = check.run_checks() and success
+                for check_load_error in check.load_errors:
+                    self.err(f'\nERROR: {check_load_error}\n')
         return 0 if success else 1
 
 
