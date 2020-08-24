@@ -18,6 +18,7 @@ import copy
 import itertools
 import json
 import os
+from collections import defaultdict
 
 
 class ControlDescriptor(object):
@@ -48,6 +49,18 @@ class ControlDescriptor(object):
     def as_dict(self):
         """Provide control descriptor content as a modifiable dictionary."""
         return copy.deepcopy(self._controls)
+
+    @property
+    def accred_checks(self):
+        """Provide all checks by accreditation (key) as a dictionary."""
+        if not hasattr(self, '_accred_checks'):
+            self._accred_checks = defaultdict(list)
+            for check, evidence in self._controls.items():
+                for control in evidence.values():
+                    for accreds in control.values():
+                        for accred in accreds:
+                            self._accred_checks[accred].append(check)
+        return self._accred_checks
 
     def get_accreditations(self, test_path):
         """
