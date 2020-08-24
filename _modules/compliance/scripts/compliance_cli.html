@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.scripts.compliance_cli &#8212; Auditree Framework 1.2.3 documentation</title>
+    <title>compliance.scripts.compliance_cli &#8212; Auditree Framework 1.2.4 documentation</title>
     <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Auditree Framework 1.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Auditree Framework 1.2.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.scripts.compliance_cli</a></li> 
       </ul>
@@ -198,11 +198,15 @@
                         <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Unable to resolve dependency issues with </span><span class="si">%s</span><span class="s1">.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span>
                         <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reruns</span><span class="p">)</span>
                     <span class="p">)</span>
+                <span class="k">for</span> <span class="n">fetch_load_error</span> <span class="ow">in</span> <span class="n">fetch</span><span class="o">.</span><span class="n">load_errors</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">ERROR: </span><span class="si">{</span><span class="n">fetch_load_error</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">check</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">CheckMode</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_args</span><span class="p">)</span> <span class="k">as</span> <span class="n">check</span><span class="p">:</span>
                 <span class="n">accreds</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">check</span><span class="o">.</span><span class="n">accreds</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Check Run - Accreditations: </span><span class="si">{</span><span class="n">accreds</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Check Run - Accreditations: </span><span class="si">{</span><span class="n">accreds</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">success</span> <span class="o">=</span> <span class="n">check</span><span class="o">.</span><span class="n">run_checks</span><span class="p">()</span> <span class="ow">and</span> <span class="n">success</span>
+                <span class="k">for</span> <span class="n">check_load_error</span> <span class="ow">in</span> <span class="n">check</span><span class="o">.</span><span class="n">load_errors</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">ERROR: </span><span class="si">{</span><span class="n">check_load_error</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="mi">1</span></div>
 
 
@@ -244,7 +248,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Auditree Framework 1.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Auditree Framework 1.2.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.scripts.compliance_cli</a></li> 
       </ul>

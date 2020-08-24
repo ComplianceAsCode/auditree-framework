@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.runners &#8212; Auditree Framework 1.2.3 documentation</title>
+    <title>compliance.runners &#8212; Auditree Framework 1.2.4 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.2.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.runners</a></li> 
       </ul>
@@ -57,6 +57,7 @@
 
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
@@ -81,6 +82,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opts</span><span class="p">,</span> <span class="n">extra_opts</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">opts</span> <span class="o">=</span> <span class="n">opts</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extra_opts</span> <span class="o">=</span> <span class="n">extra_opts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_errors</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_config</span><span class="p">()</span>
@@ -209,6 +211,15 @@
             <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">ComplianceFetcher</span><span class="p">):</span>
                     <span class="n">fetchers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">load_err</span> <span class="ow">in</span> <span class="n">tl</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">locate</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                        <span class="s1">&#39;^Failed to import test module: (.+?)</span><span class="se">\n</span><span class="s1">.*?&#39;</span><span class="p">,</span> <span class="n">load_err</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">locate</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">FETCH_PREFIX</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">load_errors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">load_err</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">pass</span>
         <span class="k">return</span> <span class="n">fetchers</span></div>
 
 <div class="viewcode-block" id="FetchMode.run_fetchers"><a class="viewcode-back" href="../../compliance.html#compliance.runners.FetchMode.run_fetchers">[docs]</a>    <span class="k">def</span> <span class="nf">run_fetchers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reruns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -284,6 +295,7 @@
 <div class="viewcode-block" id="CheckMode.get_checks"><a class="viewcode-back" href="../../compliance.html#compliance.runners.CheckMode.get_checks">[docs]</a>    <span class="k">def</span> <span class="nf">get_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Provide the appropriate compliance framework check classes.&quot;&quot;&quot;</span>
         <span class="n">checks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">tests_found</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="p">:</span>
             <span class="n">tl</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestLoader</span><span class="p">()</span>
             <span class="n">tl</span><span class="o">.</span><span class="n">testMethodPrefix</span> <span class="o">=</span> <span class="n">CHECK_PREFIX</span>
@@ -292,6 +304,7 @@
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="vm">__class__</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">]:</span>
                 <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">test</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">test</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">tests_found</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
                 <span class="n">in_accred_grouping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="o">.</span><span class="n">is_test_included</span><span class="p">(</span>
                     <span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">accreds</span>
                 <span class="p">)</span>
@@ -305,6 +318,32 @@
                         <span class="p">)</span>
                     <span class="p">]</span>
                     <span class="n">checks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">load_err</span> <span class="ow">in</span> <span class="n">tl</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">locate</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                        <span class="s1">&#39;^Failed to import test module: (.+?)</span><span class="se">\n</span><span class="s1">.*?&#39;</span><span class="p">,</span> <span class="n">load_err</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">accred</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accreds</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="o">.</span><span class="n">accred_checks</span><span class="p">[</span><span class="n">accred</span><span class="p">]:</span>
+                            <span class="k">if</span> <span class="n">check</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">locate</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)):</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">load_errors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                                    <span class="sa">f</span><span class="s1">&#39;Unable to load </span><span class="si">{</span><span class="n">check</span><span class="si">}</span><span class="se">\n\n</span><span class="si">{</span><span class="n">load_err</span><span class="si">}</span><span class="s1">&#39;</span>
+                                <span class="p">)</span>
+                                <span class="n">tests_found</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">check</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+        <span class="n">expected_checks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">accred</span><span class="p">,</span> <span class="n">checks_in_accred</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="o">.</span><span class="n">accred_checks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">accred</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accreds</span><span class="p">:</span>
+                <span class="n">expected_checks</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">checks_in_accred</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">check_not_found</span> <span class="ow">in</span> <span class="n">expected_checks</span> <span class="o">-</span> <span class="n">tests_found</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_errors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Unable to load </span><span class="si">{</span><span class="n">check_not_found</span><span class="si">}</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;The check </span><span class="si">{</span><span class="n">check_not_found</span><span class="si">}</span><span class="s1"> was not found.  &#39;</span>
+                    <span class="s1">&#39;Please validate that the path provided is correct.&#39;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">checks</span></div>
 
 <div class="viewcode-block" id="CheckMode.run_checks"><a class="viewcode-back" href="../../compliance.html#compliance.runners.CheckMode.run_checks">[docs]</a>    <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -442,7 +481,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.2.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.runners</a></li> 
       </ul>
