@@ -1,6 +1,10 @@
 # Contributing
 
-If you want to add to the framework, please familiarise yourself with the code & our [Coding Standards][]. Before you submit a PR, please [file an issue][new collab] to request collaborator access.
+If you want to add to the framework, please familiarise yourself with the code & our [Coding Standards][]. Make a fork of the repository & file a Pull Request from your fork with the changes. You will need to click the checkbox in the template to show you agree to the [Developer Certificate of Origin](../blob/master/DCO1.1.txt).
+
+If you make **regular & substantial contributions** to Auditree, you may want to become a collaborator. This means you can approve pull requests (though not your own) & create releases of the tool. Please [file an issue][new collab] to request collaborator access. A collaborator supports the project, ensuring coding standards are met & best practices are followed in contributed code, cutting & documenting releases, promoting the project etc.
+
+## Fetchers & checks
 
 If you would like to contribute checks, either add them via PR to[Arboretum][] or push to your own repository & let us know of its existence.
 
