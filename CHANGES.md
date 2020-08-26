@@ -1,3 +1,7 @@
+# 1.2.5
+
+- [FIXED] Credentials section bug affecting the Slack notifier.
+
 # 1.2.4
 
 - [IMPROVED] Fetchers and checks that failed to load appear as errors in STDERR now.
