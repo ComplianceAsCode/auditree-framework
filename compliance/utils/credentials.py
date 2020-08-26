@@ -81,8 +81,9 @@ class Config():
             logger.debug(
                 f'Loading credentials from ENV vars: {", ".join(env_vars)}'
             )
-
-        params = self._cfg.options(section)
+        params = []
+        if self._cfg.has_section(section):
+            params = self._cfg.options(section)
         values = [self._cfg.get(section, x) for x in params]
 
         d = OrderedDict(zip(params, values))
