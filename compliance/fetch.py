@@ -35,12 +35,17 @@ class ComplianceFetcher(unittest.TestCase):
         """
         Provide a requests session object with User-Agent header.
 
-        :param url: optional base URL for the session requests to use.
+        :param url: optional base URL for the session requests to use.  A url
+          argument triggers a new session object to be created whereas no url
+          argument will return the current session object if one exists.
         :param creds: optional authentication credentials.
         :param headers: optional kwargs to add to session headers.
 
         :returns: a requests Session object.
         """
+        if url is not None and hasattr(cls, '_session'):
+            cls._session.close()
+            delattr(cls, '_session')
         if not hasattr(cls, '_session'):
             if url:
                 cls._session = BaseSession(url)

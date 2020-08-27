@@ -1,6 +1,10 @@
+# 1.2.6
+
+- [FIXED] ComplianceFetcher.session can now be reset.
+
 # 1.2.5
 
-- [FIXED] Credentials section bug affecting the Slack notifier.
+- [FIXED] Credentials section bug affecting the Slack notifier is squashed.
 
 # 1.2.4
 
