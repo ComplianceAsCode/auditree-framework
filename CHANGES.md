@@ -1,5 +1,6 @@
-# UNRELEASED
-
+# 1.4.0
+ 
+- [IMPROVED] PagerDuty notifier can send alerts for a subset of the accreditation checks based on the config.
 - [NEW] Added warning for possible sensitive information contained within notifications.
 
 # 1.3.0
