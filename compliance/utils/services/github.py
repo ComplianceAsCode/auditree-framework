@@ -14,19 +14,14 @@
 # limitations under the License.
 """Compliance Github service helper."""
 
-import base64
 import json
 import random
-import re
-import sys
 from collections import OrderedDict
 from urllib.parse import parse_qs, urlparse
 
 from compliance.utils.credentials import Config
 from compliance.utils.data_parse import deep_merge
 from compliance.utils.http import BaseSession
-
-import yaml
 
 
 class Github(object):
@@ -286,103 +281,6 @@ class Github(object):
                 )
         return all_issues
 
-    def get_issue_template(
-        self,
-        owner,
-        repo,
-        template_name,
-        strip_annotations=False,
-        strip_header=True,
-        annotations=None,
-        render=False
-    ):
-        """
-        Retrieve the contents of an issue template based on template name.
-
-        The .md extension and any numeric prefix) from the owner and repo
-        are ignored.  Both the header (the YAML section at the top), and any
-        defined annotations (the JSON code block inside the issue body) are
-        returned as dictionaries along with the body of the template. You can
-        pass ``strip_annotations`` or ``strip_header`` to remove these sections
-        from the body that's returned.  You can pass a dictionary as
-        ``annotations``, and the values will be merged with those extracted
-        from the template.
-
-        If ``render`` is ``True``, then all annotations will be substituted on
-        the body and header.
-        """
-        # get a list of all templates in this repo
-        path_elements = [
-            'repos', owner, repo, 'contents', '.github', 'ISSUE_TEMPLATE'
-        ]
-        response = self._make_request('get', '/'.join(path_elements))
-        templates = [t['name'] for t in response]
-
-        # find the required template, ignoring any numeric prefix
-        template_file = next(
-            (
-                t for t in templates
-                if re.sub(r'(^[0-9]+\.)?(.*)\.md$', r'\2', t) == template_name
-            ),
-            None
-        )
-        if not template_file:
-            raise ValueError(f'Template {template_name} not found')
-
-        # get the template from .github/ISSUE_TEMPLATE in the
-        # repo (master branch)
-        path_elements = [
-            'repos',
-            owner,
-            repo,
-            'contents',
-            '.github',
-            'ISSUE_TEMPLATE',
-            template_file
-        ]
-        response = self._make_request('get', '/'.join(path_elements))
-
-        # result is base64 encoded (and bytes in py3)
-        assert response['encoding'] == 'base64'
-        template = base64.b64decode(response['content'])
-        template = template.decode(sys.stdout.encoding)
-
-        # extract header data structure (YAML)
-        body_no_header, extracted_header = extract_header(template)
-
-        # optionally strip off the leading header section
-        if strip_header:
-            template = body_no_header
-
-        # extract annotations (JSON)
-        body_no_annotations, extracted_annotations = extract_annotations(
-            template
-        )
-
-        # if we were passed some annotations,
-        # merge them into what's in the template
-        if annotations:
-            deep_merge(extracted_annotations, annotations)
-
-        if render:
-            body_no_annotations = body_no_annotations.format(
-                **extracted_annotations
-            )
-            extracted_header = {
-                k: v.format(**extracted_annotations)
-                for k,
-                v in extracted_header.items()
-            }
-        # optionally strip off the annotations section
-        if strip_annotations:
-            template = body_no_annotations
-        else:
-            template = self._annotate_body(
-                body_no_annotations, extracted_annotations
-            )
-
-        return template, extracted_annotations, extracted_header
-
     def search_issues(
         self, query, sort=None, order=None, owner=None, repo=None
     ):
@@ -605,31 +503,3 @@ def extract_annotations(content):
         annotations = OrderedDict({})
 
     return content_no_annotations, annotations
-
-
-def extract_header(content):
-    """
-    Retrieve header (YAML) from a string (issue body).
-
-    Returns the remaining content without the header,
-    and then the header fields themselves as a dictionary.
-    """
-    header_yaml = []
-    lines = content.splitlines(True)
-    if lines[0] == '---\n':
-        header_yaml.append(lines.pop(0))
-        line = ''
-        while line != '---\n':
-            line = lines.pop(0)
-            if line != '---\n':
-                header_yaml.append(line)
-        if lines[0] == '\n':
-            lines.pop(0)
-
-    content_no_header = ''.join(lines)
-    if header_yaml:
-        header_fields = yaml.safe_load(''.join(header_yaml))
-    else:
-        header_fields = {}
-
-    return content_no_header, header_fields
