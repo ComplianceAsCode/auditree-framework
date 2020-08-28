@@ -14,7 +14,7 @@ There are some guidelines to follow when making a common fetcher or check:
 
   - The sub-document structure to adhere to for a common module is one where the root of the sub-document is the org. Under the org there should be a name field which would refer to the organization’s name. Each common module configuration sub-document should also be under the org sub-document. For example:
 
-```json
+```
         {
            ...
            "org": {
