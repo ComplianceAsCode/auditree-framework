@@ -1,3 +1,8 @@
+# 1.2.7
+
+- [CHANGED] Removed PyYAML dependency to resolve downstream dependency issues.
+- [CHANGED] Removed Github.get_issue_template helper method.
+
 # 1.2.6
 
 - [FIXED] ComplianceFetcher.session can now be reset.
