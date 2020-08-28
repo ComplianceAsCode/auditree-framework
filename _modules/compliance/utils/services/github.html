@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.utils.services.github &#8212; Auditree Framework 1.2.6 documentation</title>
+    <title>compliance.utils.services.github &#8212; Auditree Framework 1.2.7 documentation</title>
     <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.2.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.2.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils.services.github</a></li> 
       </ul>
@@ -55,19 +55,14 @@
 <span class="c1"># limitations under the License.</span>
 <span class="sd">&quot;&quot;&quot;Compliance Github service helper.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">parse_qs</span><span class="p">,</span> <span class="n">urlparse</span>
 
 <span class="kn">from</span> <span class="nn">compliance.utils.credentials</span> <span class="kn">import</span> <span class="n">Config</span>
 <span class="kn">from</span> <span class="nn">compliance.utils.data_parse</span> <span class="kn">import</span> <span class="n">deep_merge</span>
 <span class="kn">from</span> <span class="nn">compliance.utils.http</span> <span class="kn">import</span> <span class="n">BaseSession</span>
-
-<span class="kn">import</span> <span class="nn">yaml</span>
 
 
 <div class="viewcode-block" id="Github"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github">[docs]</a><span class="k">class</span> <span class="nc">Github</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -327,103 +322,6 @@
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">all_issues</span></div>
 
-<div class="viewcode-block" id="Github.get_issue_template"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_issue_template">[docs]</a>    <span class="k">def</span> <span class="nf">get_issue_template</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">owner</span><span class="p">,</span>
-        <span class="n">repo</span><span class="p">,</span>
-        <span class="n">template_name</span><span class="p">,</span>
-        <span class="n">strip_annotations</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">strip_header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">render</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieve the contents of an issue template based on template name.</span>
-
-<span class="sd">        The .md extension and any numeric prefix) from the owner and repo</span>
-<span class="sd">        are ignored.  Both the header (the YAML section at the top), and any</span>
-<span class="sd">        defined annotations (the JSON code block inside the issue body) are</span>
-<span class="sd">        returned as dictionaries along with the body of the template. You can</span>
-<span class="sd">        pass ``strip_annotations`` or ``strip_header`` to remove these sections</span>
-<span class="sd">        from the body that&#39;s returned.  You can pass a dictionary as</span>
-<span class="sd">        ``annotations``, and the values will be merged with those extracted</span>
-<span class="sd">        from the template.</span>
-
-<span class="sd">        If ``render`` is ``True``, then all annotations will be substituted on</span>
-<span class="sd">        the body and header.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># get a list of all templates in this repo</span>
-        <span class="n">path_elements</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;contents&#39;</span><span class="p">,</span> <span class="s1">&#39;.github&#39;</span><span class="p">,</span> <span class="s1">&#39;ISSUE_TEMPLATE&#39;</span>
-        <span class="p">]</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_elements</span><span class="p">))</span>
-        <span class="n">templates</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">response</span><span class="p">]</span>
-
-        <span class="c1"># find the required template, ignoring any numeric prefix</span>
-        <span class="n">template_file</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
-            <span class="p">(</span>
-                <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">templates</span>
-                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(^[0-9]+\.)?(.*)\.md$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\2&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">==</span> <span class="n">template_name</span>
-            <span class="p">),</span>
-            <span class="kc">None</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">template_file</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Template </span><span class="si">{</span><span class="n">template_name</span><span class="si">}</span><span class="s1"> not found&#39;</span><span class="p">)</span>
-
-        <span class="c1"># get the template from .github/ISSUE_TEMPLATE in the</span>
-        <span class="c1"># repo (master branch)</span>
-        <span class="n">path_elements</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s1">&#39;repos&#39;</span><span class="p">,</span>
-            <span class="n">owner</span><span class="p">,</span>
-            <span class="n">repo</span><span class="p">,</span>
-            <span class="s1">&#39;contents&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;.github&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;ISSUE_TEMPLATE&#39;</span><span class="p">,</span>
-            <span class="n">template_file</span>
-        <span class="p">]</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_elements</span><span class="p">))</span>
-
-        <span class="c1"># result is base64 encoded (and bytes in py3)</span>
-        <span class="k">assert</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;encoding&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;base64&#39;</span>
-        <span class="n">template</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">])</span>
-        <span class="n">template</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
-
-        <span class="c1"># extract header data structure (YAML)</span>
-        <span class="n">body_no_header</span><span class="p">,</span> <span class="n">extracted_header</span> <span class="o">=</span> <span class="n">extract_header</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
-
-        <span class="c1"># optionally strip off the leading header section</span>
-        <span class="k">if</span> <span class="n">strip_header</span><span class="p">:</span>
-            <span class="n">template</span> <span class="o">=</span> <span class="n">body_no_header</span>
-
-        <span class="c1"># extract annotations (JSON)</span>
-        <span class="n">body_no_annotations</span><span class="p">,</span> <span class="n">extracted_annotations</span> <span class="o">=</span> <span class="n">extract_annotations</span><span class="p">(</span>
-            <span class="n">template</span>
-        <span class="p">)</span>
-
-        <span class="c1"># if we were passed some annotations,</span>
-        <span class="c1"># merge them into what&#39;s in the template</span>
-        <span class="k">if</span> <span class="n">annotations</span><span class="p">:</span>
-            <span class="n">deep_merge</span><span class="p">(</span><span class="n">extracted_annotations</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">render</span><span class="p">:</span>
-            <span class="n">body_no_annotations</span> <span class="o">=</span> <span class="n">body_no_annotations</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="o">**</span><span class="n">extracted_annotations</span>
-            <span class="p">)</span>
-            <span class="n">extracted_header</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">extracted_annotations</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">k</span><span class="p">,</span>
-                <span class="n">v</span> <span class="ow">in</span> <span class="n">extracted_header</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-            <span class="p">}</span>
-        <span class="c1"># optionally strip off the annotations section</span>
-        <span class="k">if</span> <span class="n">strip_annotations</span><span class="p">:</span>
-            <span class="n">template</span> <span class="o">=</span> <span class="n">body_no_annotations</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_annotate_body</span><span class="p">(</span>
-                <span class="n">body_no_annotations</span><span class="p">,</span> <span class="n">extracted_annotations</span>
-            <span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">template</span><span class="p">,</span> <span class="n">extracted_annotations</span><span class="p">,</span> <span class="n">extracted_header</span></div>
-
 <div class="viewcode-block" id="Github.search_issues"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.search_issues">[docs]</a>    <span class="k">def</span> <span class="nf">search_issues</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">repo</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
@@ -646,34 +544,6 @@
         <span class="n">annotations</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({})</span>
 
     <span class="k">return</span> <span class="n">content_no_annotations</span><span class="p">,</span> <span class="n">annotations</span></div>
-
-
-<div class="viewcode-block" id="extract_header"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.extract_header">[docs]</a><span class="k">def</span> <span class="nf">extract_header</span><span class="p">(</span><span class="n">content</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Retrieve header (YAML) from a string (issue body).</span>
-
-<span class="sd">    Returns the remaining content without the header,</span>
-<span class="sd">    and then the header fields themselves as a dictionary.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">header_yaml</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;---</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
-        <span class="n">header_yaml</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lines</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">while</span> <span class="n">line</span> <span class="o">!=</span> <span class="s1">&#39;---</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">line</span> <span class="o">!=</span> <span class="s1">&#39;---</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
-                <span class="n">header_yaml</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
-    <span class="n">content_no_header</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">header_yaml</span><span class="p">:</span>
-        <span class="n">header_fields</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">header_yaml</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">header_fields</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="k">return</span> <span class="n">content_no_header</span><span class="p">,</span> <span class="n">header_fields</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -705,7 +575,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.2.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.2.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils.services.github</a></li> 
       </ul>

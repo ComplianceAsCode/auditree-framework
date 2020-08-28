@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.utils.services package &#8212; Auditree Framework 1.2.6 documentation</title>
+    <title>compliance.utils.services package &#8212; Auditree Framework 1.2.7 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="compliance.utils.html" title="compliance.utils package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.2.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.2.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="compliance.utils.html" accesskey="U">compliance.utils package</a> &#187;</li>
@@ -217,22 +217,6 @@ be an empty dictionary if there aren’t any.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compliance.utils.services.github.Github.get_issue_template">
-<code class="sig-name descname">get_issue_template</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="n">template_name</span></em>, <em class="sig-param"><span class="n">strip_annotations</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">strip_header</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">annotations</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">render</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.get_issue_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.Github.get_issue_template" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the contents of an issue template based on template name.</p>
-<p>The .md extension and any numeric prefix) from the owner and repo
-are ignored.  Both the header (the YAML section at the top), and any
-defined annotations (the JSON code block inside the issue body) are
-returned as dictionaries along with the body of the template. You can
-pass <code class="docutils literal notranslate"><span class="pre">strip_annotations</span></code> or <code class="docutils literal notranslate"><span class="pre">strip_header</span></code> to remove these sections
-from the body that’s returned.  You can pass a dictionary as
-<code class="docutils literal notranslate"><span class="pre">annotations</span></code>, and the values will be merged with those extracted
-from the template.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">render</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then all annotations will be substituted on
-the body and header.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="compliance.utils.services.github.Github.get_issues_page">
 <code class="sig-name descname">get_issues_page</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">owner</span></em>, <em class="sig-param"><span class="n">repo</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.get_issues_page"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.Github.get_issues_page" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a repository’s issues by page.</p>
@@ -323,14 +307,6 @@ be merged into them.</p>
 <dd><p>Retrieve JSON annotations from a string (issue body).</p>
 <p>Returns the remaining content without the annotations,
 and then the annotations themselves as a dictionary.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="compliance.utils.services.github.extract_header">
-<code class="sig-prename descclassname">compliance.utils.services.github.</code><code class="sig-name descname">extract_header</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">content</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#extract_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.extract_header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve header (YAML) from a string (issue body).</p>
-<p>Returns the remaining content without the header,
-and then the header fields themselves as a dictionary.</p>
 </dd></dl>
 
 </div>
@@ -476,7 +452,7 @@ This uses the PD API v2.</p>
         <li class="right" >
           <a href="compliance.utils.html" title="compliance.utils package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.2.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.2.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="compliance.utils.html" >compliance.utils package</a> &#187;</li>
