@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.fetch &#8212; Auditree Framework 1.2.5 documentation</title>
+    <title>compliance.fetch &#8212; Auditree Framework 1.2.6 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.2.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.2.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.fetch</a></li> 
       </ul>
@@ -76,12 +76,17 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Provide a requests session object with User-Agent header.</span>
 
-<span class="sd">        :param url: optional base URL for the session requests to use.</span>
+<span class="sd">        :param url: optional base URL for the session requests to use.  A url</span>
+<span class="sd">          argument triggers a new session object to be created whereas no url</span>
+<span class="sd">          argument will return the current session object if one exists.</span>
 <span class="sd">        :param creds: optional authentication credentials.</span>
 <span class="sd">        :param headers: optional kwargs to add to session headers.</span>
 
 <span class="sd">        :returns: a requests Session object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;_session&#39;</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;_session&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;_session&#39;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">url</span><span class="p">:</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">BaseSession</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -191,7 +196,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.2.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.2.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.fetch</a></li> 
       </ul>
