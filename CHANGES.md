@@ -1,5 +1,8 @@
-# UNRELEASED
+# 1.3.0
 
+- [IMPROVED] Simplified `controls.json` format.  Original format is also supported.
+- [NEW] Added documentation for `controls.json` and check execution.
+- [NEW] Added ControlDescriptor unit tests.
 - [FIXED] ComplianceFetcher session object is auto-closed now in tearDownClass.
 
 # 1.2.7

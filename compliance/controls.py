@@ -30,15 +30,14 @@ class ControlDescriptor(object):
 
     def __init__(self, dirs=None):
         """Construct and initialize the ControlDescriptor object."""
-        dirs = dirs or [os.path.abspath('.')]
         self._controls = {}
         self._paths = []
-        for d in dirs:
-            json_file = os.path.join(d, 'controls.json')
+        for d in dirs or ['.']:
+            json_file = os.path.join(os.path.abspath(d), 'controls.json')
             if not os.path.isfile(json_file):
                 continue
             self._controls.update(json.loads(open(json_file).read()))
-        self._paths.append(json_file)
+            self._paths.append(json_file)
 
     @property
     def paths(self):
@@ -54,24 +53,30 @@ class ControlDescriptor(object):
     def accred_checks(self):
         """Provide all checks by accreditation (key) as a dictionary."""
         if not hasattr(self, '_accred_checks'):
-            self._accred_checks = defaultdict(list)
-            for check, evidence in self._controls.items():
-                for control in evidence.values():
-                    for accreds in control.values():
-                        for accred in accreds:
-                            self._accred_checks[accred].append(check)
+            self._accred_checks = defaultdict(set)
+            for check in self._controls.keys():
+                accreds = self.get_accreditations(check)
+                for accred in accreds:
+                    self._accred_checks[accred].add(check)
         return self._accred_checks
 
     def get_accreditations(self, test_path):
         """
         Provide the accreditation list for a given test_path.
 
-        :param test_path: the Python path to the test. For instance:
-          ``package.accr1.TestClass`` or ``package.accr2.test_function``
+        This works for original and simplified controls formats.
+
+        Original: {'test_path': {'key': {'sub-key: ['accred1', 'accred2']}}}
+        Simplified: {'test_path': ['accred1', 'accred2']}
+
+        :param test_path: the Python path to the test.
+          For example: ``package.category.checks.module.TestClass``
         """
-        test_paths = self._controls.get(test_path, {})
+        check_details = self._controls.get(test_path, {})
+        if isinstance(check_details, list):
+            return set(check_details)
         accreditations = [
-            itertools.chain(*c.values()) for c in test_paths.values()
+            itertools.chain(*c.values()) for c in check_details.values()
         ]
         return set(itertools.chain(*accreditations))
 
