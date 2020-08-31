@@ -28,7 +28,11 @@ import requests
 class ComplianceFetcher(unittest.TestCase):
     """Compliance fetcher automation TestCase class."""
 
-    _multiprocess_can_split_ = True
+    @classmethod
+    def tearDownClass(cls):
+        """Perform clean up."""
+        if hasattr(cls, '_session'):
+            cls._session.close()
 
     @classmethod
     def session(cls, url=None, creds=None, **headers):

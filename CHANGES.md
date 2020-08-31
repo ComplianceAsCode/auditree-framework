@@ -1,3 +1,7 @@
+# UNRELEASED
+
+- [FIXED] ComplianceFetcher session object is auto-closed now in tearDownClass.
+
 # 1.2.7
 
 - [CHANGED] Removed PyYAML dependency to resolve downstream dependency issues.
