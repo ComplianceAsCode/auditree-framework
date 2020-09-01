@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Design Principles &#8212; Auditree Framework 1.2.7 documentation</title>
+    <title>Design Principles &#8212; Auditree Framework 1.3.0 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.2.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.3.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>  
@@ -169,7 +169,7 @@ the raw data.</p>
 <ul class="simple">
 <li><p>Adding live-generated data that does not come from the source.</p></li>
 <li><p>Applying <cite>check-like</cite> logic (e.g. your data update if it includes an
-<cite>if</cite>). Checkers should test the evidence, not fetchers.</p></li>
+<cite>if</cite>). Checks should test the evidence, not fetchers.</p></li>
 </ul>
 <div class="section" id="evidence-validation">
 <h3>Evidence Validation<a class="headerlink" href="#evidence-validation" title="Permalink to this headline">¶</a></h3>
@@ -255,6 +255,11 @@ due to an unavailable evidence dependency.</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="fetcher-execution">
+<h3>Fetcher Execution<a class="headerlink" href="#fetcher-execution" title="Permalink to this headline">¶</a></h3>
+<p>The Auditree framework will run all fetchers (tests prefixed by <code class="docutils literal notranslate"><span class="pre">fetch_</span></code>)
+that it can find.</p>
+</div>
 </div>
 <div class="section" id="compliance-checks">
 <h2>Compliance Checks<a class="headerlink" href="#compliance-checks" title="Permalink to this headline">¶</a></h2>
@@ -265,8 +270,8 @@ provided on the command line.</p>
 <p>Checks <em>assume</em> that all evidence is retrieved by fetchers.  Consequently
 checks <strong>should not</strong> be used to retrieve or store any <code class="docutils literal notranslate"><span class="pre">RawEvidence</span></code> in the
 evidence locker. Each check class may have from one to multiple checks defined
-(that is, a check is a method prefixed with <cite>test_</cite> in a check class). Each of
-these checks will be executed by the compliance tool with the following
+(that is, a check is a method prefixed with <code class="docutils literal notranslate"><span class="pre">test_</span></code> in a check class). Each of
+these checks will be executed by the Auditree framework with the following
 possible results:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">OK</span></code>: the check ran successfully and <strong>passed</strong> all validations.</p></li>
@@ -383,11 +388,32 @@ dictionary of evidence paths were provided.</p></li>
 </pre></div>
 </div>
 </div>
+<div class="section" id="check-execution">
+<h3>Check Execution<a class="headerlink" href="#check-execution" title="Permalink to this headline">¶</a></h3>
+<p>The Auditree framework executes checks (tests prefixed by <code class="docutils literal notranslate"><span class="pre">test_</span></code>) based
+on accreditation groupings defined in a <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> config file.
+This is especially useful when targeting check result content to the
+appropriate groups of people.  The framework will by default look for
+<code class="docutils literal notranslate"><span class="pre">controls.json</span></code> in the current directory.  It is possible to supply the
+framework with alternate <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> location(s) by providing an
+alternate path or paths at the end of a compliance check execution command via
+the CLI.  In the case of multiple locations, the framework will combine the
+content of all <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> files found together.  With this check to
+accreditation mapping, the framework can execute checks based on the
+accreditations passed to the framework by the CLI.</p>
+<p><code class="docutils literal notranslate"><span class="pre">controls.json</span></code> content format example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;chk_pkg.chk_cat_foo.checks.chk_module_foo.FooCheckClass&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;accred.one&quot;</span><span class="p">],</span>
+  <span class="s2">&quot;chk_pkg.chk_cat_bar.checks.chk_module_bar.BarCheckClass&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;accred.one&quot;</span><span class="p">,</span> <span class="s2">&quot;accred.two&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="fixers">
 <h2>Fixers<a class="headerlink" href="#fixers" title="Permalink to this headline">¶</a></h2>
 <p>After checks have been run, but before notifications or reports are
-generated, the compliance tool will optionally try to fix the
+generated, the Auditree framework will optionally try to fix the
 issues automatically. This is controlled with the <code class="docutils literal notranslate"><span class="pre">--fix</span></code> option.
 By default it is <code class="docutils literal notranslate"><span class="pre">off</span></code>, and this is the mode that is used during the
 daily CI runs in Travis. But you can also set it to <code class="docutils literal notranslate"><span class="pre">dry-run</span></code> or <code class="docutils literal notranslate"><span class="pre">on</span></code>.</p>
@@ -419,7 +445,7 @@ messages to stdout, etc).</p>
 </div>
 <div class="section" id="execution-config">
 <h2>Execution Config<a class="headerlink" href="#execution-config" title="Permalink to this headline">¶</a></h2>
-<p>The compliance tool is designed to be run locally from your PC or from
+<p>The Auditree framework is designed to be run locally from your PC or from
 a CI server like Jenkins or Travis. The execution can be tweaked at 2
 levels:</p>
 <ul class="simple">
@@ -469,10 +495,12 @@ file should be similar to this:</p>
 <li><a class="reference internal" href="#compliance-fetchers">Compliance Fetchers</a><ul>
 <li><a class="reference internal" href="#evidence-validation">Evidence Validation</a></li>
 <li><a class="reference internal" href="#evidence-dependency-chaining">Evidence Dependency Chaining</a></li>
+<li><a class="reference internal" href="#fetcher-execution">Fetcher Execution</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#compliance-checks">Compliance Checks</a><ul>
 <li><a class="reference internal" href="#id2">Evidence Validation</a></li>
+<li><a class="reference internal" href="#check-execution">Check Execution</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#fixers">Fixers</a></li>
@@ -526,7 +554,7 @@ file should be similar to this:</p>
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.2.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.3.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>

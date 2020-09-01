@@ -22,6 +22,7 @@ The tool is divided in two main parts:
 Both fetch and check phases are run by unittest. This is very convenient
 as fetchers and checks are loaded automatically by ``unittest``.
 
+
 Evidences
 ~~~~~~~~~
 
@@ -145,7 +146,7 @@ This is a list of modifications that are completely forbidden:
 * Adding live-generated data that does not come from the source.
 
 * Applying `check-like` logic (e.g. your data update if it includes an
-  `if`). Checkers should test the evidence, not fetchers.
+  `if`). Checks should test the evidence, not fetchers.
 
 Evidence Validation
 ===================
@@ -231,6 +232,13 @@ due to an unavailable evidence dependency.
       ...
       return json.dumps(foo_bar_data)
 
+Fetcher Execution
+=================
+
+The Auditree framework will run all fetchers (tests prefixed by ``fetch_``)
+that it can find.
+
+
 Compliance Checks
 ~~~~~~~~~~~~~~~~~
 
@@ -242,8 +250,8 @@ provided on the command line.
 Checks *assume* that all evidence is retrieved by fetchers.  Consequently
 checks **should not** be used to retrieve or store any ``RawEvidence`` in the
 evidence locker. Each check class may have from one to multiple checks defined
-(that is, a check is a method prefixed with `test_` in a check class). Each of
-these checks will be executed by the compliance tool with the following
+(that is, a check is a method prefixed with ``test_`` in a check class). Each of
+these checks will be executed by the Auditree framework with the following
 possible results:
 
 * ``OK``: the check ran successfully and **passed** all validations.
@@ -359,12 +367,34 @@ prior to executing the check's logic.
               self.add_warnings('bar stuff', warnings)
               self.add_successes('bar stuff', successes)
 
+Check Execution
+===============
+
+The Auditree framework executes checks (tests prefixed by ``test_``) based
+on accreditation groupings defined in a ``controls.json`` config file.
+This is especially useful when targeting check result content to the
+appropriate groups of people.  The framework will by default look for
+``controls.json`` in the current directory.  It is possible to supply the
+framework with alternate ``controls.json`` location(s) by providing an
+alternate path or paths at the end of a compliance check execution command via
+the CLI.  In the case of multiple locations, the framework will combine the
+content of all ``controls.json`` files found together.  With this check to
+accreditation mapping, the framework can execute checks based on the
+accreditations passed to the framework by the CLI.
+
+``controls.json`` content format example::
+
+  {
+    "chk_pkg.chk_cat_foo.checks.chk_module_foo.FooCheckClass": ["accred.one"],
+    "chk_pkg.chk_cat_bar.checks.chk_module_bar.BarCheckClass": ["accred.one", "accred.two"]
+  }
+
 
 Fixers
 ~~~~~~
 
 After checks have been run, but before notifications or reports are
-generated, the compliance tool will optionally try to fix the
+generated, the Auditree framework will optionally try to fix the
 issues automatically. This is controlled with the ``--fix`` option.
 By default it is ``off``, and this is the mode that is used during the
 daily CI runs in Travis. But you can also set it to ``dry-run`` or ``on``.
@@ -378,6 +408,7 @@ listed in dry-run mode. If the fix succeeds, then a counter
 in the notification message.
 
 See :ref:`fixers` section for more information.
+
 
 Report Builder
 ~~~~~~~~~~~~~~
@@ -402,10 +433,11 @@ messages to stdout, etc).
 
 See :ref:`notifiers-description` section for more information.
 
+
 Execution Config
 ~~~~~~~~~~~~~~~~
 
-The compliance tool is designed to be run locally from your PC or from
+The Auditree framework is designed to be run locally from your PC or from
 a CI server like Jenkins or Travis. The execution can be tweaked at 2
 levels:
 
@@ -421,6 +453,7 @@ levels:
   example.
 
 .. _credentials:
+
 
 Credentials
 ~~~~~~~~~~~
