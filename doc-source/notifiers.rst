@@ -6,12 +6,18 @@ Notifiers
 =========
 
 The last phase in a typical framework check run is the notification
-system.  Multiple notifiers can be targeted as part of this phase  by using
+system.  Multiple notifiers can be targeted as part of this phase by using
 the ``--notify`` option on the ``compliance --check`` command.  Valid
 notifier options are ``stdout``, ``slack``, ``pagerduty``, ``findings``,
 ``gh_issues`` and, ``locker``.  The general idea behind the notification
 system is that each ``test_`` can generate a short notification that has the
 following components:
+
+    **NOTE:** When configuring notifiers, you should be aware of the
+    possibilitythat notifications may contain sensitive information that can be
+    sent to less trusted stores like Slack or public git issue trackers.  So be
+    mindful of check notification content as well as the nature of the forum
+    you intend to send these notifications to.
 
 * title (mandatory): should be a ``property`` of the
   ``ComplianceCheck``:
