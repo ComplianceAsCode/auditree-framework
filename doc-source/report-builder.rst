@@ -5,7 +5,7 @@
 Report Builder
 ==============
 
-After tests have been run by the compliance tool, the
+After tests have been run by the Auditree framework, the
 :py:class:`~compliance.report.ReportBuilder` is executed in order to
 render all the required reports. This is how it works:
 
@@ -43,7 +43,7 @@ render all the required reports. This is how it works:
    notify that the error occurred, in standard output. Note that report
    generation will not halt on an error, and will attempt to generate all other
    reports.
-   
+
 
 .. _templating:
 
