@@ -5,7 +5,7 @@
 Running on Travis
 =================
 
-Running compliance tool from a CI like Travis can be really useful for
+Running the Auditree framework from a CI like Travis can be really useful for
 executing your compliance checks periodically. Thus you can track the
 current level of compliance for different standards and also notify
 people whenever there is a failure, so it can be fixed in some way.

@@ -9,7 +9,7 @@ There might be some terms in this quick start that you don't fully
 understand, so you may want to have a look into
 :ref:`design-principles` section.
 
-The compliance tool requires, at least, one directory with the
+The Auditree framework requires, at least, one directory with the
 fetchers and checks. In order to learn how to use it, let's use a
 demo folder with a simple set of fetchers and checks. You can find it
 at `doc/demo-checks`::
@@ -59,7 +59,7 @@ mode::
 
   $ compliance --fetch --evidence no-push -C setup.json .
 
-The compliance tool will ``pull`` the repository to
+The Auditree framework will ``pull`` the repository to
 ``/tmp/compliance`` (only if it does not exist already), then run all
 the fetchers that need to be run (i.e. those whose evidence TTL
 has expired) but it will **not** push anything. This is handy for
@@ -97,10 +97,17 @@ instead::
 controls.json
 -------------
 
-The mapping between accreditations and checks happens at
-``controls.json``. New checks must be included here in order to be
-collected by the compliance tool. Note that this is not the same case
-as in fetchers, where all of them are executed.
+The mapping between a check (check class path) and accreditations
+(a list of accreditations) happens in the ``controls.json`` config
+file.  Each new check must be included in ``controls.json`` in
+order to be considered for execution by the Auditree framework.
+Note that this is not the case for fetchers, where all are executed.
+As an example, the format for ``controls.json`` is as follows::
+
+  {
+    "chk_pkg.chk_cat_foo.checks.chk_module_foo.FooCheckClass": ["accred.one"],
+    "chk_pkg.chk_cat_bar.checks.chk_module_bar.BarCheckClass": ["accred.one", "accred.two"]
+  }
 
 
 A few recommendations

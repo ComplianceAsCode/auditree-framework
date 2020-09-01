@@ -1,0 +1,7 @@
+{
+  "foo_pkg.checks.test_foo_module.FooCheck": {
+    "foo_evidence": {
+      "foo_control": ["accred.foo"]
+    }
+  }
+}
