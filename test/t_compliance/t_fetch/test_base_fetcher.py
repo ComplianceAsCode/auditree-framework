@@ -18,6 +18,9 @@ import unittest
 
 from compliance.config import ComplianceConfig
 from compliance.fetch import ComplianceFetcher
+from compliance.utils.http import BaseSession
+
+import requests
 
 
 class ComplianceFetchTest(unittest.TestCase):
@@ -30,9 +33,31 @@ class ComplianceFetchTest(unittest.TestCase):
         # unittest.TestCase, we must pass a method in the
         # constructor (otherwise, we will get a ValueError). Since we
         # don't need this method, passing ``__doc__`` is enough for
-        # building a ComplianceCheck object successfully.
-        self.check = ComplianceFetcher('__doc__')
+        # building a ComplianceFetcher object successfully.
+        ComplianceFetcher.config = ComplianceConfig()
+        self.fetcher = ComplianceFetcher('__doc__')
+        self.fetcher.config.load()
 
     def test_config(self):
         """Check that the config property returns a ComplianceConfig object."""
-        self.assertIsInstance(self.check.config, ComplianceConfig)
+        self.assertIsInstance(self.fetcher.config, ComplianceConfig)
+
+    def test_session(self):
+        """Ensure that a session is constructed correctly."""
+        # Create a requests.Session
+        self.assertIsInstance(self.fetcher.session(), requests.Session)
+        # Recycle session, create a BaseSession and persist it
+        self.assertIsInstance(
+            self.fetcher.session(
+                'https://foo.bar.com', ('foo', 'bar'), foo='FOO', bar='BAR'
+            ),
+            BaseSession
+        )
+        self.assertEqual(self.fetcher.session().baseurl, 'https://foo.bar.com')
+        self.assertEqual(self.fetcher.session().auth, ('foo', 'bar'))
+        self.assertEqual(
+            self.fetcher.session().headers['User-Agent'],
+            'your_org-compliance-checks'
+        )
+        self.assertEqual(self.fetcher.session().headers['foo'], 'FOO')
+        self.assertEqual(self.fetcher.session().headers['bar'], 'BAR')
