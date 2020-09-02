@@ -1,3 +1,7 @@
+# UNRELEASED
+
+- [NEW] Added warning for possible sensitive information contained within notifications.
+
 # 1.3.0
 
 - [IMPROVED] Simplified `controls.json` format.  Original format is also supported.
