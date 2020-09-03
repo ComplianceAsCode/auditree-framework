@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.notify &#8212; Auditree Framework 1.3.0 documentation</title>
+    <title>compliance.notify &#8212; Auditree Framework 1.4.0 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.4.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.notify</a></li> 
       </ul>
@@ -933,6 +933,16 @@
         <span class="k">for</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">accreditation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">desc</span><span class="p">:</span>
                 <span class="k">continue</span>
+            <span class="c1"># determine if we should page for all failing checks in this</span>
+            <span class="c1"># accreditation, or only a subset defined in the config.</span>
+            <span class="c1"># The config can either be a string of the PD service ID,</span>
+            <span class="c1"># or a dictionary containing additional config details, including</span>
+            <span class="c1"># the optional list of checks.</span>
+            <span class="n">all_checks</span><span class="p">,</span> <span class="n">pd_checks</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="s1">&#39;checks&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">]):</span>
+                <span class="n">all_checks</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">pd_checks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">][</span><span class="s1">&#39;checks&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="p">[]</span>
 
             <span class="c1"># get all current PD alerts</span>
             <span class="n">alerts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_alerts</span><span class="p">(</span><span class="n">accreditation</span><span class="p">)</span>
@@ -941,6 +951,10 @@
             <span class="n">passed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">warned</span><span class="p">,</span> <span class="n">errored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_by_status</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="p">(</span><span class="n">failed</span> <span class="o">+</span> <span class="n">errored</span><span class="p">):</span>
+                <span class="c1"># is the check in scope?</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">all_checks</span> <span class="ow">and</span> <span class="n">test_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pd_checks</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
                 <span class="n">summary</span><span class="p">,</span> <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_and_body</span><span class="p">(</span>
                     <span class="n">test_desc</span><span class="p">,</span>
                     <span class="n">msg</span><span class="p">,</span>
@@ -976,7 +990,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_alert</span><span class="p">(</span><span class="n">test_id</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_alerts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">):</span>
-        <span class="n">pd_service</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">]</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">]</span>
+        <span class="n">pd_service</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;service_id&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">conf</span>
 
         <span class="c1"># Get all triggered alerts</span>
         <span class="c1"># NOTE: statuses[]=triggered is supposed to work, but doesn&#39;t</span>
@@ -1180,7 +1195,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.4.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.notify</a></li> 
       </ul>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Notifiers &#8212; Auditree Framework 1.3.0 documentation</title>
+    <title>Notifiers &#8212; Auditree Framework 1.4.0 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.4.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>  
@@ -48,12 +48,19 @@
   <div class="section" id="notifiers">
 <span id="notifiers-description"></span><h1>Notifiers<a class="headerlink" href="#notifiers" title="Permalink to this headline">¶</a></h1>
 <p>The last phase in a typical framework check run is the notification
-system.  Multiple notifiers can be targeted as part of this phase  by using
+system.  Multiple notifiers can be targeted as part of this phase by using
 the <code class="docutils literal notranslate"><span class="pre">--notify</span></code> option on the <code class="docutils literal notranslate"><span class="pre">compliance</span> <span class="pre">--check</span></code> command.  Valid
 notifier options are <code class="docutils literal notranslate"><span class="pre">stdout</span></code>, <code class="docutils literal notranslate"><span class="pre">slack</span></code>, <code class="docutils literal notranslate"><span class="pre">pagerduty</span></code>, <code class="docutils literal notranslate"><span class="pre">findings</span></code>,
 <code class="docutils literal notranslate"><span class="pre">gh_issues</span></code> and, <code class="docutils literal notranslate"><span class="pre">locker</span></code>.  The general idea behind the notification
 system is that each <code class="docutils literal notranslate"><span class="pre">test_</span></code> can generate a short notification that has the
 following components:</p>
+<blockquote>
+<div><p><strong>NOTE:</strong> When configuring notifiers, you should be aware of the
+possibilitythat notifications may contain sensitive information that can be
+sent to less trusted stores like Slack or public git issue trackers.  So be
+mindful of check notification content as well as the nature of the forum
+you intend to send these notifications to.</p>
+</div></blockquote>
 <ul>
 <li><p>title (mandatory): should be a <code class="docutils literal notranslate"><span class="pre">property</span></code> of the
 <code class="docutils literal notranslate"><span class="pre">ComplianceCheck</span></code>:</p>
@@ -177,6 +184,45 @@ specify the channel ID:</p>
 <p>Channel ID <code class="docutils literal notranslate"><span class="pre">11223344</span></code> can be obtained quickly from the URL to a
 message of the target private channel. Of course, the Slack App needs
 to be part of the private channel.</p>
+</div>
+<div class="section" id="pagerduty">
+<h2>PagerDuty<a class="headerlink" href="#pagerduty" title="Permalink to this headline">¶</a></h2>
+<p>This configurable notifier will send alerts to PagerDuty.
+The following is an example configuration for this notifier
+to be added to a configuration file and used with the <code class="docutils literal notranslate"><span class="pre">pagerduty</span></code>
+option when executing your compliance checks.</p>
+<p>Note that you have two options to configure the PagerDuty notifier:</p>
+<ul class="simple">
+<li><p>Provide a list of checks by class path within an accreditation. This allows you</p></li>
+</ul>
+<p>to define which checks within the accreditation will trigger PageDuty notifications:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;pagerduty&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;my.accred1&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;service_id&quot;</span><span class="p">:</span> <span class="s2">&quot;SERVICE_ID&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;checks&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;package.category.checks.test_module_one.CheckClassOne&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;package.category.checks.test_module_two.CheckClassTwo&quot;</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Provide accreditations only and the notifier will send alerts for all checks with those</p></li>
+</ul>
+<p>accreditations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;pagerduty&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;my.accred1&quot;</span><span class="p">:</span> <span class="s2">&quot;SERVICE_ID&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">service_id</span></code> field is the service id from PagerDuty, e.g. <code class="docutils literal notranslate"><span class="pre">PABC123</span></code>.
+The PagerDuty notifier loads the active incidents to determine if
+it needs to create a new incident or update an existing one by using the <code class="docutils literal notranslate"><span class="pre">service_id</span></code>.</p>
 </div>
 <div class="section" id="github-issue">
 <h2>GitHub Issue<a class="headerlink" href="#github-issue" title="Permalink to this headline">¶</a></h2>
@@ -419,6 +465,7 @@ file:</p>
 <li><a class="reference internal" href="#">Notifiers</a><ul>
 <li><a class="reference internal" href="#file-descriptor">File descriptor</a></li>
 <li><a class="reference internal" href="#slack">Slack</a></li>
+<li><a class="reference internal" href="#pagerduty">PagerDuty</a></li>
 <li><a class="reference internal" href="#github-issue">GitHub Issue</a><ul>
 <li><a class="reference internal" href="#gh-summary-issue-by-accreditation">GH Summary Issue by Accreditation</a></li>
 <li><a class="reference internal" href="#gh-issue-per-check">GH Issue Per Check</a></li>
@@ -472,7 +519,7 @@ file:</p>
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.4.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>
