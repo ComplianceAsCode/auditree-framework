@@ -892,6 +892,16 @@ class PagerDutyNotifier(_BaseNotifier):
         for accreditation, desc in messages:
             if accreditation not in self._config or not desc:
                 continue
+            # determine if we should page for all failing checks in this
+            # accreditation, or only a subset defined in the config.
+            # The config can either be a string of the PD service ID,
+            # or a dictionary containing additional config details, including
+            # the optional list of checks.
+            all_checks, pd_checks = True, []
+            if (isinstance(self._config[accreditation], dict)
+                    and 'checks' in self._config[accreditation]):
+                all_checks = False
+                pd_checks = self._config[accreditation]['checks'] or []
 
             # get all current PD alerts
             alerts = self._get_alerts(accreditation)
@@ -900,6 +910,10 @@ class PagerDutyNotifier(_BaseNotifier):
             passed, failed, warned, errored = self._split_by_status(desc)
 
             for test_id, test_desc, msg in (failed + errored):
+                # is the check in scope?
+                if not all_checks and test_id not in pd_checks:
+                    continue
+
                 summary, body = self._get_summary_and_body(
                     test_desc,
                     msg,
@@ -935,7 +949,8 @@ class PagerDutyNotifier(_BaseNotifier):
                 self._resolve_alert(test_id, test_desc, msg, accreditation)
 
     def _get_alerts(self, accreditation):
-        pd_service = self._config[accreditation]
+        conf = self._config[accreditation]
+        pd_service = conf['service_id'] if isinstance(conf, dict) else conf
 
         # Get all triggered alerts
         # NOTE: statuses[]=triggered is supposed to work, but doesn't
