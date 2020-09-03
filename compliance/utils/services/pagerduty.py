@@ -15,7 +15,7 @@
 """Compliance Pagerduty service helper."""
 
 import json
-from urllib.parse import urlparse
+from urllib.parse import urljoin
 
 from compliance.utils.credentials import Config
 
@@ -36,7 +36,7 @@ def _init_request(path, params, headers, creds):
     if headers:
         hdrs.update(headers)
     params = params or {}
-    url = urlparse.urljoin(PAGERDUTY_API_URL, path)
+    url = urljoin(PAGERDUTY_API_URL, path)
     return url, params, hdrs
 
 
