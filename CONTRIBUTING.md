@@ -61,6 +61,23 @@ suite locally by using:
 make test
 ```
 
+## Releases and change logs
+
+We follow [semantic versioning][semver] and [changelog standards][changelog] with
+the following addendum:
+
+- We set the main package `__init__.py` `version` for version tracking.
+- Our change log is CHANGES.md.
+- In addition to the _types of changes_ outlined in the
+[changelog standards][changelog] we also include a BREAKING _type of change_ to
+call out any change that may cause downstream execution disruption.
+- Change types are always capitalized and enclosed in square brackets.  For
+example `[ADDED]`, `[CHANGED]`, etc.
+- Changes are in the form of complete sentences with appropriate punctuation.
+
+[semver]: https://semver.org/
+[changelog]: https://keepachangelog.com/en/1.0.0/#how
+
 [Arboretum]: https://github.com/ComplianceAsCode/auditree-arboretum
 [Coding Standards]: https://github.com/ComplianceAsCode/auditree-framework/blob/master/doc/coding-standards.rst
 [flake8]: https://gitlab.com/pycqa/flake8
