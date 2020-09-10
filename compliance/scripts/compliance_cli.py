@@ -88,13 +88,14 @@ class ComplianceCLI(Command):
             metavar='/path/to/creds.ini',
             default='~/.credentials'
         )
+        notify_options = [k for k in get_notifiers().keys() if k != 'stdout']
         self.add_argument(
             '--notify',
             help=(
                 'Specifies a list of notifiers for sending notifications.  '
                 'Valid values (can be a comma separated list - no spaces): '
-                f'{", ".join(get_notifiers().keys())}.  '
-                'Defaults to %(default)s.'
+                f'{", ".join(notify_options)}.  NOTE: In addition to those '
+                'specified, the %(default)s notifier will always execute.'
             ),
             metavar='[slack,gh_issues,...]',
             default='stdout'
@@ -108,6 +109,8 @@ class ComplianceCLI(Command):
         )
 
     def _validate_arguments(self, args):
+        if 'stdout' not in args.notify:
+            args.notify += ',stdout'
         if args.check == '':
             self.parser.error(
                 '--check option requires accreditation grouping(s).'

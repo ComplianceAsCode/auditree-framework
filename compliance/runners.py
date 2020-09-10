@@ -30,6 +30,7 @@ from compliance.fix import Fixer
 from compliance.locker import Locker
 from compliance.notify import get_notifiers
 from compliance.report import ReportBuilder
+from compliance.utils.exceptions import LockerPushError
 from compliance.utils.path import (
     CHECK_PREFIX, FETCH_PREFIX, get_toplevel_dirpath, load_evidences_modules
 )
@@ -231,6 +232,7 @@ class CheckMode(_BaseRunner):
             n.strip().replace('ghe_issues', 'gh_issues')
             for n in opts.notify.split(',')
         ]
+        self.push_error = False
 
     def __enter__(self):
         """Initialize check mode processing."""
@@ -241,8 +243,13 @@ class CheckMode(_BaseRunner):
     def __exit__(self, typ, val, traceback):
         """Handle post check test execution processing."""
         super(CheckMode, self).__exit__(typ, val, traceback)
-        self.fix_failures()
-        self.build_reports()
+        try:
+            self.build_reports()
+            # When in full-remote mode, fixers only run if push was successful
+            self.fix_failures()
+        except LockerPushError as lpe:
+            self.locker.logger.error(str(lpe))
+            self.push_error = True
         self.run_notifiers()
 
     def init_config(self):
@@ -343,7 +350,9 @@ class CheckMode(_BaseRunner):
             notifier_args = [self.results, self.controls]
             if notifier_name == 'locker':
                 notifier_args.append(self.locker)
-            notifier = notifiers[notifier_name](*notifier_args)
+            notifier = notifiers[notifier_name](
+                *notifier_args, push_error=self.push_error
+            )
             notifier.notify()
 
 
