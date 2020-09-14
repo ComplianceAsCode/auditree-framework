@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.notify &#8212; Auditree Framework 1.4.0 documentation</title>
+    <title>compliance.notify &#8212; Auditree Framework 1.5.0 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.4.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.notify</a></li> 
       </ul>
@@ -83,10 +83,18 @@
 <span class="sd">    It shouldn&#39;t be used outside of this module.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">results</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_controls</span> <span class="o">=</span> <span class="n">controls</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;compliance.notifier&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_push_error</span> <span class="o">=</span> <span class="n">push_error</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;compliance.notifier&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(levelname)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">messages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -119,7 +127,7 @@
                 <span class="n">body</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">elif</span> <span class="n">test_desc</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;error&#39;</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">body</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Test </span><span class="si">{</span><span class="n">test_id</span><span class="si">}</span><span class="s1"> failed to run&#39;</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Check </span><span class="si">{</span><span class="n">test_id</span><span class="si">}</span><span class="s1"> failed to execute&#39;</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_obj</span><span class="o">.</span><span class="n">tests</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">msg_method</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;msg_&#39;</span><span class="p">):</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">test_obj</span><span class="p">,</span> <span class="n">msg_method</span><span class="p">)(</span><span class="n">method_name</span><span class="p">)</span>
                 <span class="n">body</span> <span class="o">=</span> <span class="n">msg</span> <span class="ow">and</span> <span class="s1">&#39;body&#39;</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">and</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="kc">None</span>
@@ -257,8 +265,8 @@
 <span class="sd">    It shouldn&#39;t be used outside of this module.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">_BaseMDNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">_BaseMDNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_generate_accred_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accred</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">skip_title</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">md_content</span> <span class="o">=</span> <span class="p">[]</span>
@@ -268,43 +276,52 @@
         <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">## Notification for </span><span class="si">{</span><span class="n">accred</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1"> accreditation</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="p">)</span>
-        <span class="k">for</span> <span class="n">heading</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Passed Checks&#39;</span><span class="p">,</span> <span class="s1">&#39;Errored Checks&#39;</span><span class="p">]:</span>
-            <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;### </span><span class="si">{</span><span class="n">heading</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">checks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_check_names</span><span class="p">(</span>
-                <span class="n">results</span><span class="p">[</span><span class="n">heading</span><span class="p">[:</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()],</span> <span class="n">include_path</span><span class="o">=</span><span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_error</span><span class="p">:</span>
+            <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;### All Checks (Errored)</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s1">&#39;   - Evidence/Results failed to push to remote locker.  &#39;</span>
+                <span class="s1">&#39;See execution log for details.&#39;</span>
             <span class="p">)</span>
-            <span class="k">if</span> <span class="n">checks</span><span class="p">:</span>
-                <span class="n">check_title</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="n">checks</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">check</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">check_title</span><span class="p">:</span>
-                        <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- **</span><span class="si">{</span><span class="n">check</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">**&#39;</span><span class="p">)</span>
-                        <span class="n">check_title</span> <span class="o">=</span> <span class="n">check</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">heading</span> <span class="o">==</span> <span class="s1">&#39;Errored Checks&#39;</span><span class="p">:</span>
-                        <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   - </span><span class="si">{</span><span class="n">check</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> failed to execute&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- **No </span><span class="si">{</span><span class="n">heading</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1">**&#39;</span><span class="p">)</span>
-        <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;### Failures/Warnings</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">fail_and_warn</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;fail&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;warn&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">fail_and_warn</span><span class="p">:</span>
-            <span class="n">summary_format</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="s1">&#39;- **</span><span class="si">{title}</span><span class="s1">**&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;   - **</span><span class="si">{status}</span><span class="s1">** | </span><span class="si">{reports}</span><span class="s1"> </span><span class="si">{runbook}</span><span class="s1">&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;   - </span><span class="si">{issues}</span><span class="s1">&#39;</span>
-            <span class="p">]</span>
-            <span class="n">rpt_link_format</span> <span class="o">=</span> <span class="s1">&#39;[</span><span class="si">{name}</span><span class="s1">](</span><span class="si">{url}</span><span class="s1">)&#39;</span>
-            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">fail_and_warn</span><span class="p">:</span>
-                <span class="n">summary</span><span class="p">,</span> <span class="n">addl_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_and_body</span><span class="p">(</span>
-                    <span class="n">test_desc</span><span class="p">,</span>
-                    <span class="n">msg</span><span class="p">,</span>
-                    <span class="n">summary_format</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">summary_format</span><span class="p">),</span>
-                    <span class="n">link_format</span><span class="o">=</span><span class="n">rpt_link_format</span>
-                <span class="p">)</span>
-                <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">addl_content</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">addl_content</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
-                        <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   - _</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s1">_&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;- **No failures or warnings**&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">heading</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Passed Checks&#39;</span><span class="p">,</span> <span class="s1">&#39;Errored Checks&#39;</span><span class="p">]:</span>
+                <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;### </span><span class="si">{</span><span class="n">heading</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">checks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_check_names</span><span class="p">(</span>
+                    <span class="n">results</span><span class="p">[</span><span class="n">heading</span><span class="p">[:</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()],</span> <span class="n">include_path</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">checks</span><span class="p">:</span>
+                    <span class="n">check_title</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="n">checks</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">check</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">check_title</span><span class="p">:</span>
+                            <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- **</span><span class="si">{</span><span class="n">check</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">**&#39;</span><span class="p">)</span>
+                            <span class="n">check_title</span> <span class="o">=</span> <span class="n">check</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">heading</span> <span class="o">==</span> <span class="s1">&#39;Errored Checks&#39;</span><span class="p">:</span>
+                            <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s1">&#39;   - </span><span class="si">{</span><span class="n">check</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> failed to execute&#39;</span>
+                            <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- **No </span><span class="si">{</span><span class="n">heading</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1">**&#39;</span><span class="p">)</span>
+            <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;### Failures/Warnings</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">fail_and_warn</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;fail&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;warn&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">fail_and_warn</span><span class="p">:</span>
+                <span class="n">summary_format</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="s1">&#39;- **</span><span class="si">{title}</span><span class="s1">**&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;   - **</span><span class="si">{status}</span><span class="s1">** | </span><span class="si">{reports}</span><span class="s1"> </span><span class="si">{runbook}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;   - </span><span class="si">{issues}</span><span class="s1">&#39;</span>
+                <span class="p">]</span>
+                <span class="n">rpt_link_format</span> <span class="o">=</span> <span class="s1">&#39;[</span><span class="si">{name}</span><span class="s1">](</span><span class="si">{url}</span><span class="s1">)&#39;</span>
+                <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">fail_and_warn</span><span class="p">:</span>
+                    <span class="n">summary</span><span class="p">,</span> <span class="n">addl_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_and_body</span><span class="p">(</span>
+                        <span class="n">test_desc</span><span class="p">,</span>
+                        <span class="n">msg</span><span class="p">,</span>
+                        <span class="n">summary_format</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">summary_format</span><span class="p">),</span>
+                        <span class="n">link_format</span><span class="o">=</span><span class="n">rpt_link_format</span>
+                    <span class="p">)</span>
+                    <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">addl_content</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">addl_content</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                            <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   - _</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s1">_&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">md_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;- **No failures or warnings**&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">md_content</span>
 
 
@@ -316,7 +333,7 @@
 <span class="sd">    Defaults to STDOUT.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">fd</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">fd</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">push_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct and initialize the file descriptor notifier object.</span>
 
@@ -326,51 +343,57 @@
 <span class="sd">        :param fd: a file descriptor where to write the notifications on.</span>
 <span class="sd">          Defaults to STDOUT.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">FDNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FDNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="n">fd</span>
 
 <div class="viewcode-block" id="FDNotifier.notify"><a class="viewcode-back" href="../../compliance.html#compliance.notify.FDNotifier.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Write notifications into the file descriptor.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span>
-            <span class="k">return</span>
-
-        <span class="n">accreds</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">messages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_messages_by_accreditations</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-        <span class="n">messages</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">acc_msgs</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">acc_msgs</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="n">passed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">warned</span><span class="p">,</span> <span class="n">errored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_by_status</span><span class="p">(</span><span class="n">acc_msgs</span><span class="p">)</span>
-            <span class="n">accreds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">accreditation</span><span class="p">,</span>
-                    <span class="s1">&#39;passed&#39;</span><span class="p">:</span> <span class="n">passed</span><span class="p">,</span>
-                    <span class="s1">&#39;failed&#39;</span><span class="p">:</span> <span class="n">failed</span><span class="p">,</span>
-                    <span class="s1">&#39;warned&#39;</span><span class="p">:</span> <span class="n">warned</span><span class="p">,</span>
-                    <span class="s1">&#39;errored&#39;</span><span class="p">:</span> <span class="n">errored</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running the STDOUT notifier...&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">-- NOTIFICATIONS --</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">accred</span> <span class="ow">in</span> <span class="n">accreds</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;No results</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_error</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Notifications for </span><span class="si">{</span><span class="n">accred</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1"> accreditation</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                <span class="s1">&#39;All accreditation checks:  &#39;</span>
+                <span class="s1">&#39;Evidence/Results failed to push to remote locker.</span><span class="se">\n</span><span class="s1">&#39;</span>
             <span class="p">)</span>
-            <span class="n">passed_msg</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_get_check_names</span><span class="p">(</span><span class="n">accred</span><span class="p">[</span><span class="s1">&#39;passed&#39;</span><span class="p">])</span>
-            <span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;(none)&#39;</span>
-            <span class="n">accred_msgs</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;PASSED tests: </span><span class="si">{</span><span class="n">passed_msg</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">msg_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;errored&#39;</span><span class="p">,</span> <span class="s1">&#39;warned&#39;</span><span class="p">,</span> <span class="s1">&#39;failed&#39;</span><span class="p">]:</span>
-                <span class="n">accred_msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                        <span class="p">[</span>
-                            <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_and_body</span><span class="p">(</span><span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-                            <span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="ow">in</span> <span class="n">accred</span><span class="p">[</span><span class="n">msg_type</span><span class="p">]</span>
-                        <span class="p">]</span>
-                    <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">accreds</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">messages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_messages_by_accreditations</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">msgs</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">msgs</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">passed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">warned</span><span class="p">,</span> <span class="n">errored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_by_status</span><span class="p">(</span><span class="n">msgs</span><span class="p">)</span>
+                <span class="n">accreds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">accreditation</span><span class="p">,</span>
+                        <span class="s1">&#39;passed&#39;</span><span class="p">:</span> <span class="n">passed</span><span class="p">,</span>
+                        <span class="s1">&#39;failed&#39;</span><span class="p">:</span> <span class="n">failed</span><span class="p">,</span>
+                        <span class="s1">&#39;warned&#39;</span><span class="p">:</span> <span class="n">warned</span><span class="p">,</span>
+                        <span class="s1">&#39;errored&#39;</span><span class="p">:</span> <span class="n">errored</span>
+                    <span class="p">}</span>
                 <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">accred_msgs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">accred</span> <span class="ow">in</span> <span class="n">accreds</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Notifications for </span><span class="si">{</span><span class="n">accred</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1"> &#39;</span>
+                    <span class="s1">&#39;accreditation</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                <span class="p">)</span>
+                <span class="n">passed_msg</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_check_names</span><span class="p">(</span><span class="n">accred</span><span class="p">[</span><span class="s1">&#39;passed&#39;</span><span class="p">])</span>
+                <span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;(none)&#39;</span>
+                <span class="n">accred_msgs</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;PASSED checks: </span><span class="si">{</span><span class="n">passed_msg</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">msg_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;errored&#39;</span><span class="p">,</span> <span class="s1">&#39;warned&#39;</span><span class="p">,</span> <span class="s1">&#39;failed&#39;</span><span class="p">]:</span>
+                    <span class="n">accred_msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_and_body</span><span class="p">(</span><span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+                                <span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">test_desc</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="ow">in</span> <span class="n">accred</span><span class="p">[</span><span class="n">msg_type</span><span class="p">]</span>
+                            <span class="p">]</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">accred_msgs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div></div>
 
 
@@ -386,7 +409,7 @@
 <span class="sd">      that they belong to.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">locker</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">locker</span><span class="p">,</span> <span class="n">push_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct and initialize the evidence locker notifier object.</span>
 
@@ -395,11 +418,20 @@
 <span class="sd">        :param controls: the control descriptor that manages accreditations.</span>
 <span class="sd">        :param locker: the evidence locker object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">LockerNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LockerNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">locker</span> <span class="o">=</span> <span class="n">locker</span>
 
 <div class="viewcode-block" id="LockerNotifier.notify"><a class="viewcode-back" href="../../compliance.html#compliance.notify.LockerNotifier.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Write notifications into the evidence locker.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;No results.  Locker notifier not triggered.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_error</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;Remote locker push failed.  Locker notifier not triggered.&#39;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running the Locker notifier...&#39;</span><span class="p">)</span>
         <span class="n">messages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_messages_by_accreditations</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="n">messages</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S UTC&#39;</span><span class="p">)</span>
@@ -437,7 +469,7 @@
 <span class="sd">    notifier is configurable via :class:`compliance.config.ComplianceConfig`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct and initialize the Github notifier object.</span>
 
@@ -445,7 +477,7 @@
 <span class="sd">          :py:class:`compliance.runners.CheckMode` at the end of the execution.</span>
 <span class="sd">        :param controls: the control descriptor that manages accreditations.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">GHIssuesNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GHIssuesNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;notify.gh_issues&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span>
@@ -461,6 +493,7 @@
 
 <div class="viewcode-block" id="GHIssuesNotifier.notify"><a class="viewcode-back" href="../../compliance.html#compliance.notify.GHIssuesNotifier.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send notifications to Github as repository issues.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running the Github Issues notifier...&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Using Github Issues notifier without config&#39;</span><span class="p">)</span>
 
@@ -478,6 +511,11 @@
             <span class="p">}</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accreditation</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;summary_issue&#39;</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_notify_by_summary_issue</span><span class="p">(</span><span class="n">accreditation</span><span class="p">,</span> <span class="n">results_by_status</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_error</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s1">&#39;Remote locker push failed.  &#39;</span>
+                    <span class="s1">&#39;Github Issues notifier not triggered.&#39;</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_notify_by_check_issues</span><span class="p">(</span><span class="n">accreditation</span><span class="p">,</span> <span class="n">results_by_status</span><span class="p">)</span></div>
 
@@ -718,7 +756,7 @@
         <span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="s1">&#39;#FFD300&#39;</span>
     <span class="p">}</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct and initialize the Slack notifier object.</span>
 
@@ -726,12 +764,13 @@
 <span class="sd">          :py:class:`compliance.runners.CheckMode` at the end of the execution.</span>
 <span class="sd">        :param controls: the control descriptor that manages accreditations.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SlackNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SlackNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">creds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;notify.slack&#39;</span><span class="p">,</span> <span class="p">{})</span>
 
 <div class="viewcode-block" id="SlackNotifier.notify"><a class="viewcode-back" href="../../compliance.html#compliance.notify.SlackNotifier.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send notifications to Slack channel(s).&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running the Slack notifier...&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Using Slack notifier without config&#39;</span><span class="p">)</span>
 
@@ -774,13 +813,29 @@
             <span class="s1">&#39;normal&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_normal_attachments</span><span class="p">,</span>
             <span class="s1">&#39;compact&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_compact_attachments</span>
         <span class="p">}</span>
-        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">modes</span><span class="p">:</span>
-            <span class="n">message</span><span class="p">[</span><span class="s1">&#39;attachments&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">modes</span><span class="p">[</span><span class="n">mode</span><span class="p">](</span><span class="n">accreditation</span><span class="p">,</span> <span class="n">test_descs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">modes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_error</span><span class="p">:</span>
+                <span class="n">message</span><span class="p">[</span><span class="s1">&#39;attachments&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_push_error_attachment</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">message</span><span class="p">[</span><span class="s1">&#39;attachments&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">modes</span><span class="p">[</span><span class="n">mode</span><span class="p">](</span><span class="n">test_descs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown Slack message mode: &#39;</span> <span class="o">+</span> <span class="n">mode</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown Slack message mode: </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">message</span>
 
-    <span class="k">def</span> <span class="nf">_generate_normal_attachments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">test_descs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_generate_push_error_attachment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;ALL checks&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="s1">&#39;Evidence/Results failed to push to remote locker.  &#39;</span>
+                    <span class="s1">&#39;See execution log for details.&#39;</span>
+                <span class="p">),</span>
+                <span class="s1">&#39;mrkdwn_in&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;pretext&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">SlackNotifier</span><span class="o">.</span><span class="n">MESSAGE_COLORS</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_generate_normal_attachments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_descs</span><span class="p">):</span>
         <span class="n">retval</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">passed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">warned</span><span class="p">,</span> <span class="n">errored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_by_status</span><span class="p">(</span><span class="n">test_descs</span><span class="p">)</span>
 
@@ -806,7 +861,7 @@
             <span class="n">passed_titles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;(none)&#39;</span><span class="p">)</span>
         <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="p">{</span>
-                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PASSED tests&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PASSED checks&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">passed_titles</span><span class="p">),</span>
                 <span class="s1">&#39;mrkdwn_in&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;pretext&#39;</span><span class="p">],</span>
                 <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">SlackNotifier</span><span class="o">.</span><span class="n">MESSAGE_COLORS</span><span class="p">[</span><span class="s1">&#39;pass&#39;</span><span class="p">]</span>
@@ -815,7 +870,7 @@
 
         <span class="k">return</span> <span class="n">retval</span>
 
-    <span class="k">def</span> <span class="nf">_generate_compact_attachments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accreditation</span><span class="p">,</span> <span class="n">test_descs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_generate_compact_attachments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_descs</span><span class="p">):</span>
         <span class="n">retval</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">passed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">warned</span><span class="p">,</span> <span class="n">errored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_by_status</span><span class="p">(</span><span class="n">test_descs</span><span class="p">)</span>
 
@@ -823,7 +878,7 @@
         <span class="k">if</span> <span class="n">passed</span><span class="p">:</span>
             <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;PASS: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">passed</span><span class="p">)</span><span class="si">}</span><span class="s1"> tests&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;PASS: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">passed</span><span class="p">)</span><span class="si">}</span><span class="s1"> checks&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;mrkdwn_in&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;pretext&#39;</span><span class="p">],</span>
                     <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">SlackNotifier</span><span class="o">.</span><span class="n">MESSAGE_COLORS</span><span class="p">[</span><span class="s1">&#39;pass&#39;</span><span class="p">]</span>
@@ -850,7 +905,7 @@
                 <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
             <span class="k">if</span> <span class="n">text</span><span class="p">:</span>
                 <span class="n">attachment</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">status</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="si">}</span><span class="s1"> tests&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">status</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="si">}</span><span class="s1"> checks&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
                     <span class="s1">&#39;mrkdwn_in&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;pretext&#39;</span><span class="p">],</span>
                     <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">SlackNotifier</span><span class="o">.</span><span class="n">MESSAGE_COLORS</span><span class="p">[</span><span class="n">status</span><span class="p">]</span>
@@ -861,7 +916,7 @@
         <span class="k">if</span> <span class="n">errored</span><span class="p">:</span>
             <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;ERRORS: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">errored</span><span class="p">)</span><span class="si">}</span><span class="s1"> tests&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;ERRORS: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">errored</span><span class="p">)</span><span class="si">}</span><span class="s1"> checks&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_check_names</span><span class="p">(</span><span class="n">errored</span><span class="p">))),</span>
                     <span class="s1">&#39;mrkdwn_in&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;pretext&#39;</span><span class="p">],</span>
                     <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">SlackNotifier</span><span class="o">.</span><span class="n">MESSAGE_COLORS</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span>
@@ -910,7 +965,7 @@
 <div class="viewcode-block" id="PagerDutyNotifier"><a class="viewcode-back" href="../../compliance.html#compliance.notify.PagerDutyNotifier">[docs]</a><span class="k">class</span> <span class="nc">PagerDutyNotifier</span><span class="p">(</span><span class="n">_BaseNotifier</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;PagerDuty notifier class.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct and initialize the PagerDuty notifier object.</span>
 
@@ -918,12 +973,18 @@
 <span class="sd">          :py:class:`compliance.runners.CheckMode` at the end of the execution.</span>
 <span class="sd">        :param controls: the control descriptor that manages accreditations.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">PagerDutyNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PagerDutyNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">creds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;notify.pagerduty&#39;</span><span class="p">,</span> <span class="p">{})</span>
 
 <div class="viewcode-block" id="PagerDutyNotifier.notify"><a class="viewcode-back" href="../../compliance.html#compliance.notify.PagerDutyNotifier.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send notifications as PagerDuty alerts.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_error</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;Remote locker push failed.  PagerDuty notifier not triggered.&#39;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running the PagerDuty notifier...&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Using PagerDuty notifier without config&#39;</span><span class="p">)</span>
 
@@ -1087,7 +1148,7 @@
 <span class="sd">    configurable via :class:`compliance.config.ComplianceConfig`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct and initialize the Findings notifier object.</span>
 
@@ -1095,7 +1156,7 @@
 <span class="sd">          :py:class:`compliance.runners.CheckMode` at the end of the execution.</span>
 <span class="sd">        :param controls: the control descriptor that manages accreditations.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FindingsNotifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">controls</span><span class="p">,</span> <span class="n">push_error</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;notify.findings&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">creds</span>
         <span class="n">api_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="p">[</span><span class="s1">&#39;findings&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">api_key</span>
@@ -1104,6 +1165,12 @@
 
 <div class="viewcode-block" id="FindingsNotifier.notify"><a class="viewcode-back" href="../../compliance.html#compliance.notify.FindingsNotifier.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send notifications to the Findings API.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_push_error</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;Remote locker push failed.  Findings notifier not triggered.&#39;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running the Findings notifier...&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Using findings notification without config&#39;</span><span class="p">)</span>
 
@@ -1195,7 +1262,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.4.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.notify</a></li> 
       </ul>

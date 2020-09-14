@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance package &#8212; Auditree Framework 1.4.0 documentation</title>
+    <title>compliance package &#8212; Auditree Framework 1.5.0 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="modules.html" title="compliance"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.4.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
@@ -1426,7 +1426,7 @@ updated evidence.</p>
 <p>Compliance notification management automation module.</p>
 <dl class="py class">
 <dt id="compliance.notify.FDNotifier">
-<em class="property">class </em><code class="sig-prename descclassname">compliance.notify.</code><code class="sig-name descname">FDNotifier</code><span class="sig-paren">(</span><em class="sig-param">results</em>, <em class="sig-param">controls</em>, <em class="sig-param">fd=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='UTF-8'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#FDNotifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.notify.FDNotifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">compliance.notify.</code><code class="sig-name descname">FDNotifier</code><span class="sig-paren">(</span><em class="sig-param">results</em>, <em class="sig-param">controls</em>, <em class="sig-param">fd=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='UTF-8'&gt;</em>, <em class="sig-param">push_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#FDNotifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.notify.FDNotifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.notify._BaseNotifier</span></code></p>
 <p>File descriptor notifier class.</p>
 <p>Notifications are written to the file descriptor specified.
@@ -1441,7 +1441,7 @@ Defaults to STDOUT.</p>
 
 <dl class="py class">
 <dt id="compliance.notify.FindingsNotifier">
-<em class="property">class </em><code class="sig-prename descclassname">compliance.notify.</code><code class="sig-name descname">FindingsNotifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results</span></em>, <em class="sig-param"><span class="n">controls</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#FindingsNotifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.notify.FindingsNotifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">compliance.notify.</code><code class="sig-name descname">FindingsNotifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results</span></em>, <em class="sig-param"><span class="n">controls</span></em>, <em class="sig-param"><span class="n">push_error</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#FindingsNotifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.notify.FindingsNotifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.notify._BaseNotifier</span></code></p>
 <p>Findings notifier class.</p>
 <p>Notifications are sent using the Findings API.  This notifier is
@@ -1456,7 +1456,7 @@ configurable via <a class="reference internal" href="#compliance.config.Complian
 
 <dl class="py class">
 <dt id="compliance.notify.GHIssuesNotifier">
-<em class="property">class </em><code class="sig-prename descclassname">compliance.notify.</code><code class="sig-name descname">GHIssuesNotifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results</span></em>, <em class="sig-param"><span class="n">controls</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#GHIssuesNotifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.notify.GHIssuesNotifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">compliance.notify.</code><code class="sig-name descname">GHIssuesNotifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results</span></em>, <em class="sig-param"><span class="n">controls</span></em>, <em class="sig-param"><span class="n">push_error</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#GHIssuesNotifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.notify.GHIssuesNotifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.notify._BaseMDNotifier</span></code></p>
 <p>Github notifier class.</p>
 <p>Notifications are sent to Github as repository issues.  This
@@ -1471,7 +1471,7 @@ notifier is configurable via <a class="reference internal" href="#compliance.con
 
 <dl class="py class">
 <dt id="compliance.notify.LockerNotifier">
-<em class="property">class </em><code class="sig-prename descclassname">compliance.notify.</code><code class="sig-name descname">LockerNotifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results</span></em>, <em class="sig-param"><span class="n">controls</span></em>, <em class="sig-param"><span class="n">locker</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#LockerNotifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.notify.LockerNotifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">compliance.notify.</code><code class="sig-name descname">LockerNotifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results</span></em>, <em class="sig-param"><span class="n">controls</span></em>, <em class="sig-param"><span class="n">locker</span></em>, <em class="sig-param"><span class="n">push_error</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#LockerNotifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.notify.LockerNotifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.notify._BaseMDNotifier</span></code></p>
 <p>Evidence Locker notifier class.</p>
 <p>Notifications are written to the evidence locker.</p>
@@ -1495,7 +1495,7 @@ that they belong to.</p></li>
 
 <dl class="py class">
 <dt id="compliance.notify.PagerDutyNotifier">
-<em class="property">class </em><code class="sig-prename descclassname">compliance.notify.</code><code class="sig-name descname">PagerDutyNotifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results</span></em>, <em class="sig-param"><span class="n">controls</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#PagerDutyNotifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.notify.PagerDutyNotifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">compliance.notify.</code><code class="sig-name descname">PagerDutyNotifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results</span></em>, <em class="sig-param"><span class="n">controls</span></em>, <em class="sig-param"><span class="n">push_error</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#PagerDutyNotifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.notify.PagerDutyNotifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.notify._BaseNotifier</span></code></p>
 <p>PagerDuty notifier class.</p>
 <dl class="py method">
@@ -1508,7 +1508,7 @@ that they belong to.</p></li>
 
 <dl class="py class">
 <dt id="compliance.notify.SlackNotifier">
-<em class="property">class </em><code class="sig-prename descclassname">compliance.notify.</code><code class="sig-name descname">SlackNotifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results</span></em>, <em class="sig-param"><span class="n">controls</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#SlackNotifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.notify.SlackNotifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">compliance.notify.</code><code class="sig-name descname">SlackNotifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results</span></em>, <em class="sig-param"><span class="n">controls</span></em>, <em class="sig-param"><span class="n">push_error</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#SlackNotifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.notify.SlackNotifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.notify._BaseNotifier</span></code></p>
 <p>Slack notifier class.</p>
 <p>Notifications are sent to Slack channel(s).  This notifier is
@@ -1807,7 +1807,7 @@ compatibility with checks, reporting, and notifiers.</p>
         <li class="right" >
           <a href="modules.html" title="compliance"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.4.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
