@@ -30,7 +30,10 @@ from compliance.utils.data_parse import (
     format_json, get_sha256_hash, parse_dot_key
 )
 from compliance.utils.exceptions import (
-    EvidenceNotFoundError, HistoricalEvidenceNotFoundError, StaleEvidenceError
+    EvidenceNotFoundError,
+    HistoricalEvidenceNotFoundError,
+    LockerPushError,
+    StaleEvidenceError
 )
 
 import git
@@ -180,11 +183,10 @@ class Locker(object):
 
     def logger_init_msgs(self):
         """Log locker initialization information."""
-        self.logger.info(f'Local locker location is {self.local_path}')
         gpgsign = self.gitconfig.get('commit', {}).get('gpgsign')
         if self._do_push and not gpgsign:
             self.logger.warning(
-                'Commits will not be cryptographically signed, best '
+                'Commits may not be cryptographically signed, best '
                 'practice is to set gitconfig.commit.gpgsign to true '
                 'in your locker configuration.'
             )
@@ -523,8 +525,12 @@ class Locker(object):
     def checkout(self):
         """Pull (clone) the remote repository to the local git repository."""
         if os.path.isdir(os.path.join(self.local_path, '.git')):
+            self.logger.info(f'Using locker found in {self.local_path}...')
             self.repo = git.Repo(self.local_path)
         else:
+            self.logger.info(
+                f'Cloning locker {self.repo_url} to {self.local_path}...'
+            )
             self.repo = git.Repo.clone_from(
                 self.repo_url_with_creds, self.local_path, branch=self.branch
             )
@@ -550,6 +556,9 @@ class Locker(object):
                 f'Files updated at local time {time.ctime(time.time())}'
                 f'\n\n{updated_files}'
             )
+        self.logger.info(
+            f'Committing changes to local locker in {self.local_path}...'
+        )
         try:
             diff = self.repo.index.diff('HEAD')
             if len(diff) > 0:
@@ -560,7 +569,12 @@ class Locker(object):
     def push(self):
         """Push the local git repository to the remote repository."""
         if self._do_push:
-            self.repo.remotes[0].push()
+            self.logger.info(
+                f'Pushing local locker to remote repo {self.repo_url}...'
+            )
+            push_info = self.repo.remotes[0].push()[0]
+            if push_info.flags >= git.remote.PushInfo.ERROR:
+                raise LockerPushError(push_info)
 
     def add_content_to_locker(self, content, folder='', filename=None):
         """
@@ -694,7 +708,7 @@ class Locker(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """
-        Handle local locker checkin and remote push if applicable.
+        Handle local locker check-in and remote push if applicable.
 
         Log an exception if raised, commit the files to the repo and if
         configured push it up to the `repo_url`.
@@ -708,8 +722,10 @@ class Locker(object):
 
     def _repo_init(self):
         if os.path.isdir(os.path.join(self.local_path, '.git')):
+            self.logger.info(f'Using locker found in {self.local_path}...')
             self.repo = git.Repo(self.local_path)
         else:
+            self.logger.info(f'Creating locker in {self.local_path}...')
             self.repo = git.Repo.init(self.local_path)
         self.init_config()
 

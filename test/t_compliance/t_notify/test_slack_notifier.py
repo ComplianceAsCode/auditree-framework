@@ -53,7 +53,7 @@ class SlackNotifierTest(unittest.TestCase):
         args, kwargs = post_mock.call_args
         self.assertTrue(args[0].startswith('https://hooks.slack.com'))
         msg = json.loads(kwargs['data'])
-        self.assertIn('failed to run', msg['attachments'][0]['text'])
+        self.assertIn('failed to execute', msg['attachments'][0]['text'])
 
     @patch('requests.post')
     @patch('compliance.notify.get_config')
@@ -81,9 +81,9 @@ class SlackNotifierTest(unittest.TestCase):
         self.assertTrue(args[0].startswith('https://hooks.slack.com'))
         msg = json.loads(kwargs['data'])
         self.assertEqual(len(msg['attachments']), 3)
-        self.assertEqual('PASSED tests', msg['attachments'][2]['title'])
+        self.assertEqual('PASSED checks', msg['attachments'][2]['title'])
         for att in msg['attachments'][:-1]:
-            self.assertIn('failed to run', att['text'])
+            self.assertIn('failed to execute', att['text'])
 
     @patch('requests.post')
     @patch('compliance.notify.get_config')
@@ -127,7 +127,7 @@ class SlackNotifierTest(unittest.TestCase):
         self.assertTrue(args[0].startswith('https://hooks.slack.com'))
         msg = json.loads(kwargs['data'])
         self.assertEqual(len(msg['attachments']), 3)
-        self.assertEqual('PASSED tests', msg['attachments'][2]['title'])
+        self.assertEqual('PASSED checks', msg['attachments'][2]['title'])
         for att in msg['attachments'][:-1]:
             testname = att['title'].rsplit(' ', 1)[1]
             url = f'http://mockedrunbooks/path/to/runbook_{testname}'

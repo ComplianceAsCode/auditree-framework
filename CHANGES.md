@@ -1,3 +1,10 @@
+# 1.5.0 (2020-09-14)
+
+- [ADDED] Remote locker push failure notifications were added.
+- [ADDED] Logging for git locker operations was added.
+- [ADDED] Notifier logging was added.
+- [CHANGED] The file descriptor (stdout) notifier always notifies now.
+
 # 1.4.0 (2020-09-03)
 
 - [CHANGED] PagerDuty notifier can send alerts for a subset of the accreditation checks based on the config.

@@ -43,3 +43,26 @@ class DependencyFetcherNotFoundError(ValueError):
     """Dependency fetcher not found exception class."""
 
     pass
+
+
+class LockerPushError(Exception):
+    """Locker push exception class."""
+
+    def __init__(self, push_info=None):
+        """
+        Construct the locker push exception.
+
+        :param push_info: a GitPython PushInfo object containing Git remote
+          push information
+        """
+        self.push_info = push_info
+
+    def __str__(self):
+        """Display the error as a string."""
+        msg = 'Push to remote locker failed.\n'
+        if self.push_info:
+            msg += (
+                f'       Summary: {self.push_info.summary}'
+                f'       Error Flags: {self.push_info.flags}'
+            )
+        return msg
