@@ -46,7 +46,7 @@ class BaseNotifierTest(unittest.TestCase):
 
         controls = create_autospec(ControlDescriptor)
         controls.get_accreditations.return_value = ['infra']
-        notifier = _BaseMDNotifier(results, controls)
+        notifier = _BaseMDNotifier(results, controls, push_error=False)
 
         split_tests = notifier._split_by_status(notifier.messages)
 

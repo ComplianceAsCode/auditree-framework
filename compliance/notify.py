@@ -42,10 +42,18 @@ class _BaseNotifier(object):
     It shouldn't be used outside of this module.
     """
 
-    def __init__(self, results, controls):
+    def __init__(self, results, controls, push_error):
         self._results = results
         self._controls = controls
-        self.logger = logging.getLogger('compliance.notifier')
+        self._push_error = push_error
+        self.logger = logging.getLogger(name='compliance.notifier')
+        self._handler = logging.StreamHandler()
+        self._handler.setFormatter(
+            logging.Formatter('%(levelname)s: %(message)s')
+        )
+        self.logger.handlers.clear()
+        self.logger.addHandler(self._handler)
+        self.logger.setLevel(logging.INFO)
 
     @property
     def messages(self):
@@ -78,7 +86,7 @@ class _BaseNotifier(object):
                 body = None
             elif test_desc['status'] == 'error':
                 msg = None
-                body = f'Test {test_id} failed to run'
+                body = f'Check {test_id} failed to execute'
             elif len(test_obj.tests) > 1 and not msg_method.startswith('msg_'):
                 msg = getattr(test_obj, msg_method)(method_name)
                 body = msg and 'body' in msg and msg['body'] or None
@@ -216,8 +224,8 @@ class _BaseMDNotifier(_BaseNotifier):
     It shouldn't be used outside of this module.
     """
 
-    def __init__(self, results, controls):
-        super(_BaseMDNotifier, self).__init__(results, controls)
+    def __init__(self, results, controls, push_error):
+        super(_BaseMDNotifier, self).__init__(results, controls, push_error)
 
     def _generate_accred_content(self, accred, results, skip_title=False):
         md_content = []
@@ -227,43 +235,52 @@ class _BaseMDNotifier(_BaseNotifier):
         md_content.append(
             f'\n## Notification for {accred.upper()} accreditation\n'
         )
-        for heading in ['Passed Checks', 'Errored Checks']:
-            md_content.append(f'### {heading}\n')
-            checks = self._get_check_names(
-                results[heading[:-9].lower()], include_path=True
+        if self._push_error:
+            md_content.append('### All Checks (Errored)\n')
+            md_content.append(
+                '   - Evidence/Results failed to push to remote locker.  '
+                'See execution log for details.'
             )
-            if checks:
-                check_title = None
-                for check in checks:
-                    if check[0] != check_title:
-                        md_content.append(f'- **{check[0]}**')
-                        check_title = check[0]
-                    if heading == 'Errored Checks':
-                        md_content.append(f'   - {check[1]} failed to execute')
-            else:
-                md_content.append(f'- **No {heading.lower()}**')
-        md_content.append('### Failures/Warnings\n')
-        fail_and_warn = results['fail'] + results['warn']
-        if fail_and_warn:
-            summary_format = [
-                '- **{title}**',
-                '   - **{status}** | {reports} {runbook}',
-                '   - {issues}'
-            ]
-            rpt_link_format = '[{name}]({url})'
-            for _, test_desc, msg in fail_and_warn:
-                summary, addl_content = self._get_summary_and_body(
-                    test_desc,
-                    msg,
-                    summary_format='\n'.join(summary_format),
-                    link_format=rpt_link_format
-                )
-                md_content.append(summary)
-                if addl_content:
-                    for line in addl_content.strip().split('\n'):
-                        md_content.append(f'   - _{line}_')
         else:
-            md_content.append('- **No failures or warnings**')
+            for heading in ['Passed Checks', 'Errored Checks']:
+                md_content.append(f'### {heading}\n')
+                checks = self._get_check_names(
+                    results[heading[:-9].lower()], include_path=True
+                )
+                if checks:
+                    check_title = None
+                    for check in checks:
+                        if check[0] != check_title:
+                            md_content.append(f'- **{check[0]}**')
+                            check_title = check[0]
+                        if heading == 'Errored Checks':
+                            md_content.append(
+                                f'   - {check[1]} failed to execute'
+                            )
+                else:
+                    md_content.append(f'- **No {heading.lower()}**')
+            md_content.append('### Failures/Warnings\n')
+            fail_and_warn = results['fail'] + results['warn']
+            if fail_and_warn:
+                summary_format = [
+                    '- **{title}**',
+                    '   - **{status}** | {reports} {runbook}',
+                    '   - {issues}'
+                ]
+                rpt_link_format = '[{name}]({url})'
+                for _, test_desc, msg in fail_and_warn:
+                    summary, addl_content = self._get_summary_and_body(
+                        test_desc,
+                        msg,
+                        summary_format='\n'.join(summary_format),
+                        link_format=rpt_link_format
+                    )
+                    md_content.append(summary)
+                    if addl_content:
+                        for line in addl_content.strip().split('\n'):
+                            md_content.append(f'   - _{line}_')
+            else:
+                md_content.append('- **No failures or warnings**')
         return md_content
 
 
@@ -275,7 +292,7 @@ class FDNotifier(_BaseNotifier):
     Defaults to STDOUT.
     """
 
-    def __init__(self, results, controls, fd=sys.stdout):
+    def __init__(self, results, controls, fd=sys.stdout, push_error=False):
         """
         Construct and initialize the file descriptor notifier object.
 
@@ -285,51 +302,57 @@ class FDNotifier(_BaseNotifier):
         :param fd: a file descriptor where to write the notifications on.
           Defaults to STDOUT.
         """
-        super(FDNotifier, self).__init__(results, controls)
+        super(FDNotifier, self).__init__(results, controls, push_error)
         self.fd = fd
 
     def notify(self):
         """Write notifications into the file descriptor."""
-        if not self._results:
-            return
-
-        accreds = []
-        messages = list(self._messages_by_accreditations().items())
-        messages.sort(key=lambda x: x[0])
-        for accreditation, acc_msgs in messages:
-            if not acc_msgs:
-                continue
-            passed, failed, warned, errored = self._split_by_status(acc_msgs)
-            accreds.append(
-                {
-                    'name': accreditation,
-                    'passed': passed,
-                    'failed': failed,
-                    'warned': warned,
-                    'errored': errored
-                }
-            )
-
+        self.logger.info('Running the STDOUT notifier...')
         self.fd.write('\n-- NOTIFICATIONS --\n\n')
-        for accred in accreds:
+        if not self._results:
+            self.fd.write('No results\n')
+        elif self._push_error:
             self.fd.write(
-                f'Notifications for {accred["name"].upper()} accreditation\n\n'
+                'All accreditation checks:  '
+                'Evidence/Results failed to push to remote locker.\n'
             )
-            passed_msg = ', '.join(
-                self._get_check_names(accred['passed'])
-            ) or '(none)'
-            accred_msgs = [f'PASSED tests: {passed_msg}']
-            for msg_type in ['errored', 'warned', 'failed']:
-                accred_msgs.append(
-                    '\n\n'.join(
-                        [
-                            ''.join(
-                                self._get_summary_and_body(test_desc, msg)
-                            ) for (_, test_desc, msg) in accred[msg_type]
-                        ]
-                    )
+        else:
+            accreds = []
+            messages = list(self._messages_by_accreditations().items())
+            messages.sort(key=lambda x: x[0])
+            for accreditation, msgs in messages:
+                if not msgs:
+                    continue
+                passed, failed, warned, errored = self._split_by_status(msgs)
+                accreds.append(
+                    {
+                        'name': accreditation,
+                        'passed': passed,
+                        'failed': failed,
+                        'warned': warned,
+                        'errored': errored
+                    }
                 )
-            self.fd.write('\n\n'.join(accred_msgs) + '\n\n')
+            for accred in accreds:
+                self.fd.write(
+                    f'Notifications for {accred["name"].upper()} '
+                    'accreditation\n\n'
+                )
+                passed_msg = ', '.join(
+                    self._get_check_names(accred['passed'])
+                ) or '(none)'
+                accred_msgs = [f'PASSED checks: {passed_msg}']
+                for msg_type in ['errored', 'warned', 'failed']:
+                    accred_msgs.append(
+                        '\n\n'.join(
+                            [
+                                ''.join(
+                                    self._get_summary_and_body(test_desc, msg)
+                                ) for (_, test_desc, msg) in accred[msg_type]
+                            ]
+                        )
+                    )
+                self.fd.write('\n\n'.join(accred_msgs) + '\n\n')
         self.fd.flush()
 
 
@@ -345,7 +368,7 @@ class LockerNotifier(_BaseMDNotifier):
       that they belong to.
     """
 
-    def __init__(self, results, controls, locker):
+    def __init__(self, results, controls, locker, push_error=False):
         """
         Construct and initialize the evidence locker notifier object.
 
@@ -354,11 +377,20 @@ class LockerNotifier(_BaseMDNotifier):
         :param controls: the control descriptor that manages accreditations.
         :param locker: the evidence locker object.
         """
-        super(LockerNotifier, self).__init__(results, controls)
+        super(LockerNotifier, self).__init__(results, controls, push_error)
         self.locker = locker
 
     def notify(self):
         """Write notifications into the evidence locker."""
+        if not self._results:
+            self.logger.error('No results.  Locker notifier not triggered.')
+            return
+        if self._push_error:
+            self.logger.error(
+                'Remote locker push failed.  Locker notifier not triggered.'
+            )
+            return
+        self.logger.info('Running the Locker notifier...')
         messages = list(self._messages_by_accreditations().items())
         messages.sort(key=lambda x: x[0])
         now = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
@@ -396,7 +428,7 @@ class GHIssuesNotifier(_BaseMDNotifier):
     notifier is configurable via :class:`compliance.config.ComplianceConfig`.
     """
 
-    def __init__(self, results, controls):
+    def __init__(self, results, controls, push_error=False):
         """
         Construct and initialize the Github notifier object.
 
@@ -404,7 +436,7 @@ class GHIssuesNotifier(_BaseMDNotifier):
           :py:class:`compliance.runners.CheckMode` at the end of the execution.
         :param controls: the control descriptor that manages accreditations.
         """
-        super(GHIssuesNotifier, self).__init__(results, controls)
+        super(GHIssuesNotifier, self).__init__(results, controls, push_error)
 
         self._config = get_config().get('notify.gh_issues')
         if not self._config:
@@ -420,6 +452,7 @@ class GHIssuesNotifier(_BaseMDNotifier):
 
     def notify(self):
         """Send notifications to Github as repository issues."""
+        self.logger.info('Running the Github Issues notifier...')
         if not self._config:
             self.logger.warning('Using Github Issues notifier without config')
 
@@ -437,6 +470,11 @@ class GHIssuesNotifier(_BaseMDNotifier):
             }
             if self._config[accreditation].get('summary_issue'):
                 self._notify_by_summary_issue(accreditation, results_by_status)
+            elif self._push_error:
+                self.logger.error(
+                    'Remote locker push failed.  '
+                    'Github Issues notifier not triggered.'
+                )
             else:
                 self._notify_by_check_issues(accreditation, results_by_status)
 
@@ -677,7 +715,7 @@ class SlackNotifier(_BaseNotifier):
         'warn': '#FFD300'
     }
 
-    def __init__(self, results, controls):
+    def __init__(self, results, controls, push_error=False):
         """
         Construct and initialize the Slack notifier object.
 
@@ -685,12 +723,13 @@ class SlackNotifier(_BaseNotifier):
           :py:class:`compliance.runners.CheckMode` at the end of the execution.
         :param controls: the control descriptor that manages accreditations.
         """
-        super(SlackNotifier, self).__init__(results, controls)
+        super(SlackNotifier, self).__init__(results, controls, push_error)
         self._creds = get_config().creds
         self._config = get_config().get('notify.slack', {})
 
     def notify(self):
         """Send notifications to Slack channel(s)."""
+        self.logger.info('Running the Slack notifier...')
         if not self._config:
             self.logger.warning('Using Slack notifier without config')
 
@@ -733,13 +772,29 @@ class SlackNotifier(_BaseNotifier):
             'normal': self._generate_normal_attachments,
             'compact': self._generate_compact_attachments
         }
-        if mode in modes:
-            message['attachments'] = modes[mode](accreditation, test_descs)
+        if mode in modes.keys():
+            if self._push_error:
+                message['attachments'] = self._generate_push_error_attachment()
+            else:
+                message['attachments'] = modes[mode](test_descs)
         else:
-            raise ValueError('Unknown Slack message mode: ' + mode)
+            raise ValueError(f'Unknown Slack message mode: {mode}')
         return message
 
-    def _generate_normal_attachments(self, accreditation, test_descs):
+    def _generate_push_error_attachment(self):
+        return [
+            {
+                'title': 'ALL checks',
+                'text': (
+                    'Evidence/Results failed to push to remote locker.  '
+                    'See execution log for details.'
+                ),
+                'mrkdwn_in': ['text', 'pretext'],
+                'color': SlackNotifier.MESSAGE_COLORS['error']
+            }
+        ]
+
+    def _generate_normal_attachments(self, test_descs):
         retval = []
         passed, failed, warned, errored = self._split_by_status(test_descs)
 
@@ -765,7 +820,7 @@ class SlackNotifier(_BaseNotifier):
             passed_titles.append('(none)')
         retval.append(
             {
-                'title': 'PASSED tests',
+                'title': 'PASSED checks',
                 'text': ', '.join(passed_titles),
                 'mrkdwn_in': ['text', 'pretext'],
                 'color': SlackNotifier.MESSAGE_COLORS['pass']
@@ -774,7 +829,7 @@ class SlackNotifier(_BaseNotifier):
 
         return retval
 
-    def _generate_compact_attachments(self, accreditation, test_descs):
+    def _generate_compact_attachments(self, test_descs):
         retval = []
         passed, failed, warned, errored = self._split_by_status(test_descs)
 
@@ -782,7 +837,7 @@ class SlackNotifier(_BaseNotifier):
         if passed:
             retval.append(
                 {
-                    'title': f'PASS: {len(passed)} tests',
+                    'title': f'PASS: {len(passed)} checks',
                     'text': '',
                     'mrkdwn_in': ['text', 'pretext'],
                     'color': SlackNotifier.MESSAGE_COLORS['pass']
@@ -809,7 +864,7 @@ class SlackNotifier(_BaseNotifier):
                 text += '\n'
             if text:
                 attachment = {
-                    'title': f'{status.upper()}: {len(c)} tests',
+                    'title': f'{status.upper()}: {len(c)} checks',
                     'text': text.strip(),
                     'mrkdwn_in': ['text', 'pretext'],
                     'color': SlackNotifier.MESSAGE_COLORS[status]
@@ -820,7 +875,7 @@ class SlackNotifier(_BaseNotifier):
         if errored:
             retval.append(
                 {
-                    'title': f'ERRORS: {len(errored)} tests',
+                    'title': f'ERRORS: {len(errored)} checks',
                     'text': ', '.join(set(self._get_check_names(errored))),
                     'mrkdwn_in': ['text', 'pretext'],
                     'color': SlackNotifier.MESSAGE_COLORS['error']
@@ -869,7 +924,7 @@ class SlackNotifier(_BaseNotifier):
 class PagerDutyNotifier(_BaseNotifier):
     """PagerDuty notifier class."""
 
-    def __init__(self, results, controls):
+    def __init__(self, results, controls, push_error=False):
         """
         Construct and initialize the PagerDuty notifier object.
 
@@ -877,12 +932,18 @@ class PagerDutyNotifier(_BaseNotifier):
           :py:class:`compliance.runners.CheckMode` at the end of the execution.
         :param controls: the control descriptor that manages accreditations.
         """
-        super(PagerDutyNotifier, self).__init__(results, controls)
+        super(PagerDutyNotifier, self).__init__(results, controls, push_error)
         self._creds = get_config().creds
         self._config = get_config().get('notify.pagerduty', {})
 
     def notify(self):
         """Send notifications as PagerDuty alerts."""
+        if self._push_error:
+            self.logger.error(
+                'Remote locker push failed.  PagerDuty notifier not triggered.'
+            )
+            return
+        self.logger.info('Running the PagerDuty notifier...')
         if not self._config:
             self.logger.warning('Using PagerDuty notifier without config')
 
@@ -1046,7 +1107,7 @@ class FindingsNotifier(_BaseNotifier):
     configurable via :class:`compliance.config.ComplianceConfig`.
     """
 
-    def __init__(self, results, controls):
+    def __init__(self, results, controls, push_error=False):
         """
         Construct and initialize the Findings notifier object.
 
@@ -1054,7 +1115,7 @@ class FindingsNotifier(_BaseNotifier):
           :py:class:`compliance.runners.CheckMode` at the end of the execution.
         :param controls: the control descriptor that manages accreditations.
         """
-        super().__init__(results, controls)
+        super(FindingsNotifier, self).__init__(results, controls, push_error)
         self._config = get_config().get('notify.findings')
         self._creds = get_config().creds
         api_key = self._creds['findings'].api_key
@@ -1063,6 +1124,12 @@ class FindingsNotifier(_BaseNotifier):
 
     def notify(self):
         """Send notifications to the Findings API."""
+        if self._push_error:
+            self.logger.error(
+                'Remote locker push failed.  Findings notifier not triggered.'
+            )
+            return
+        self.logger.info('Running the Findings notifier...')
         if not self._config:
             self.logger.warning('Using findings notification without config')
 

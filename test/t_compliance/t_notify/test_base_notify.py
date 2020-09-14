@@ -54,7 +54,7 @@ class BaseNotifierTest(unittest.TestCase):
         }
         controls = create_autospec(ControlDescriptor)
         controls.get_accreditations.return_value = ['infra']
-        notifier = _BaseNotifier(results, controls)
+        notifier = _BaseNotifier(results, controls, push_error=False)
 
         (_, _, _, errored_tests) = notifier._split_by_status(notifier.messages)
 
@@ -84,7 +84,7 @@ class BaseNotifierTest(unittest.TestCase):
         }
         controls = create_autospec(ControlDescriptor)
         controls.get_accreditations.return_value = ['infra']
-        notifier = _BaseNotifier(results, controls)
+        notifier = _BaseNotifier(results, controls, push_error=False)
 
         (_, _, _, errored_tests) = notifier._split_by_status(notifier.messages)
 

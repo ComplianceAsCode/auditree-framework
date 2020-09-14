@@ -8,14 +8,14 @@ Coding Standards
 In this project, we use Python as programming language so please
 follow these rules:
 
-* Keep the code tidy using `flake8
+* Keep the code tidy using `yapf
+  <https://pypi.org/project/yapf/>`_ and `flake8
   <http://flake8.pycqa.org/en/latest>`_. Don't introduce new
-  violations and remove them if you spot any. This is enforced now by
-  travis build. To check your code locally, use:
-  
-  ```
-  make lint
-  ```
+  violations and remove them if you spot any. This is enforced by
+  Github Actions builds. To check your code locally, use::
+
+    make code-format
+    make code-lint
 
 * Please provide good unit tests for your code changes. It is
   important to keep a good level of test coverage.
@@ -23,11 +23,9 @@ follow these rules:
 * Document everything you create using docstring within the code. We
   use `sphinx <http://www.sphinx-doc.org>`_ for documentation.
 
-* Test your code locally and make sure it works before creating a PR.
+* Test your code locally and make sure it works before creating a PR::
 
-  ```
-  make unit-tests-with-coverage
-  ```
+    make test
 
 
 Avoid code smells
@@ -65,11 +63,9 @@ Avoid third-party stuff
 Always Test
 ~~~~~~~~~~~
 
-* Always test your code, please dont assume it works. To do this, add
-  unit tests and pay attention to the coverage results that come back.
-  
-  ```
-  make unit-tests-with-coverage
-  ```
+* Always test your code, please don't assume it works. To do this, add
+  unit tests and pay attention to the coverage results that come back::
+
+    make test
 
 * Always make sure that the entire test suite runs cleanly
