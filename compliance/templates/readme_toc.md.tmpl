@@ -1,0 +1,48 @@
+{#- -*- mode:jinja2; coding: utf-8 -*- -#}
+{#
+Copyright (c) 2020 IBM Corp. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+#}
+{%- if original|length == 0 -%}
+# Evidence Locker
+{%- else -%}
+{%- set ns = namespace(found=false) -%}
+{%- for line in original if ns.found == false -%}
+{%- if line == '## Table of Contents - Check Reports' -%}
+{%- set ns.found = true -%}
+{%- else -%}
+{{ line }}
+{% endif %}
+{%- endfor -%}
+{%- endif -%}
+## Table of Contents - Check Reports
+
+{% for rpt in reports -%}
+<details>
+<summary><a href="{{ rpt['url'] }}">{{ rpt['descr'] }}</a></summary>
+
+- Accreditations: **{{ rpt['accreditations']|upper }}**
+- Check:`{{ rpt['check'] }}`
+- From: {{ rpt['from'] }}
+{%- if rpt['evidences']|length == 0 %}
+- Evidences used: N/A
+{% else %}
+- Evidences used:
+{%- for ev in rpt['evidences'] %}
+   - <a href="{{ ev['url'] }}">{{ ev['descr'] }}</a> from {{ ev['from'] }}
+{%- endfor -%}
+{%- endif %}
+</details>
+
+{% endfor -%}

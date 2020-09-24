@@ -16,13 +16,13 @@
 
 import copy
 import datetime
-import json
 import logging
 import os
 import traceback
 
 from compliance.config import get_config
 from compliance.evidence import get_evidence_by_path
+from compliance.utils.data_parse import format_json
 
 import jinja2
 
@@ -49,7 +49,9 @@ class ReportBuilder(object):
         test_by_class = self._get_test_by_class()
         with self.locker:
             self._generate_reports(test_by_class)
-            self._generate_raw_results()
+            rpt_metadata = self.locker.get_reports_metadata()
+            self.generate_toc(rpt_metadata)
+            self.generate_check_results(rpt_metadata)
 
     def render_evidence_with_template(self, evidence, test_obj):
         """
@@ -76,11 +78,9 @@ class ReportBuilder(object):
             'builder': self,
             'now': now
         }
-        content = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(path),
-            autoescape=True,
-        ).get_template(filename).render(context)
-        evidence.set_content(content)
+        loader = jinja2.FileSystemLoader(path)
+        env = jinja2.Environment(loader=loader, autoescape=True)
+        evidence.set_content(env.get_template(filename).render(context))
 
     def get_template_for(self, test_obj, evidence):
         """
@@ -99,27 +99,86 @@ class ReportBuilder(object):
             return os.path.join(tmpl_dir, 'default.md.tmpl')
         return tmpl_path
 
-    def _generate_raw_results(self):
-        """Create a check results JSON file stored in the evidence locker."""
-        self.locker.add_content_to_locker(
-            json.dumps(
-                self._munge_chk_results(self.locker.get_reports_metadata()),
-                indent=2,
-                sort_keys=True,
-                separators=(',', ': '),
-                skipkeys=True,
-                default=str
-            ),
-            filename='check_results.json'
-        )
+    def generate_toc(self, rpt_metadata):
+        """
+        Generate a check reports table of contents.
 
-    def _munge_chk_results(self, rpt_metadata):
+        This method generates a TOC based on all report evidence metadata and
+        appends that TOC to the bottom of an evidence locker's README.md file.
+
+        :param rpt_metadata: Metadata from all report evidence index.json files
+        """
+        readme = 'README.md'
+        if 'readme.md' in os.listdir(self.locker.local_path):
+            readme = 'readme.md'
+        elif 'Readme.md' in os.listdir(self.locker.local_path):
+            readme = 'Readme.md'
+        content_as_str = self.locker.get_content_from_locker(filename=readme)
+        rpts = []
+        for rpt, meta in rpt_metadata.items():
+            if meta.get('pruned_by'):
+                continue
+            rpt_descr = meta['description'] or rpt.rsplit('/', 1).pop()
+            rpt_url = self.locker.get_remote_location(rpt, False)
+            check = meta['checks'][0].rsplit('.', 1).pop(0)
+            evidences = []
+            for ev in meta['evidence']:
+                ev_descr = ev['description'] or ev['path'].rsplit('/', 1).pop()
+                if not ev.get('partitions'):
+                    ev_url = self.locker.get_remote_location(
+                        ev['path'], False, ev['commit_sha']
+                    )
+                    evidences.append(
+                        {
+                            'descr': ev_descr,
+                            'url': ev_url,
+                            'from': ev['last_update']
+                        }
+                    )
+                else:
+                    for hash_key, part in ev['partitions'].items():
+                        ev_part_descr = f'{ev_descr} - {hash_key} partition'
+                        head, tail = os.path.split(ev['path'])
+                        part_path = os.path.join(head, f'{hash_key}_{tail}')
+                        ev_url = self.locker.get_remote_location(
+                            part_path, False, part['commit_sha']
+                        )
+                        evidences.append(
+                            {
+                                'descr': ev_part_descr,
+                                'url': ev_url,
+                                'from': ev['last_update']
+                            }
+                        )
+            accreditations = self.controls.get_accreditations(check)
+            rpts.append(
+                {
+                    'descr': rpt_descr,
+                    'url': rpt_url,
+                    'check': check,
+                    'accreditations': ', '.join(sorted(accreditations)),
+                    'from': meta['last_update'],
+                    'evidences': sorted(evidences, key=lambda ev: ev['descr'])
+                }
+            )
+        context = {
+            'original': content_as_str.split('\n') if content_as_str else [],
+            'reports': sorted(rpts, key=lambda r: r['descr'])
+        }
+        loader = jinja2.FileSystemLoader(get_config().get_template_dir(self))
+        env = jinja2.Environment(loader=loader, autoescape=True)
+        content = env.get_template('readme_toc.md.tmpl').render(context)
+        self.locker.add_content_to_locker(content, filename=readme)
+
+    def generate_check_results(self, rpt_metadata):
         """
         Combine the check execution results with associated reports metadata.
 
         This method combines check results with details about associated
         reports and evidences used, found in the report metadata.  It
         returns a dictionary keyed by check class dot path.
+
+        :param rpt_metadata: Metadata from all report evidence index.json files
         """
         chk_results = {}
         for rpt, meta in rpt_metadata.items():
@@ -154,7 +213,10 @@ class ReportBuilder(object):
                 }
             else:
                 chk_results[check_class]['reports'][rpt] = meta['description']
-        return chk_results
+        self.locker.add_content_to_locker(
+            format_json(chk_results, skipkeys=True, default=str),
+            filename='check_results.json'
+        )
 
     def _get_test_by_class(self):
         """
@@ -171,7 +233,6 @@ class ReportBuilder(object):
             test_obj = info['test'].test
             if not hasattr(test_obj, 'get_reports'):
                 continue
-
             test_class = test_obj.__class__
             if test_class in retval:
                 retval[test_class].__dict__.update(test_obj.__dict__)
@@ -195,7 +256,6 @@ class ReportBuilder(object):
                 info for info in self.results.values()
                 if info['test'].test.__class__ == test_class
             ]
-
             try:
                 reports = test_obj.get_reports()
             except (AttributeError, ValueError) as e:
@@ -206,7 +266,6 @@ class ReportBuilder(object):
                 for info in test_infos:
                     info['status'] = 'error'
                 continue
-
             for r in reports:
                 try:
                     self.__render_report(r, test_obj, test_infos)
@@ -242,9 +301,7 @@ class ReportBuilder(object):
             if not report.startswith('reports/'):
                 path = 'reports/' + report
             evidence = get_evidence_by_path(path)
-
         self.render_evidence_with_template(evidence, test_obj)
-
         self.locker.add_evidence(
             evidence,
             self._get_checks(test_obj),

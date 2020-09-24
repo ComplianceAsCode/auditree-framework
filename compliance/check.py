@@ -286,6 +286,17 @@ class ComplianceCheck(unittest.TestCase):
         else:
             self.add_failures(msg, sorted(diff))
 
+    def get_historical_evidence(self, evidence_path, evidence_dt):
+        """
+        Retrieve historical evidence from the locker and track as metadata.
+
+        :param evidence_path: the evidence path.
+        :param evidence_dt: the evidence date.
+        """
+        evidence = self.locker.get_evidence(evidence_path, True, evidence_dt)
+        self.add_evidence_metadata(evidence_path, evidence_dt)
+        return evidence
+
     def add_evidence_metadata(self, evidence_path, evidence_dt=None):
         """
         Add evidence metadata to the evidences property of each check.

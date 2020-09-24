@@ -41,7 +41,7 @@ import git
 INDEX_FILE = 'index.json'
 DAY = 60 * 60 * 24
 AE_DEFAULT = 30 * DAY
-AE_EXEMPT = [INDEX_FILE, 'README.md', 'readme.md']
+AE_EXEMPT = [INDEX_FILE, 'README.md', 'readme.md', 'Readme.md']
 
 
 class Locker(object):
@@ -411,24 +411,27 @@ class Locker(object):
         """
         return os.path.join(self.local_path, filename)
 
-    def get_remote_location(self, filename, include_commit=True):
+    def get_remote_location(self, filename, include_commit=True, sha=None):
         """
         Provide the path for a file/commit SHA in the locker.
 
         The file may or may not exist in the locker.
 
         :param filename: the name of a file in the locker.
-        :param include_commit: if the commit SHA should be included.
+        :param include_commit: if the latest commit SHA should be included.
+        :param sha: use this commit SHA; requires include_commit to be False.
 
         :returns: the remote repository path to the filename provided.
         """
         if not self.repo_url_with_creds:
             return os.path.join(self.local_path, filename)
 
-        ref = 'master'
+        ref = self.branch
         if include_commit:
             ref = self.repo.head.commit.hexsha
-        return f'{self.repo_url}/blob/{ref}/{filename}'
+        elif not include_commit and sha:
+            ref = sha
+        return f'{self.repo_url}/blob/{ref}/{filename.strip("/")}'
 
     def get_evidence(self, evidence_path, ignore_ttl=False, evidence_dt=None):
         """
@@ -593,6 +596,22 @@ class Locker(object):
         with open(results_file, 'w+') as f:
             f.write(content)
         self.repo.index.add([results_file])
+
+    def get_content_from_locker(self, folder='', filename=None):
+        """
+        Read non-evidence related content from the local locker.
+
+        :param folder: the folder in the local locker to get the content from.
+        :param filename: the name of the file in the local locker.
+        """
+        if not filename:
+            raise ValueError('Filename cannot be empty.')
+        file_path = os.path.join(self.local_path, folder, filename)
+        content = None
+        if os.path.exists(file_path):
+            with open(file_path) as f:
+                content = f.read()
+        return content
 
     def get_reports_metadata(self):
         """
