@@ -17,11 +17,12 @@
 import copy
 import datetime
 import logging
-import os
+import pathlib
 import traceback
 
 from compliance.config import get_config
 from compliance.evidence import get_evidence_by_path
+from compliance.locker import READMES
 from compliance.utils.data_parse import format_json
 
 import jinja2
@@ -65,8 +66,7 @@ class ReportBuilder(object):
         """
         if evidence.content is not None:
             return
-        tmpl_path = self.get_template_for(test_obj, evidence)
-        path, filename = os.path.split(tmpl_path)
+        tmpl_path = pathlib.Path(self.get_template_for(test_obj, evidence))
         now = datetime.datetime.utcnow()
         context = {
             'test': test_obj,
@@ -78,9 +78,9 @@ class ReportBuilder(object):
             'builder': self,
             'now': now
         }
-        loader = jinja2.FileSystemLoader(path)
+        loader = jinja2.FileSystemLoader(str(tmpl_path.parent))
         env = jinja2.Environment(loader=loader, autoescape=True)
-        evidence.set_content(env.get_template(filename).render(context))
+        evidence.set_content(env.get_template(tmpl_path.name).render(context))
 
     def get_template_for(self, test_obj, evidence):
         """
@@ -94,10 +94,10 @@ class ReportBuilder(object):
             raise RuntimeError(
                 f'Unable to find template directory for test {test_obj.id()}'
             )
-        tmpl_path = os.path.join(tmpl_dir, evidence.path + '.tmpl')
-        if not os.path.exists(tmpl_path):
-            return os.path.join(tmpl_dir, 'default.md.tmpl')
-        return tmpl_path
+        tmpl_path = pathlib.Path(tmpl_dir, f'{evidence.path}.tmpl')
+        if not tmpl_path.exists():
+            tmpl_path = pathlib.Path(tmpl_dir, 'default.md.tmpl')
+        return str(tmpl_path)
 
     def generate_toc(self, rpt_metadata):
         """
@@ -108,22 +108,23 @@ class ReportBuilder(object):
 
         :param rpt_metadata: Metadata from all report evidence index.json files
         """
-        readme = 'README.md'
-        if 'readme.md' in os.listdir(self.locker.local_path):
-            readme = 'readme.md'
-        elif 'Readme.md' in os.listdir(self.locker.local_path):
-            readme = 'Readme.md'
+        path = pathlib.Path(self.locker.local_path)
+        files = sorted(
+            str(f) for f in path.iterdir() if f.is_file() and f.name in READMES
+        )
+        readme = files[0] if files else 'README.md'
         content_as_str = self.locker.get_content_from_locker(filename=readme)
         rpts = []
         for rpt, meta in rpt_metadata.items():
             if meta.get('pruned_by'):
                 continue
-            rpt_descr = meta['description'] or rpt.rsplit('/', 1).pop()
+            rpt_descr = meta['description'] or pathlib.Path(rpt).name
             rpt_url = self.locker.get_remote_location(rpt, False)
             check = meta['checks'][0].rsplit('.', 1).pop(0)
             evidences = []
             for ev in meta['evidence']:
-                ev_descr = ev['description'] or ev['path'].rsplit('/', 1).pop()
+                ev_path = pathlib.Path(ev['path'])
+                ev_descr = ev['description'] or ev_path.name
                 if not ev.get('partitions'):
                     ev_url = self.locker.get_remote_location(
                         ev['path'], False, ev['commit_sha']
@@ -138,10 +139,10 @@ class ReportBuilder(object):
                 else:
                     for hash_key, part in ev['partitions'].items():
                         ev_part_descr = f'{ev_descr} - {hash_key} partition'
-                        head, tail = os.path.split(ev['path'])
-                        part_path = os.path.join(head, f'{hash_key}_{tail}')
                         ev_url = self.locker.get_remote_location(
-                            part_path, False, part['commit_sha']
+                            str(ev_path.parent / f'{hash_key}_{ev_path.name}'),
+                            False,
+                            part['commit_sha']
                         )
                         evidences.append(
                             {

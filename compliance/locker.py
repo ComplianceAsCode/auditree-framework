@@ -41,7 +41,8 @@ import git
 INDEX_FILE = 'index.json'
 DAY = 60 * 60 * 24
 AE_DEFAULT = 30 * DAY
-AE_EXEMPT = [INDEX_FILE, 'README.md', 'readme.md', 'Readme.md']
+READMES = ['README.md', 'readme.md', 'Readme.md']
+AE_EXEMPT = [INDEX_FILE] + READMES
 
 
 class Locker(object):
