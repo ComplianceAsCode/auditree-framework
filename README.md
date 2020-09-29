@@ -95,32 +95,7 @@ This will update the files in `doc` with the latest documentation. These files s
 
 ## Try it
 
-First, create an empty [credentials file][]:
-
-```shell
-touch ~/.credentials
-```
-
-Go to the demo checks and install required dependencies:
-
-```shell
-cd doc/demo-checks
-pip install -r requirements.txt
-```
-
-Run the fetchers:
-
-```shell
-compliance --fetch -v --evidence=local -C setup.json
-```
-
-And then run the checks of the demo accreditations:
-
-```shell
-compliance --check demo.accreditation1,demo.accreditation2 --evidence=local -v -C setup.json
-```
-
-See a more detailed [quick start guide][].
+Coming soon...
 
 ## Contribute
 
