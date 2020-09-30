@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.utils package &#8212; Auditree Framework 1.5.0 documentation</title>
+    <title>compliance.utils package &#8212; Auditree Framework 1.6.0 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="compliance.scripts.html" title="compliance.scripts package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" accesskey="U">compliance package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils package</a></li> 
@@ -107,14 +107,17 @@
 
 <dl class="py function">
 <dt id="compliance.utils.data_parse.format_json">
-<code class="sig-prename descclassname">compliance.utils.data_parse.</code><code class="sig-name descname">format_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/data_parse.html#format_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.data_parse.format_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">compliance.utils.data_parse.</code><code class="sig-name descname">format_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">addl_kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/data_parse.html#format_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.data_parse.format_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a JSON string formatted to the standards of the library.</p>
 <p>This function ensures that the JSON is sorted, indented, and uses
 the appropriate separators for all instances of JSON generated
 by this library.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>data</strong> – The data structure to be formatted.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – The data structure to be formatted.</p></li>
+<li><p><strong>add_kwargs</strong> – Additional json.dumps options</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A formatted JSON string.</p>
@@ -359,7 +362,7 @@ path structure is different from the suggested one.</p>
         <li class="right" >
           <a href="compliance.scripts.html" title="compliance.scripts package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils package</a></li> 

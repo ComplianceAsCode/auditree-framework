@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.check &#8212; Auditree Framework 1.5.0 documentation</title>
+    <title>compliance.check &#8212; Auditree Framework 1.6.0 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.check</a></li> 
       </ul>
@@ -327,6 +327,17 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_failures</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span></div>
 
+<div class="viewcode-block" id="ComplianceCheck.get_historical_evidence"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.get_historical_evidence">[docs]</a>    <span class="k">def</span> <span class="nf">get_historical_evidence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve historical evidence from the locker and track as metadata.</span>
+
+<span class="sd">        :param evidence_path: the evidence path.</span>
+<span class="sd">        :param evidence_dt: the evidence date.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">evidence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_evidence</span><span class="p">(</span><span class="n">evidence_path</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_evidence_metadata</span><span class="p">(</span><span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">evidence</span></div>
+
 <div class="viewcode-block" id="ComplianceCheck.add_evidence_metadata"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.add_evidence_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">add_evidence_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add evidence metadata to the evidences property of each check.</span>
@@ -411,7 +422,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.check</a></li> 
       </ul>

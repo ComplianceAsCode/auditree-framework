@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance package &#8212; Auditree Framework 1.5.0 documentation</title>
+    <title>compliance package &#8212; Auditree Framework 1.6.0 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="modules.html" title="compliance"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
@@ -220,6 +220,20 @@
 <dt id="compliance.check.ComplianceCheck.fixed_failure_count">
 <em class="property">property </em><code class="sig-name descname">fixed_failure_count</code><a class="headerlink" href="#compliance.check.ComplianceCheck.fixed_failure_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count of failures fixed by the fix routine.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.check.ComplianceCheck.get_historical_evidence">
+<code class="sig-name descname">get_historical_evidence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">evidence_path</span></em>, <em class="sig-param"><span class="n">evidence_dt</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.get_historical_evidence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.get_historical_evidence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve historical evidence from the locker and track as metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>evidence_path</strong> – the evidence path.</p></li>
+<li><p><strong>evidence_dt</strong> – the evidence date.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1142,6 +1156,20 @@ provided.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="compliance.locker.Locker.get_content_from_locker">
+<code class="sig-name descname">get_content_from_locker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">folder</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_content_from_locker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.locker.Locker.get_content_from_locker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read non-evidence related content from the local locker.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> – the folder in the local locker to get the content from.</p></li>
+<li><p><strong>filename</strong> – the name of the file in the local locker.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="compliance.locker.Locker.get_dependency_reruns">
 <code class="sig-name descname">get_dependency_reruns</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_dependency_reruns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.locker.Locker.get_dependency_reruns" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide dot notation path to fetcher methods to be re-executed.</p>
@@ -1258,14 +1286,15 @@ locker.</p>
 
 <dl class="py method">
 <dt id="compliance.locker.Locker.get_remote_location">
-<code class="sig-name descname">get_remote_location</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">include_commit</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_remote_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.locker.Locker.get_remote_location" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_remote_location</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">include_commit</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sha</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_remote_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.locker.Locker.get_remote_location" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide the path for a file/commit SHA in the locker.</p>
 <p>The file may or may not exist in the locker.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename</strong> – the name of a file in the locker.</p></li>
-<li><p><strong>include_commit</strong> – if the commit SHA should be included.</p></li>
+<li><p><strong>include_commit</strong> – if the latest commit SHA should be included.</p></li>
+<li><p><strong>sha</strong> – use this commit SHA; requires include_commit to be False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1552,6 +1581,33 @@ values.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="compliance.report.ReportBuilder.generate_check_results">
+<code class="sig-name descname">generate_check_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rpt_metadata</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/report.html#ReportBuilder.generate_check_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.report.ReportBuilder.generate_check_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine the check execution results with associated reports metadata.</p>
+<p>This method combines check results with details about associated
+reports and evidences used, found in the report metadata.  It
+returns a dictionary keyed by check class dot path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rpt_metadata</strong> – Metadata from all report evidence index.json files</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.report.ReportBuilder.generate_toc">
+<code class="sig-name descname">generate_toc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rpt_metadata</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/report.html#ReportBuilder.generate_toc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.report.ReportBuilder.generate_toc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a check reports table of contents.</p>
+<p>This method generates a TOC based on all report evidence metadata and
+appends that TOC to the bottom of an evidence locker’s README.md file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rpt_metadata</strong> – Metadata from all report evidence index.json files</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="compliance.report.ReportBuilder.get_template_for">
 <code class="sig-name descname">get_template_for</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">test_obj</span></em>, <em class="sig-param"><span class="n">evidence</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/report.html#ReportBuilder.get_template_for"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.report.ReportBuilder.get_template_for" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide the file path of the template associated to the given evidence.</p>
@@ -1807,7 +1863,7 @@ compatibility with checks, reporting, and notifiers.</p>
         <li class="right" >
           <a href="modules.html" title="compliance"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.locker &#8212; Auditree Framework 1.5.0 documentation</title>
+    <title>compliance.locker &#8212; Auditree Framework 1.6.0 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.locker</a></li> 
       </ul>
@@ -82,7 +82,8 @@
 <span class="n">INDEX_FILE</span> <span class="o">=</span> <span class="s1">&#39;index.json&#39;</span>
 <span class="n">DAY</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">24</span>
 <span class="n">AE_DEFAULT</span> <span class="o">=</span> <span class="mi">30</span> <span class="o">*</span> <span class="n">DAY</span>
-<span class="n">AE_EXEMPT</span> <span class="o">=</span> <span class="p">[</span><span class="n">INDEX_FILE</span><span class="p">,</span> <span class="s1">&#39;README.md&#39;</span><span class="p">,</span> <span class="s1">&#39;readme.md&#39;</span><span class="p">]</span>
+<span class="n">READMES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;README.md&#39;</span><span class="p">,</span> <span class="s1">&#39;readme.md&#39;</span><span class="p">,</span> <span class="s1">&#39;Readme.md&#39;</span><span class="p">]</span>
+<span class="n">AE_EXEMPT</span> <span class="o">=</span> <span class="p">[</span><span class="n">INDEX_FILE</span><span class="p">]</span> <span class="o">+</span> <span class="n">READMES</span>
 
 
 <div class="viewcode-block" id="Locker"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker">[docs]</a><span class="k">class</span> <span class="nc">Locker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -452,24 +453,27 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Locker.get_remote_location"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.get_remote_location">[docs]</a>    <span class="k">def</span> <span class="nf">get_remote_location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">include_commit</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Locker.get_remote_location"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.get_remote_location">[docs]</a>    <span class="k">def</span> <span class="nf">get_remote_location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">include_commit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sha</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Provide the path for a file/commit SHA in the locker.</span>
 
 <span class="sd">        The file may or may not exist in the locker.</span>
 
 <span class="sd">        :param filename: the name of a file in the locker.</span>
-<span class="sd">        :param include_commit: if the commit SHA should be included.</span>
+<span class="sd">        :param include_commit: if the latest commit SHA should be included.</span>
+<span class="sd">        :param sha: use this commit SHA; requires include_commit to be False.</span>
 
 <span class="sd">        :returns: the remote repository path to the filename provided.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_url_with_creds</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
 
-        <span class="n">ref</span> <span class="o">=</span> <span class="s1">&#39;master&#39;</span>
+        <span class="n">ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">branch</span>
         <span class="k">if</span> <span class="n">include_commit</span><span class="p">:</span>
             <span class="n">ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">commit</span><span class="o">.</span><span class="n">hexsha</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span><span class="si">}</span><span class="s1">/blob/</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span></div>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">include_commit</span> <span class="ow">and</span> <span class="n">sha</span><span class="p">:</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">sha</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span><span class="si">}</span><span class="s1">/blob/</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">filename</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span></div>
 
 <div class="viewcode-block" id="Locker.get_evidence"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.get_evidence">[docs]</a>    <span class="k">def</span> <span class="nf">get_evidence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_path</span><span class="p">,</span> <span class="n">ignore_ttl</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -634,6 +638,22 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">results_file</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">add</span><span class="p">([</span><span class="n">results_file</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Locker.get_content_from_locker"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.get_content_from_locker">[docs]</a>    <span class="k">def</span> <span class="nf">get_content_from_locker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read non-evidence related content from the local locker.</span>
+
+<span class="sd">        :param folder: the folder in the local locker to get the content from.</span>
+<span class="sd">        :param filename: the name of the file in the local locker.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Filename cannot be empty.&#39;</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">content</span></div>
 
 <div class="viewcode-block" id="Locker.get_reports_metadata"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.get_reports_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_reports_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -882,7 +902,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.locker</a></li> 
       </ul>
