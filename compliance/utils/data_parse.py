@@ -56,7 +56,7 @@ def get_sha256_hash(key, size=None):
     return sha256_hash[:size]
 
 
-def format_json(data):
+def format_json(data, **addl_kwargs):
     """
     Provide a JSON string formatted to the standards of the library.
 
@@ -65,10 +65,13 @@ def format_json(data):
     by this library.
 
     :param data: The data structure to be formatted.
+    :param add_kwargs: Additional json.dumps options
 
     :returns: A formatted JSON string.
     """
-    return json.dumps(data, indent=2, sort_keys=True, separators=(',', ': '))
+    return json.dumps(
+        data, indent=2, sort_keys=True, separators=(',', ': '), **addl_kwargs
+    )
 
 
 def deep_merge(a, b, path=None, append=False):
