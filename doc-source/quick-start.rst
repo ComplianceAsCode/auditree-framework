@@ -10,32 +10,27 @@ understand, so you may want to have a look into
 :ref:`design-principles` section.
 
 The Auditree framework requires, at least, one directory with the
-fetchers and checks. In order to learn how to use it, let's use a
-demo folder with a simple set of fetchers and checks. You can find it
-at `doc/demo-checks`::
-
-  $ cd doc/demo-checks
-  $ mkvirtual env ** #TODO CHECK mkvirtual **
-  $ . ./env/bin/activate
-  $ pip install -r requirements.txt
+fetchers and checks.
 
 A normal execution is broken down in 2 steps:
 
 * Run the fetchers::
 
-    $ compliance --fetch .
+    $ compliance --fetch evidence local
 
-  This executes all the fetchers located at ``demo/fetchers``
+  This executes all the fetchers that the framework can find
   and generates a git repository locally at ``/$TMPDIR/compliance``.
 
 * Run the checks::
 
-    $ compliance --check 'demo.accreditation1,demo.accreditation2' .
+    $ compliance --check 'accred1,accred2' .
 
-  This executes the checks located at ``demo/checks``, creates the reports,
-  executes notifiers (you can see the messages in the output), and generates a
-  file called ``check_results.json`` with detailed information about the
-  execution.  The file is put into the evidence locker by default.
+  This executes the checks that are associated with the specified accreditations,
+  creates the reports, executes notifiers (you can see the messages in the output),
+  and generates a file called ``check_results.json`` with detailed information about
+  the execution.  The file is put into the evidence locker by default.
+  Accreditation to check mapping is handled in the ``controls.json`` file.  More
+  on that below.
 
 Advanced Topics
 ---------------

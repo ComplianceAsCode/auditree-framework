@@ -158,9 +158,7 @@ class _BaseNotifier(object):
 
         return [
             link_format.format(
-                url=test_obj.locker.get_remote_location(
-                    report.path, include_commit=True
-                ),
+                url=test_obj.locker.get_remote_location(report.path),
                 name=report.name
             ) for report in test_obj.reports
         ]

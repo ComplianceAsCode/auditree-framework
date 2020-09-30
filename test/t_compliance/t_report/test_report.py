@@ -15,7 +15,7 @@
 """Compliance automation report builder tests module."""
 
 import unittest
-from unittest.mock import create_autospec, patch
+from unittest.mock import MagicMock, create_autospec, patch
 
 from compliance.config import ComplianceConfig
 from compliance.controls import ControlDescriptor
@@ -29,9 +29,13 @@ from .. import build_test_mock
 class ReportTest(unittest.TestCase):
     """ReportBuilder test class."""
 
+    @patch('compliance.report.ReportBuilder.generate_toc')
+    @patch('compliance.report.ReportBuilder.generate_check_results')
     @patch('compliance.report.get_config')
     @patch('compliance.report.get_evidence_by_path')
-    def test_report_fail_to_generate(self, evidence_path_mock, get_cfg_mock):
+    def test_report_fail_to_generate(
+        self, evidence_path_mock, get_cfg_mock, gen_chk_mock, gen_toc_mock
+    ):
         """Test report generation failure affects on general execution."""
         config_mock = create_autospec(ComplianceConfig)
         config_mock.get_template_dir.return_value = '/tmp/templates'
@@ -43,6 +47,7 @@ class ReportTest(unittest.TestCase):
 
         locker = create_autospec(Locker())
         locker.local_path = '/tmp/fake_locker'
+        locker.get_reports_metadata = MagicMock(return_value={'foo': 'bar'})
 
         test_obj = build_test_mock()
         test_obj.test.get_reports.return_value = ['test/example.md']
@@ -52,3 +57,5 @@ class ReportTest(unittest.TestCase):
         builder = ReportBuilder(locker, results, controls)
         builder.build()
         self.assertEqual(results['mock.test.test_one']['status'], 'error')
+        gen_chk_mock.assert_called_once_with({'foo': 'bar'})
+        gen_toc_mock.assert_called_once_with({'foo': 'bar'})
