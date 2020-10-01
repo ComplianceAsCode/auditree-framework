@@ -120,9 +120,9 @@ class ReportBuilder(object):
                 continue
             rpt_descr = meta['description'] or pathlib.Path(rpt).name
             rpt_url = self.locker.get_remote_location(rpt, False)
-            check = meta['checks'][0].rsplit('.', 1).pop(0)
+            check = meta.get('checks', ['N/A'])[0].rsplit('.', 1).pop(0)
             evidences = []
-            for ev in meta['evidence']:
+            for ev in meta.get('evidence', []):
                 ev_path = pathlib.Path(ev['path'])
                 ev_descr = ev['description'] or ev_path.name
                 if not ev.get('partitions'):
@@ -151,13 +151,13 @@ class ReportBuilder(object):
                                 'from': ev['last_update']
                             }
                         )
-            accreditations = self.controls.get_accreditations(check)
+            accreditations = sorted(self.controls.get_accreditations(check))
             rpts.append(
                 {
                     'descr': rpt_descr,
                     'url': rpt_url,
                     'check': check,
-                    'accreditations': ', '.join(sorted(accreditations)),
+                    'accreditations': ', '.join(accreditations) or 'N/A',
                     'from': meta['last_update'],
                     'evidences': sorted(evidences, key=lambda ev: ev['descr'])
                 }
