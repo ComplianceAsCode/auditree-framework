@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.report &#8212; Auditree Framework 1.6.0 documentation</title>
+    <title>compliance.report &#8212; Auditree Framework 1.6.1 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.report</a></li> 
       </ul>
@@ -161,9 +161,9 @@
                 <span class="k">continue</span>
             <span class="n">rpt_descr</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">rpt</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
             <span class="n">rpt_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_remote_location</span><span class="p">(</span><span class="n">rpt</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-            <span class="n">check</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;checks&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">check</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;checks&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;N/A&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">evidences</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">ev</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;evidence&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">ev</span> <span class="ow">in</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;evidence&#39;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">ev_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">ev</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
                 <span class="n">ev_descr</span> <span class="o">=</span> <span class="n">ev</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">ev_path</span><span class="o">.</span><span class="n">name</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">ev</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;partitions&#39;</span><span class="p">):</span>
@@ -192,13 +192,13 @@
                                 <span class="s1">&#39;from&#39;</span><span class="p">:</span> <span class="n">ev</span><span class="p">[</span><span class="s1">&#39;last_update&#39;</span><span class="p">]</span>
                             <span class="p">}</span>
                         <span class="p">)</span>
-            <span class="n">accreditations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="o">.</span><span class="n">get_accreditations</span><span class="p">(</span><span class="n">check</span><span class="p">)</span>
+            <span class="n">accreditations</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="o">.</span><span class="n">get_accreditations</span><span class="p">(</span><span class="n">check</span><span class="p">))</span>
             <span class="n">rpts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">{</span>
                     <span class="s1">&#39;descr&#39;</span><span class="p">:</span> <span class="n">rpt_descr</span><span class="p">,</span>
                     <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">rpt_url</span><span class="p">,</span>
                     <span class="s1">&#39;check&#39;</span><span class="p">:</span> <span class="n">check</span><span class="p">,</span>
-                    <span class="s1">&#39;accreditations&#39;</span><span class="p">:</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">accreditations</span><span class="p">)),</span>
+                    <span class="s1">&#39;accreditations&#39;</span><span class="p">:</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">accreditations</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;N/A&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;from&#39;</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;last_update&#39;</span><span class="p">],</span>
                     <span class="s1">&#39;evidences&#39;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">evidences</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">ev</span><span class="p">:</span> <span class="n">ev</span><span class="p">[</span><span class="s1">&#39;descr&#39;</span><span class="p">])</span>
                 <span class="p">}</span>
@@ -382,7 +382,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.report</a></li> 
       </ul>
