@@ -1,3 +1,7 @@
+# [1.6.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.6.1)
+
+- [FIXED] Table of contents now handles old/abandoned report evidence metadata appropriately.
+
 # [1.6.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.6.0)
 
 - [ADDED] Check reports table of contents now appended to an evidence locker's README.
