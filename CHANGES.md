@@ -1,3 +1,7 @@
+# [1.6.2](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.6.2)
+
+- [FIXED] Table of contents now handled appropriately for locker without a README.
+
 # [1.6.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.6.1)
 
 - [FIXED] Table of contents now handles old/abandoned report evidence metadata appropriately.
