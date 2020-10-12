@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.runners &#8212; Auditree Framework 1.6.2 documentation</title>
+    <title>compliance.runners &#8212; Auditree Framework 1.6.3 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.runners</a></li> 
       </ul>
@@ -247,7 +247,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dependency_rerun</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">reset_depenency_rerun</span><span class="p">()</span>
             <span class="n">fetchers</span><span class="o">.</span><span class="n">addTests</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">loadTestsFromNames</span><span class="p">(</span><span class="n">reruns</span><span class="p">))</span>
-        <span class="n">runner</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TextTestRunner</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="n">runner</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TextTestRunner</span><span class="p">(</span>
+            <span class="n">verbosity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="n">resultclass</span><span class="o">=</span><span class="n">ComplianceBaseResult</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="nb">all</span><span class="p">(</span>
             <span class="p">(</span>
                 <span class="s1">&#39;DependencyUnavailableError&#39;</span> <span class="ow">in</span> <span class="n">tb</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;Traceback&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -397,7 +399,26 @@
             <span class="n">notifier</span><span class="o">.</span><span class="n">notify</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="ComplianceCheckResult"><a class="viewcode-back" href="../../compliance.html#compliance.runners.ComplianceCheckResult">[docs]</a><span class="k">class</span> <span class="nc">ComplianceCheckResult</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TextTestResult</span><span class="p">):</span>
+<div class="viewcode-block" id="ComplianceBaseResult"><a class="viewcode-back" href="../../compliance.html#compliance.runners.ComplianceBaseResult">[docs]</a><span class="k">class</span> <span class="nc">ComplianceBaseResult</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TextTestResult</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base Compliance result class.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ComplianceBaseResult.startTest"><a class="viewcode-back" href="../../compliance.html#compliance.runners.ComplianceBaseResult.startTest">[docs]</a>    <span class="k">def</span> <span class="nf">startTest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test</span><span class="p">):</span>  <span class="c1"># noqa: N802</span>
+        <span class="sd">&quot;&quot;&quot;Start test timer for each test.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ComplianceBaseResult</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">startTest</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">showAll</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ComplianceBaseResult.stopTest"><a class="viewcode-back" href="../../compliance.html#compliance.runners.ComplianceBaseResult.stopTest">[docs]</a>    <span class="k">def</span> <span class="nf">stopTest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test</span><span class="p">):</span>  <span class="c1"># noqa: N802</span>
+        <span class="sd">&quot;&quot;&quot;Report on execution time at the end of each test.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ComplianceBaseResult</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">stopTest</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">showAll</span><span class="p">:</span>
+            <span class="n">time_taken</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">getDescription</span><span class="p">(</span><span class="n">test</span><span class="p">)</span><span class="si">}</span><span class="s1"> - ran in: &#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">writeln</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">time_taken</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">s&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="ComplianceCheckResult"><a class="viewcode-back" href="../../compliance.html#compliance.runners.ComplianceCheckResult">[docs]</a><span class="k">class</span> <span class="nc">ComplianceCheckResult</span><span class="p">(</span><span class="n">ComplianceBaseResult</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compliance check result class.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -490,7 +511,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.runners</a></li> 
       </ul>
