@@ -206,7 +206,9 @@ class FetchMode(_BaseRunner):
             self.config.dependency_rerun = True
             self.locker.reset_depenency_rerun()
             fetchers.addTests(loader.loadTestsFromNames(reruns))
-        runner = unittest.TextTestRunner(verbosity=self.opts.verbose)
+        runner = unittest.TextTestRunner(
+            verbosity=self.opts.verbose, resultclass=ComplianceBaseResult
+        )
         return all(
             (
                 'DependencyUnavailableError' in tb.split('Traceback')[-1]
@@ -356,7 +358,26 @@ class CheckMode(_BaseRunner):
             notifier.notify()
 
 
-class ComplianceCheckResult(unittest.TextTestResult):
+class ComplianceBaseResult(unittest.TextTestResult):
+    """Base Compliance result class."""
+
+    def startTest(self, test):  # noqa: N802
+        """Start test timer for each test."""
+        super(ComplianceBaseResult, self).startTest(test)
+        if self.showAll:
+            self.start_time = time.perf_counter()
+
+    def stopTest(self, test):  # noqa: N802
+        """Report on execution time at the end of each test."""
+        super(ComplianceBaseResult, self).stopTest(test)
+        if self.showAll:
+            time_taken = time.perf_counter() - self.start_time
+            self.stream.write(f'{self.getDescription(test)} - ran in: ')
+            self.stream.writeln(f'{time_taken:.3f}s')
+            self.stream.flush()
+
+
+class ComplianceCheckResult(ComplianceBaseResult):
     """Compliance check result class."""
 
     def __init__(self, *args, **kwargs):
