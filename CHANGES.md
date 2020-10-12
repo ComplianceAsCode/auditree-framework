@@ -1,3 +1,7 @@
+# [1.6.3](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.6.3)
+
+- [ADDED] Fetcher and check execution times are now included in execution logging.
+
 # [1.6.2](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.6.2)
 
 - [FIXED] Table of contents now handled appropriately for locker without a README.
