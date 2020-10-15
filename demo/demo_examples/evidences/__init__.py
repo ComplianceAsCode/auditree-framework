@@ -12,6 +12,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Compliance automation package."""
 
-__version__ = '1.6.4'
+from compliance.config import get_config
+from compliance.evidence import DAY, ReportEvidence, RawEvidence
+
+get_config().add_evidences(
+    [
+        RawEvidence(
+            'world_clock_utc.json',
+            'time',
+            DAY,
+            'Coordinated Universal Time'
+        ),
+        ReportEvidence(
+            'world_clock.md',
+            'time',
+            DAY,
+            'World Clock Analysis report.'
+        )
+    ]
+)

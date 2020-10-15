@@ -1,3 +1,9 @@
+# [1.6.4](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.6.4)
+
+- [ADDED] Demo set of fetchers and checks added.
+- [ADDED] "Try It" section added to the README.
+- [CHANGED] Quick Start guide updated to include references to demo fetchers and checks implementation.
+
 # [1.6.3](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.6.3)
 
 - [ADDED] Fetcher and check execution times are now included in execution logging.
