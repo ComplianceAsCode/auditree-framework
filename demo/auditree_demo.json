@@ -1,0 +1,17 @@
+{
+  "locker": {
+      "url": "https://github.com/MY_ORG/MY_EVIDENCE_REPO"
+  },
+  "notify": {
+    "slack": {
+      "demo.arboretum.accred": ["#some-slack-channel", "#some-other-slack-channel"],
+      "demo.custom.accred": ["#some-slack-channel"]
+    },
+    "gh_issues": {
+      "demo.arboretum.accred": {
+        "repo": ["MY_ORG/MY_GH_ISSUES_REPO", "MY_ORG/MY_OTHER_GH_ISSUES_REPO"],
+        "title": "Check results for demo.arboretum.accred accreditation"
+      }
+    }
+  }
+}

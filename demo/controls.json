@@ -1,0 +1,4 @@
+{
+  "arboretum.auditree.checks.test_python_packages.PythonPackageCheck": ["demo.arboretum.accred"],
+  "demo_examples.checks.test_world_clock.WorldClockCheck": ["demo.custom.accred"]
+}
