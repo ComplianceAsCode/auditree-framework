@@ -12,6 +12,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Compliance automation package."""
 
-__version__ = '1.6.4'
+from compliance.evidence import store_raw_evidence
+from compliance.fetch import ComplianceFetcher
+
+class WorldClockFetcher(ComplianceFetcher):
+    """Fetch the current coordinated universal time."""
+
+    @store_raw_evidence('time/world_clock_utc.json')
+    def fetch_world_clock_utc(self):
+        """Fetch the universal time."""
+        session = self.session('http://worldclockapi.com/api/json')
+        clock = session.get('utc/now')
+        clock.raise_for_status()
+        return clock.text

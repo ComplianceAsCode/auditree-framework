@@ -12,6 +12,5 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Compliance automation package."""
 
-__version__ = '1.6.4'
+from arboretum.auditree.checks.test_python_packages import PythonPackageCheck
