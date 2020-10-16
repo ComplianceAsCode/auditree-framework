@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quick Start &#8212; Auditree Framework 1.6.3 documentation</title>
+    <title>Quick Start &#8212; Auditree Framework 1.6.4 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="index.html" title="Auditree framework documentation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.4 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Quick Start</a></li> 
       </ul>
     </div>  
@@ -47,90 +47,52 @@
             
   <div class="section" id="quick-start">
 <span id="id1"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
-<p>There might be some terms in this quick start that you don’t fully
-understand, so you may want to have a look into
-<a class="reference internal" href="design-principles.html#design-principles"><span class="std std-ref">Design Principles</span></a> section.</p>
-<p>The Auditree framework requires, at least, one directory with the
-fetchers and checks.</p>
-<p>A normal execution is broken down in 2 steps:</p>
+<p>If any terminology used in this quick start guide is unclear, have a look at the
+<a class="reference internal" href="design-principles.html#design-principles"><span class="std std-ref">Design Principles</span></a> documentation for clarification.</p>
+<p>The Auditree framework requires at least one directory containing fetchers and
+checks.  Let’s use the fetchers and checks packaged up in the <code class="docutils literal notranslate"><span class="pre">demo</span></code> folder
+of the <code class="docutils literal notranslate"><span class="pre">auditree-framework</span></code> project as an example.  First things first, we need
+to ensure that we have a proper Python virtual environment configured and running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd demo
+$ python -m venv
+$ . ./venv/bin/activate
+$ pip install -r requirements.txt
+</pre></div>
+</div>
+<p>A typical execution consists of two phases:</p>
 <ul>
-<li><p>Run the fetchers:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --fetch evidence local
+<li><p>Running the fetchers:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --fetch --evidence local -C auditree_demo.json
 </pre></div>
 </div>
-<p>This executes all the fetchers that the framework can find
-and generates a git repository locally at <code class="docutils literal notranslate"><span class="pre">/$TMPDIR/compliance</span></code>.</p>
+<p>Running this command generates a Git repository locally at <code class="docutils literal notranslate"><span class="pre">/$TMPDIR/compliance</span></code>
+and it executes all fetchers found within the <code class="docutils literal notranslate"><span class="pre">demo_example</span></code> package.</p>
 </li>
-<li><p>Run the checks:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --check &#39;accred1,accred2&#39; .
+<li><p>Running the checks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --check demo.arboretum.accred,demo.custom.accred --evidence local -C auditree_demo.json
 </pre></div>
 </div>
-<p>This executes the checks that are associated with the specified accreditations,
-creates the reports, executes notifiers (you can see the messages in the output),
-and generates a file called <code class="docutils literal notranslate"><span class="pre">check_results.json</span></code> with detailed information about
-the execution.  The file is put into the evidence locker by default.
-Accreditation to check mapping is handled in the <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> file.  More
-on that below.</p>
+<p>Running this command executes checks associated with the specified accreditations,
+creates check result reports in the evidence locker, executes notifiers (you can
+see the messages in the output), updates the evidence locker README with a check
+report table of contents and generates a file in the evidence locker root called
+<code class="docutils literal notranslate"><span class="pre">check_results.json</span></code> with detailed information about the check execution.</p>
 </li>
 </ul>
 <div class="section" id="advanced-topics">
 <h2>Advanced Topics<a class="headerlink" href="#advanced-topics" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="fetchers">
-<h3>Fetchers<a class="headerlink" href="#fetchers" title="Permalink to this headline">¶</a></h3>
-<p>You might want to push the evidences generated by <code class="docutils literal notranslate"><span class="pre">--fetch</span></code> into a
-remote git repository. For that, you can use <code class="docutils literal notranslate"><span class="pre">--evidence</span></code> and <code class="docutils literal notranslate"><span class="pre">-C</span>
-<span class="pre">setup.json</span></code>. This <code class="docutils literal notranslate"><span class="pre">setup.json</span></code> contains a fake URL of the repo, you
-can edit it to match the URL you want. However, you have to provide
-GitHub credentials. By default, you should use
-<code class="docutils literal notranslate"><span class="pre">~/.credentials</span></code> (or use <code class="docutils literal notranslate"><span class="pre">--creds-path</span></code> to point somewhere else):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">github</span><span class="p">]</span>
-<span class="n">token</span><span class="o">=</span><span class="n">XXX</span>
-</pre></div>
-</div>
-<p>Once you have set it up, you can run the fetchers in <code class="docutils literal notranslate"><span class="pre">no-push</span></code>
-mode:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --fetch --evidence no-push -C setup.json .
-</pre></div>
-</div>
-<p>The Auditree framework will <code class="docutils literal notranslate"><span class="pre">pull</span></code> the repository to
-<code class="docutils literal notranslate"><span class="pre">/tmp/compliance</span></code> (only if it does not exist already), then run all
-the fetchers that need to be run (i.e. those whose evidence TTL
-has expired) but it will <strong>not</strong> push anything. This is handy for
-testing the current state of the evidences of your remote repository.</p>
-<p>If you really want to push the evidences generated:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --fetch --evidence full-remote -C setup.json .
-</pre></div>
-</div>
-</div>
-<div class="section" id="checks">
-<h3>Checks<a class="headerlink" href="#checks" title="Permalink to this headline">¶</a></h3>
-<p>You can also use <code class="docutils literal notranslate"><span class="pre">-C</span> <span class="pre">setup.json</span></code> to configure the check run and
-tweak some components like notifiers. For example, you can use the
-<code class="docutils literal notranslate"><span class="pre">slack</span></code> notifier as following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --check demo.accreditation2 --notify slack -C setup.json .
-</pre></div>
-</div>
-<p>This will only run <code class="docutils literal notranslate"><span class="pre">demo.accreditation2</span></code> accreditation. Note that in
-<code class="docutils literal notranslate"><span class="pre">setup.json</span></code> how to notify people/channels based on
-accreditations. Also note that you will need to add a <code class="docutils literal notranslate"><span class="pre">webhook</span></code> into
-the credentials:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">slack</span><span class="p">]</span>
-<span class="n">webhook</span><span class="o">=</span><span class="n">XXX</span>
-</pre></div>
-</div>
-<p>Slack webhooks cannot be used for posting messages into private
-channels. If you need this, we recommend to use a Slack app token
-instead:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">slack</span><span class="p">]</span>
-<span class="n">token</span><span class="o">=</span><span class="n">XXX</span>
-</pre></div>
-</div>
-</div>
+<div class="section" id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<p>There are two configuration files used to configure the execution of the
+<code class="docutils literal notranslate"><span class="pre">auditree-framework</span></code>.  The main configuration file can be named anything you
+like.  In the case of our demo we’ve chosen the name <code class="docutils literal notranslate"><span class="pre">auditree-demo.json</span></code>.  There
+is also a check to accreditation mapping configuration file and this file must be
+named <code class="docutils literal notranslate"><span class="pre">controls.json</span></code>.</p>
 </div>
 <div class="section" id="controls-json">
-<h2>controls.json<a class="headerlink" href="#controls-json" title="Permalink to this headline">¶</a></h2>
+<h3>controls.json<a class="headerlink" href="#controls-json" title="Permalink to this headline">¶</a></h3>
 <p>The mapping between a check (check class path) and accreditations
-(a list of accreditations) happens in the <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> config
+(a list of accreditations) happens in the <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> configuration
 file.  Each new check must be included in <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> in
 order to be considered for execution by the Auditree framework.
 Note that this is not the case for fetchers, where all are executed.
@@ -142,26 +104,106 @@ As an example, the format for <code class="docutils literal notranslate"><span c
 </pre></div>
 </div>
 </div>
-<div class="section" id="a-few-recommendations">
-<h2>A few recommendations<a class="headerlink" href="#a-few-recommendations" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="remote-evidence-locker">
+<h3>Remote Evidence Locker<a class="headerlink" href="#remote-evidence-locker" title="Permalink to this headline">¶</a></h3>
+<p>Storing and using evidence in a Git remote hosting service repository is achievable
+by using the <code class="docutils literal notranslate"><span class="pre">--evidence</span></code> option with settings of either <code class="docutils literal notranslate"><span class="pre">no-push</span></code> or
+<code class="docutils literal notranslate"><span class="pre">full-remote</span></code> along with the locker configuration URL similar to the one found
+in the <code class="docutils literal notranslate"><span class="pre">auditree_demo.json</span></code>.  Set the locker URL to the URL of your remote
+evidence locker repository and use <code class="docutils literal notranslate"><span class="pre">--evidence</span> <span class="pre">no-push</span></code> to pull down a remote
+evidence locker only or <code class="docutils literal notranslate"><span class="pre">--evidence</span> <span class="pre">full-remote</span></code> to pull down and push to a
+remote evidence locker.  Finally you’ll need to configure your credentials file
+with the appropriate personal access token for your Git remote hosting service.  The
+credentials file defaults to <code class="docutils literal notranslate"><span class="pre">~/.credentials</span></code> or use the <code class="docutils literal notranslate"><span class="pre">--creds-path</span></code> option
+to point elsewhere.  Valid section headings for Git remote hosting services in your
+credentials are <code class="docutils literal notranslate"><span class="pre">github</span></code>, <code class="docutils literal notranslate"><span class="pre">github_enterprise</span></code>, <code class="docutils literal notranslate"><span class="pre">bitbucket</span></code>, and <code class="docutils literal notranslate"><span class="pre">gitlab</span></code>.
+Using <code class="docutils literal notranslate"><span class="pre">github</span></code> as an example, add the following to your credentials file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">github</span><span class="p">]</span>
+<span class="n">token</span><span class="o">=</span><span class="n">XXX</span>
+</pre></div>
+</div>
+<p>Once the credentials are set up, you can run fetchers and checks in <code class="docutils literal notranslate"><span class="pre">no-push</span></code>
+or <code class="docutils literal notranslate"><span class="pre">full-remote</span></code> mode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --fetch --evidence no-push -C auditree_demo.json
+</pre></div>
+</div>
+<p>For a fetcher execution the Auditree framework will <code class="docutils literal notranslate"><span class="pre">pull</span></code> the repository to
+<code class="docutils literal notranslate"><span class="pre">/$TMPDIR/compliance</span></code> (only if it does not exist already), and then run all
+of the fetchers.  If evidence time to live (TTL) has not expired for a given
+evidence file then the associated fetcher will perform a no-op run.  It is
+important to note that nothing will be pushed at the end of a fetcher execution
+regardless of the <code class="docutils literal notranslate"><span class="pre">--evidence</span></code> option used.  This is handy for testing the
+current state of the evidence in your remote evidence locker.</p>
+<p>Likewise once the credentials are set up and you’ve executed your fetchers in
+either <code class="docutils literal notranslate"><span class="pre">no-push</span></code> or <code class="docutils literal notranslate"><span class="pre">full-remote</span></code> mode.  To execute checks in <code class="docutils literal notranslate"><span class="pre">no-push</span></code>
+mode which will not push the evidence locker to the remote evidence locker:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --check demo.arboretum.accred,demo.custom.accred --evidence no-push -C auditree_demo.json
+</pre></div>
+</div>
+<p>To execute checks in <code class="docutils literal notranslate"><span class="pre">full-remote</span></code> mode which will push the evidence locker to
+the remote evidence locker:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --check demo.arboretum.accred,demo.custom.accred --evidence full-remote -C auditree_demo.json
+</pre></div>
+</div>
+</div>
+<div class="section" id="notifications">
+<h3>Notifications<a class="headerlink" href="#notifications" title="Permalink to this headline">¶</a></h3>
+<p>You can also configure the check run to send notifications to Slack,
+GitHub (as issues), PagerDuty, the evidence locker, Findings, and the terminal
+console which is the default.  To do this add the desired notifier(s) to your
+configuration file similar to <code class="docutils literal notranslate"><span class="pre">auditree_demo.json</span></code> and use the <code class="docutils literal notranslate"><span class="pre">--notify</span></code>
+option as part of the check execution.  For example, you can use the
+<code class="docutils literal notranslate"><span class="pre">slack</span></code> notifier to send Slack alerts:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --check demo.custom.accred --evidence no-push -C auditree_demo.json --notify slack
+</pre></div>
+</div>
+<p>This will run only <code class="docutils literal notranslate"><span class="pre">demo.custom.accred</span></code> accreditation in <code class="docutils literal notranslate"><span class="pre">no-push</span></code> mode and
+Slack notifications for this accreditation will be sent to the channels and
+individuals specified in your configuration.  In addition to configuring the
+notifiers, notifier specific credentials also need to be added to your credentials
+file.  For example, for Slack you can either provide a webhook or a token:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">slack</span><span class="p">]</span>
+<span class="n">webhook</span><span class="o">=</span><span class="n">XXX</span>
+</pre></div>
+</div>
+<p>Slack webhooks cannot be used for posting messages into private channels. If you
+need this, we recommend to use a Slack app token instead:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">slack</span><span class="p">]</span>
+<span class="n">token</span><span class="o">=</span><span class="n">XXX</span>
+</pre></div>
+</div>
+<p>Each notifier requires its own configuration and credentials and you can specify
+as many notifiers as you want on any given check execution.</p>
+</div>
+</div>
+<div class="section" id="recommendations">
+<h2>Recommendations<a class="headerlink" href="#recommendations" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Use the example project you have used above as a template:</p>
+<li><p>Use the example project showcased above as a template for your configuration/execution</p></li>
+</ul>
+<p>repository/project:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Put your <code class="docutils literal notranslate"><span class="pre">fetchers</span></code> and <code class="docutils literal notranslate"><span class="pre">checks</span></code> in separate folders. Technically, there
+is no rule about fetcher and check organization, but it is a good guideline to
+follow.  As you add more fetchers and checks you can create more sub-directories.</p></li>
+<li><p>Create a <code class="docutils literal notranslate"><span class="pre">templates</span></code> folder for your check report templates.  Remember that
+they should have the same path as your report evidence.</p></li>
+<li><p>Execute fetchers and checks separately.</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p>When debugging, always use the safest options for the Auditree framework. This
+should mitigate unintended slack notifications or commits to your remote evidence
+locker.</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">demo</span></code> should be replaced by the name of your unit or
-organization.</p></li>
-<li><p>Put your <code class="docutils literal notranslate"><span class="pre">fetchers</span></code> in a separate directory from
-<code class="docutils literal notranslate"><span class="pre">checks</span></code>. Technically, there is no requirement regarding how to
-organise fetchers and checks, but it is recommended to keep them
-separated. As you add more fetchers and checks you can create
-subdirectories.</p></li>
-<li><p>For your report templates, use
-<code class="docutils literal notranslate"><span class="pre">demo/templates/reports</span></code>. Remember that they should have the
-same path as the report evidences.</p></li>
+<li><p>It doesn’t hurt to delete your local evidence locker <code class="docutils literal notranslate"><span class="pre">compliance</span></code> folder.
+This ensures a clean execution and should mirror an official run from a CI
+tool.</p></li>
+<li><p>Notify using the <code class="docutils literal notranslate"><span class="pre">stdout</span></code> notifier which is the default.</p></li>
+<li><p>Only use <code class="docutils literal notranslate"><span class="pre">--evidence</span> <span class="pre">local</span></code> or <code class="docutils literal notranslate"><span class="pre">evidence</span> <span class="pre">no-push</span></code> options.</p></li>
 </ul>
 </li>
-<li><p>When debugging, always use the safest options for compliance
-tool. This will try to prevent incidental slack notifications or
-commits to your git evidence collector.</p></li>
 </ul>
 </div>
 </div>
@@ -177,12 +219,13 @@ commits to your git evidence collector.</p></li>
   <ul>
 <li><a class="reference internal" href="#">Quick Start</a><ul>
 <li><a class="reference internal" href="#advanced-topics">Advanced Topics</a><ul>
-<li><a class="reference internal" href="#fetchers">Fetchers</a></li>
-<li><a class="reference internal" href="#checks">Checks</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#controls-json">controls.json</a></li>
+<li><a class="reference internal" href="#remote-evidence-locker">Remote Evidence Locker</a></li>
+<li><a class="reference internal" href="#notifications">Notifications</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#controls-json">controls.json</a></li>
-<li><a class="reference internal" href="#a-few-recommendations">A few recommendations</a></li>
+<li><a class="reference internal" href="#recommendations">Recommendations</a></li>
 </ul>
 </li>
 </ul>
@@ -229,7 +272,7 @@ commits to your git evidence collector.</p></li>
         <li class="right" >
           <a href="index.html" title="Auditree framework documentation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.4 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Quick Start</a></li> 
       </ul>
     </div>
