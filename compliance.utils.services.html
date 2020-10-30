@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.utils.services package &#8212; Auditree Framework 1.6.4 documentation</title>
+    <title>compliance.utils.services package &#8212; Auditree Framework 1.6.5 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="compliance.utils.html" title="compliance.utils package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="compliance.utils.html" accesskey="U">compliance.utils package</a> &#187;</li>
@@ -255,9 +255,46 @@ be an empty dictionary if there aren’t any.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="compliance.utils.services.github.Github.make_request">
+<code class="sig-name descname">make_request</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">method</span></em>, <em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">parse</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.make_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.Github.make_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a REST call to the Github API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> – HTTP request method</p></li>
+<li><p><strong>url</strong> – The URL to make the request to</p></li>
+<li><p><strong>parse</strong> – Return the JSON response content, defaults to True.  If
+False then the entire response is returned</p></li>
+<li><p><strong>kwargs</strong> – Additional arguments added directly to the request call</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>response content from the request made</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="compliance.utils.services.github.Github.move_card">
 <code class="sig-name descname">move_card</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">card</span></em>, <em class="sig-param"><span class="n">to_column_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.move_card"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.Github.move_card" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move a card from one project column to another.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.Github.paginate_api">
+<code class="sig-name descname">paginate_api</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">api_url</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.paginate_api"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.utils.services.github.Github.paginate_api" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform GET calls handling pagination.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>api_url</strong> – The URL to make the GET request to</p></li>
+<li><p><strong>kwargs</strong> – Additional arguments added directly to the request call</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Combined paginated JSON content</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -452,7 +489,7 @@ This uses the PD API v2.</p>
         <li class="right" >
           <a href="compliance.utils.html" title="compliance.utils package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="compliance.utils.html" >compliance.utils package</a> &#187;</li>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.utils.services.github &#8212; Auditree Framework 1.6.4 documentation</title>
+    <title>compliance.utils.services.github &#8212; Auditree Framework 1.6.5 documentation</title>
     <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.6.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.6.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils.services.github</a></li> 
       </ul>
@@ -471,6 +471,31 @@
             <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;repos/</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s1">/branches/</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s1">/protection&#39;</span>
         <span class="p">)</span></div>
 
+<div class="viewcode-block" id="Github.make_request"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.make_request">[docs]</a>    <span class="k">def</span> <span class="nf">make_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform a REST call to the Github API.</span>
+
+<span class="sd">        :param method: HTTP request method</span>
+<span class="sd">        :param url: The URL to make the request to</span>
+<span class="sd">        :param parse: Return the JSON response content, defaults to True.  If</span>
+<span class="sd">          False then the entire response is returned</span>
+<span class="sd">        :param kwargs: Additional arguments added directly to the request call</span>
+
+<span class="sd">        :returns: response content from the request made</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">parse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Github.paginate_api"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.paginate_api">[docs]</a>    <span class="k">def</span> <span class="nf">paginate_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform GET calls handling pagination.</span>
+
+<span class="sd">        :param api_url: The URL to make the GET request to</span>
+<span class="sd">        :param kwargs: Additional arguments added directly to the request call</span>
+
+<span class="sd">        :returns: Combined paginated JSON content</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paginate_api</span><span class="p">(</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
     <span class="k">def</span> <span class="nf">_make_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
@@ -575,7 +600,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.6.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.6.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils.services.github</a></li> 
       </ul>
