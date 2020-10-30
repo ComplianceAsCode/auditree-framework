@@ -1,3 +1,7 @@
+# [1.6.5](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.6.5)
+
+- [ADDED] Direct calls to the GH API can be made using the Github service now.
+
 # [1.6.4](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.6.4)
 
 - [ADDED] Demo set of fetchers and checks added.

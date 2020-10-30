@@ -430,6 +430,31 @@ class Github(object):
             'get', f'repos/{repo}/branches/{branch}/protection'
         )
 
+    def make_request(self, method, url, parse=True, **kwargs):
+        """
+        Perform a REST call to the Github API.
+
+        :param method: HTTP request method
+        :param url: The URL to make the request to
+        :param parse: Return the JSON response content, defaults to True.  If
+          False then the entire response is returned
+        :param kwargs: Additional arguments added directly to the request call
+
+        :returns: response content from the request made
+        """
+        return self._make_request(method, url, parse, **kwargs)
+
+    def paginate_api(self, api_url, **kwargs):
+        """
+        Perform GET calls handling pagination.
+
+        :param api_url: The URL to make the GET request to
+        :param kwargs: Additional arguments added directly to the request call
+
+        :returns: Combined paginated JSON content
+        """
+        return self._paginate_api(api_url, **kwargs)
+
     def _make_request(self, method, url, parse=True, **kwargs):
         r = self.session.request(method, url, **kwargs)
         r.raise_for_status()
