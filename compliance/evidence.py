@@ -37,6 +37,8 @@ HOUR = 60 * 60
 DAY = HOUR * 24
 YEAR = DAY * 365
 
+LazyLoader = namedtuple('LazyLoader', 'path ev_class', defaults=[None])
+
 
 class _BaseEvidence(object):
     """
@@ -75,6 +77,10 @@ class _BaseEvidence(object):
         return new_evidence
 
     @classmethod
+    def lazy_load(cls, path):
+        return LazyLoader(path, cls)
+
+    @classmethod
     def from_locker(cls, path, locker):
         path = substitute_config(path)
         return cls(locker.get_evidence(path))
@@ -106,7 +112,7 @@ class _BaseEvidence(object):
     @property
     def content_as_json(self):
         if self.extension != 'json':
-            return
+            raise ValueError(f'{self.name} does not have JSON content.')
         if not hasattr(self, '_content_as_json'):
             self._content_as_json = json.loads(self.content)
         return self._content_as_json
@@ -419,9 +425,6 @@ class derived_evidence(object):  # noqa: N801
             self.locker.add_evidence(self.evidences['derived'])
 
 
-FromEvidence = namedtuple('FromEvidence', 'path ev_class', defaults=[None])
-
-
 class evidences(object):  # noqa: N801
     """
     Helper context manager for a typical ``test_`` method implementation.
@@ -454,13 +457,13 @@ class evidences(object):  # noqa: N801
         :param from_evidences: The paths to evidences within the evidence
           locker.  It can be any of the following:
           - A string path
-          - A FromEvidence namedtuple
-          - A list of string paths or FromEvidence namedtuples or a
-          combination of string paths and FromEvidence namedtuples
+          - A LazyLoader namedtuple
+          - A list of string paths or LazyLoader namedtuples or a
+          combination of string paths and LazyLoader namedtuples
           - A dictionary where a key is an evidence short name and a value
-          is either string path or a FromEvidence namedtuple
+          is either string path or a LazyLoader namedtuple
 
-          Using the FromEvidence namedtuple tells this context manager to cast
+          Using the LazyLoader namedtuple tells this context manager to cast
           your evidence as a subclass of one of the framework's base evidence
           classes.
         """
@@ -478,7 +481,7 @@ class evidences(object):  # noqa: N801
         if isinstance(self.from_evidences, list):
             for from_evidence in self.from_evidences:
                 path = from_evidence
-                if isinstance(from_evidence, FromEvidence):
+                if isinstance(from_evidence, LazyLoader):
                     # preserve original path to be used as key of evidence dict
                     path = from_evidence.path
                 ev = self._get_evidence(from_evidence)
@@ -505,12 +508,12 @@ class evidences(object):  # noqa: N801
         Retrieve an evidence instance based on the from_evidence provided.
 
         from_evidence can be either a path to the evidence in the locker as a
-        string or a FromEvidence namedtuple object that contains the path as a
+        string or a LazyLoader namedtuple object that contains the path as a
         string and an evidence class to cast the evidence as.
         """
         path = from_evidence
         ev_class = None
-        if isinstance(from_evidence, FromEvidence):
+        if isinstance(from_evidence, LazyLoader):
             path = from_evidence.path
             ev_class = from_evidence.ev_class
             ev_types = get_evidence_types()
@@ -750,7 +753,7 @@ def with_raw_evidences(*from_evidences):
     ``evidences`` context manager instead.
 
     :param from_evidences: relative paths to evidences as strings or
-      FromEvidence namedtuples that contain relative paths to evidences and
+      LazyLoader namedtuples that contain relative paths to evidences and
       evidence classes required by the check.
     """
 
@@ -769,7 +772,7 @@ def with_external_evidences(*from_evidences):
     ``evidences`` context manager instead.
 
     :param from_evidences: relative paths to evidences as strings or
-      FromEvidence namedtuples that contain relative paths to evidences and
+      LazyLoader namedtuples that contain relative paths to evidences and
       evidence classes required by the check.
     """
 
@@ -789,7 +792,7 @@ def with_derived_evidences(*from_evidences):
     ``evidences`` context manager instead.
 
     :param from_evidences: relative paths to evidences as strings or
-      FromEvidence namedtuples that contain relative paths to evidences and
+      LazyLoader namedtuples that contain relative paths to evidences and
       evidence classes required by the check.
     """
 
@@ -809,7 +812,7 @@ def with_tmp_evidences(*from_evidences):
     ``evidences`` context manager instead.
 
     :param from_evidences: relative paths to evidences as strings or
-      FromEvidence namedtuples that contain relative paths to evidences and
+      LazyLoader namedtuples that contain relative paths to evidences and
       evidence classes required by the check.
     """
 
@@ -837,7 +840,7 @@ def _with_evidence_decorator(from_evidences, f, type_str):
     for from_ev in from_evidences:
         path = from_ev
         ev_class = None
-        if isinstance(from_ev, FromEvidence):
+        if isinstance(from_ev, LazyLoader):
             path = from_ev.path
             if issubclass(from_ev.ev_class, get_evidence_class(type_str)):
                 ev_class = from_ev.ev_class
@@ -845,7 +848,7 @@ def _with_evidence_decorator(from_evidences, f, type_str):
             path = f'{prefix}{path}'
         if not ev_class:
             ev_class = get_evidence_class(type_str)
-        from_evs.append(FromEvidence(path, ev_class))
+        from_evs.append(LazyLoader(path, ev_class))
 
     if hasattr(f, 'args'):
         f.args.extend(from_evs)
