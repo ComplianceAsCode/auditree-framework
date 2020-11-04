@@ -517,11 +517,11 @@ class evidences(object):  # noqa: N801
             path = from_evidence.path
             ev_class = from_evidence.ev_class
             ev_types = get_evidence_types()
-            if not any(path.startswith(f'{et}/') for et in ev_types):
+            if not any(PurePath(path).parts[0] == et for et in ev_types):
                 for ev_type in ev_types:
                     base_evidence_class = get_evidence_class(ev_type)
                     if ev_class and issubclass(ev_class, base_evidence_class):
-                        path = f'{ev_type}/{path}'
+                        path = str(PurePath(ev_type).joinpath(path))
                         break
         evidence = get_evidence_by_path(path, self.locker)
         base_evidence_class = get_evidence_class(evidence.rootdir)
