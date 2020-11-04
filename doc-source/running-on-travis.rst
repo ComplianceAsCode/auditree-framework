@@ -56,7 +56,7 @@ This is a typical `.travis.yml` file:
    python:
      - "3.7"
    install:
-     - pip -r requirements.txt
+     - pip install -r requirements.txt
      - ./travis/gen-credentials.py > ~/.credentials
    script:
      - make clean
@@ -64,9 +64,9 @@ This is a typical `.travis.yml` file:
    after_script:
      - rm  ~/.credentials
 
-Basically, this will firstly install the dependencies through ``pip -r
-requirements.txt`` and then generate the credentials file from using
-Travis environment variables.
+Basically, this will firstly install the dependencies through
+``pip install -r requirements.txt`` and then generate the credentials file from
+using Travis environment variables.
 
 Credentials generation
 ~~~~~~~~~~~~~~~~~~~~~~

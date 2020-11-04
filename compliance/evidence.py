@@ -835,19 +835,19 @@ def _store_wrapper(self, evidence_path, func, type_name):
 
 
 def _with_evidence_decorator(from_evidences, f, type_str):
-    prefix = f'{type_str}/'
     from_evs = []
     for from_ev in from_evidences:
         path = from_ev
-        ev_class = None
+        # Default the evidence class to evidence of type type_str.
+        # If from_ev is a LazyLoader and its evidence class is of the type
+        # type_str then set the evidence class to the from_ev evidence class.
+        ev_class = get_evidence_class(type_str)
         if isinstance(from_ev, LazyLoader):
             path = from_ev.path
-            if issubclass(from_ev.ev_class, get_evidence_class(type_str)):
+            if issubclass(from_ev.ev_class, ev_class):
                 ev_class = from_ev.ev_class
-        if not path.startswith(prefix):
-            path = f'{prefix}{path}'
-        if not ev_class:
-            ev_class = get_evidence_class(type_str)
+        # Ensure path is the full relative path including the type root.
+        path = str(PurePath(type_str).joinpath(*PurePath(path).parts[-2:]))
         from_evs.append(LazyLoader(path, ev_class))
 
     if hasattr(f, 'args'):
