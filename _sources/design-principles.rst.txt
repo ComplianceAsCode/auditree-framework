@@ -271,22 +271,37 @@ we've provided some helpful decorators and context managers that validate
 ``ttl`` for you and will ``ERROR`` the check if evidence ``ttl`` has expired
 prior to executing the check's logic.
 
-* ``with_raw_evidences`` decorator: Use this decorator on your check method
-  when you know the full path and name of your raw evidences.  The decorator
-  takes as arguments, the paths to your raw evidences as strings.  It also
-  passes the raw evidences to the decorated method in the form of method
-  arguments.
+* ``with_raw_evidences``, ``with_external_evidences`` decorators: Use these
+  decorators on your check method when you know the full path and name of
+  your raw or external evidences.  Each decorator takes as arguments, the
+  paths to your raw or external evidences as strings or as evidence
+  ``LazyLoader`` named tuples.  Evidence ``LazyLoader`` has ``path`` and
+  ``ev_class`` (evidence class) as attributes.  If the requested evidences pass
+  TTL validation the evidences are then passed along to the decorated method in
+  the form of method arguments.  Use an evidence ``LazyLoader`` when dealing
+  with sub-classed ``RawEvidence`` or ``ExternalEvidence``, and you want the
+  evidence provided to the decorated method to be cast as that sub-classed
+  evidence otherwise use a string path and the evidence will be provided as
+  either ``RawEvidence`` or ``ExternalEvidence``.  A ``LazyLoader`` named tuple
+  can be constructed by executing the ``lazy_load`` class method of any evidence
+  class such as ``BarEvidence.lazy_load('foo/evidence_bar.json')``.
 
 ``@with_*_evidences`` usage example::
 
   ...
   from compliance.evidence import with_raw_evidences
+  from my_pkg.bar_evidence import BarEvidence
   ...
-  @with_raw_evidence('foo/evidence_bar.json', 'foo/evidence_baz.json')
+  @with_raw_evidence(
+      BarEvidence.lazy_load('foo/evidence_bar.json'),
+      'foo/evidence_baz.json'
+  )
   test_bar_vs_baz(self, bar_evidence, baz_evidence):
       # Check code only executes if evidence is not stale.
       # Perform your check logic
-      failures, warnings, successes = self._do_whatever(bar_evidence, baz_evidence)
+      failures, warnings, successes = self._do_whatever(
+          bar_evidence, baz_evidence
+      )
       self.add_failures('bar vs. baz', failures)
       self.add_warnings('bar vs. baz', warnings)
       self.add_successes('bar vs. baz', successes)
@@ -296,33 +311,41 @@ prior to executing the check's logic.
   based on a dynamic set of configurable values.  In other words the full name
   and content of the evidences are based on a configuration and not known prior
   to execution of the check logic.  The context manager takes as arguments, the
-  check (self) object and evidence paths.  The evidence paths can be in the
-  form of a list of paths as strings, a dictionary of key/values pairs as
-  strings where the key is an evidence short name and the value is the evidence
-  path, or simply a single evidence path as a string.  The context manager
+  check (``self``) object and either evidence paths strings or ``LazyLoader``
+  named tuples.  Evidence ``LazyLoader`` has ``path`` and ``ev_class``
+  (evidence class) as attributes.  The evidence arguments can be in the form of
+  a list of paths as strings or ``LazyLoader`` named tuples, a dictionary of
+  key/values pairs where the key is an evidence short name and the value is the
+  evidence path as a string or a ``LazyLoader`` named tuple, or simply a single
+  evidence path as a string or ``LazyLoader`` named tuple.  The context manager
   yields a dictionary containing the evidences as the dictionary values if a
-  list or dictionary or evidence paths are provided and yields an evidence
-  object if a single evidence path as a string is provided.  When a dictionary
-  is yielded by the context manager, the evidence key is its evidence path if a
-  list of evidence paths were provided or its evidence short name if a
-  dictionary of evidence paths were provided.
+  list or dictionary of evidence paths or ``LazyLoader`` named tuples are
+  provided and yields an evidence object if a single evidence path as a string
+  or ``LazyLoader`` named tuple is provided.  When a dictionary is yielded by
+  the context manager, the evidence key is its evidence path if a list of
+  evidence paths or ``LazyLoader`` named tuples were provided or its evidence
+  short name if a dictionary of evidence paths or ``LazyLoader`` named tuples
+  were provided.  A ``LazyLoader`` named tuple can be constructed by executing
+  the ``lazy_load`` class method of any evidence class such as
+  ``BarEvidence.lazy_load('foo/evidence_bar.json')``.
 
 ``with evidences`` (list provided) usage example::
 
   ...
   from compliance.evidence import evidences
+  from my_pkg.bar_evidence import BarEvidence
   ...
   test_bar_vs_baz(self):
       for system in systems:
           evidence_paths = [
-              'raw/foo/evidence_bar.json',
+              BarEvidence.lazy_load('foo/evidence_bar.json'),
               'raw/foo/evidence_baz.json'
           ]
           with evidences(self, evidence_paths) as evidences:
               # Check code only executes if evidence is not stale.
               # Perform your check logic
               failures, warnings, successes = self._do_whatever(
-                  evidences['raw/foo/evidence_bar.json'],
+                  evidences['foo/evidence_bar.json'],
                   evidences['raw/foo/evidence_baz.json']
               )
               self.add_failures('bar vs. baz', failures)
@@ -333,11 +356,12 @@ prior to executing the check's logic.
 
   ...
   from compliance.evidence import evidences
+  from my_pkg.bar_evidence import BarEvidence
   ...
   test_bar_vs_baz(self):
       for system in systems:
           evidence_paths = {
-              'bar': 'raw/foo/evidence_bar.json',
+              'bar': BarEvidence.lazy_load('foo/evidence_bar.json'),
               'baz': 'raw/foo/evidence_baz.json'
           }
           with evidences(self, evidence_paths) as evidences:
@@ -360,6 +384,23 @@ prior to executing the check's logic.
       for system in systems:
           evidence_path = 'raw/foo/evidence_bar.json'
           with evidences(self, evidence_path) as evidence:
+              # Check code only executes if evidence is not stale.
+              # Perform your check logic
+              failures, warnings, successes = self._do_whatever(evidence)
+              self.add_failures('bar stuff', failures)
+              self.add_warnings('bar stuff', warnings)
+              self.add_successes('bar stuff', successes)
+
+``with evidences`` (``LazyLoader`` provided) usage example::
+
+  ...
+  from compliance.evidence import evidences
+  from my_pkg.bar_evidence import BarEvidence
+  ...
+  test_bar_stuff(self):
+      for system in systems:
+          lazy_evidence = BarEvidence.lazy_load('foo/evidence_bar.json')
+          with evidences(self, lazy_evidence) as evidence:
               # Check code only executes if evidence is not stale.
               # Perform your check logic
               failures, warnings, successes = self._do_whatever(evidence)

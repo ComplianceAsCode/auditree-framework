@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Design Principles &#8212; Auditree Framework 1.6.5 documentation</title>
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <title>Design Principles &#8212; Auditree Framework 1.7.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.7.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>  
@@ -290,21 +290,36 @@ we’ve provided some helpful decorators and context managers that validate
 <code class="docutils literal notranslate"><span class="pre">ttl</span></code> for you and will <code class="docutils literal notranslate"><span class="pre">ERROR</span></code> the check if evidence <code class="docutils literal notranslate"><span class="pre">ttl</span></code> has expired
 prior to executing the check’s logic.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">with_raw_evidences</span></code> decorator: Use this decorator on your check method
-when you know the full path and name of your raw evidences.  The decorator
-takes as arguments, the paths to your raw evidences as strings.  It also
-passes the raw evidences to the decorated method in the form of method
-arguments.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">with_raw_evidences</span></code>, <code class="docutils literal notranslate"><span class="pre">with_external_evidences</span></code> decorators: Use these
+decorators on your check method when you know the full path and name of
+your raw or external evidences.  Each decorator takes as arguments, the
+paths to your raw or external evidences as strings or as evidence
+<code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> named tuples.  Evidence <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> has <code class="docutils literal notranslate"><span class="pre">path</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ev_class</span></code> (evidence class) as attributes.  If the requested evidences pass
+TTL validation the evidences are then passed along to the decorated method in
+the form of method arguments.  Use an evidence <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> when dealing
+with sub-classed <code class="docutils literal notranslate"><span class="pre">RawEvidence</span></code> or <code class="docutils literal notranslate"><span class="pre">ExternalEvidence</span></code>, and you want the
+evidence provided to the decorated method to be cast as that sub-classed
+evidence otherwise use a string path and the evidence will be provided as
+either <code class="docutils literal notranslate"><span class="pre">RawEvidence</span></code> or <code class="docutils literal notranslate"><span class="pre">ExternalEvidence</span></code>.  A <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> named tuple
+can be constructed by executing the <code class="docutils literal notranslate"><span class="pre">lazy_load</span></code> class method of any evidence
+class such as <code class="docutils literal notranslate"><span class="pre">BarEvidence.lazy_load('foo/evidence_bar.json')</span></code>.</p></li>
 </ul>
 <p><code class="docutils literal notranslate"><span class="pre">&#64;with_*_evidences</span></code> usage example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
 <span class="kn">from</span> <span class="nn">compliance.evidence</span> <span class="kn">import</span> <span class="n">with_raw_evidences</span>
+<span class="kn">from</span> <span class="nn">my_pkg.bar_evidence</span> <span class="kn">import</span> <span class="n">BarEvidence</span>
 <span class="o">...</span>
-<span class="nd">@with_raw_evidence</span><span class="p">(</span><span class="s1">&#39;foo/evidence_bar.json&#39;</span><span class="p">,</span> <span class="s1">&#39;foo/evidence_baz.json&#39;</span><span class="p">)</span>
+<span class="nd">@with_raw_evidence</span><span class="p">(</span>
+    <span class="n">BarEvidence</span><span class="o">.</span><span class="n">lazy_load</span><span class="p">(</span><span class="s1">&#39;foo/evidence_bar.json&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;foo/evidence_baz.json&#39;</span>
+<span class="p">)</span>
 <span class="n">test_bar_vs_baz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bar_evidence</span><span class="p">,</span> <span class="n">baz_evidence</span><span class="p">):</span>
     <span class="c1"># Check code only executes if evidence is not stale.</span>
     <span class="c1"># Perform your check logic</span>
-    <span class="n">failures</span><span class="p">,</span> <span class="n">warnings</span><span class="p">,</span> <span class="n">successes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_whatever</span><span class="p">(</span><span class="n">bar_evidence</span><span class="p">,</span> <span class="n">baz_evidence</span><span class="p">)</span>
+    <span class="n">failures</span><span class="p">,</span> <span class="n">warnings</span><span class="p">,</span> <span class="n">successes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_whatever</span><span class="p">(</span>
+        <span class="n">bar_evidence</span><span class="p">,</span> <span class="n">baz_evidence</span>
+    <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">add_failures</span><span class="p">(</span><span class="s1">&#39;bar vs. baz&#39;</span><span class="p">,</span> <span class="n">failures</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">add_warnings</span><span class="p">(</span><span class="s1">&#39;bar vs. baz&#39;</span><span class="p">,</span> <span class="n">warnings</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">add_successes</span><span class="p">(</span><span class="s1">&#39;bar vs. baz&#39;</span><span class="p">,</span> <span class="n">successes</span><span class="p">)</span>
@@ -316,32 +331,40 @@ check method when your check method acts on multiple, similar evidences
 based on a dynamic set of configurable values.  In other words the full name
 and content of the evidences are based on a configuration and not known prior
 to execution of the check logic.  The context manager takes as arguments, the
-check (self) object and evidence paths.  The evidence paths can be in the
-form of a list of paths as strings, a dictionary of key/values pairs as
-strings where the key is an evidence short name and the value is the evidence
-path, or simply a single evidence path as a string.  The context manager
+check (<code class="docutils literal notranslate"><span class="pre">self</span></code>) object and either evidence paths strings or <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code>
+named tuples.  Evidence <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> has <code class="docutils literal notranslate"><span class="pre">path</span></code> and <code class="docutils literal notranslate"><span class="pre">ev_class</span></code>
+(evidence class) as attributes.  The evidence arguments can be in the form of
+a list of paths as strings or <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> named tuples, a dictionary of
+key/values pairs where the key is an evidence short name and the value is the
+evidence path as a string or a <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> named tuple, or simply a single
+evidence path as a string or <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> named tuple.  The context manager
 yields a dictionary containing the evidences as the dictionary values if a
-list or dictionary or evidence paths are provided and yields an evidence
-object if a single evidence path as a string is provided.  When a dictionary
-is yielded by the context manager, the evidence key is its evidence path if a
-list of evidence paths were provided or its evidence short name if a
-dictionary of evidence paths were provided.</p></li>
+list or dictionary of evidence paths or <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> named tuples are
+provided and yields an evidence object if a single evidence path as a string
+or <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> named tuple is provided.  When a dictionary is yielded by
+the context manager, the evidence key is its evidence path if a list of
+evidence paths or <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> named tuples were provided or its evidence
+short name if a dictionary of evidence paths or <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> named tuples
+were provided.  A <code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> named tuple can be constructed by executing
+the <code class="docutils literal notranslate"><span class="pre">lazy_load</span></code> class method of any evidence class such as
+<code class="docutils literal notranslate"><span class="pre">BarEvidence.lazy_load('foo/evidence_bar.json')</span></code>.</p></li>
 </ul>
 <p><code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">evidences</span></code> (list provided) usage example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
 <span class="kn">from</span> <span class="nn">compliance.evidence</span> <span class="kn">import</span> <span class="n">evidences</span>
+<span class="kn">from</span> <span class="nn">my_pkg.bar_evidence</span> <span class="kn">import</span> <span class="n">BarEvidence</span>
 <span class="o">...</span>
 <span class="n">test_bar_vs_baz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">system</span> <span class="ow">in</span> <span class="n">systems</span><span class="p">:</span>
         <span class="n">evidence_paths</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s1">&#39;raw/foo/evidence_bar.json&#39;</span><span class="p">,</span>
+            <span class="n">BarEvidence</span><span class="o">.</span><span class="n">lazy_load</span><span class="p">(</span><span class="s1">&#39;foo/evidence_bar.json&#39;</span><span class="p">),</span>
             <span class="s1">&#39;raw/foo/evidence_baz.json&#39;</span>
         <span class="p">]</span>
         <span class="k">with</span> <span class="n">evidences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_paths</span><span class="p">)</span> <span class="k">as</span> <span class="n">evidences</span><span class="p">:</span>
             <span class="c1"># Check code only executes if evidence is not stale.</span>
             <span class="c1"># Perform your check logic</span>
             <span class="n">failures</span><span class="p">,</span> <span class="n">warnings</span><span class="p">,</span> <span class="n">successes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_whatever</span><span class="p">(</span>
-                <span class="n">evidences</span><span class="p">[</span><span class="s1">&#39;raw/foo/evidence_bar.json&#39;</span><span class="p">],</span>
+                <span class="n">evidences</span><span class="p">[</span><span class="s1">&#39;foo/evidence_bar.json&#39;</span><span class="p">],</span>
                 <span class="n">evidences</span><span class="p">[</span><span class="s1">&#39;raw/foo/evidence_baz.json&#39;</span><span class="p">]</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_failures</span><span class="p">(</span><span class="s1">&#39;bar vs. baz&#39;</span><span class="p">,</span> <span class="n">failures</span><span class="p">)</span>
@@ -352,11 +375,12 @@ dictionary of evidence paths were provided.</p></li>
 <p><code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">evidences</span></code> (dictionary provided) usage example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
 <span class="kn">from</span> <span class="nn">compliance.evidence</span> <span class="kn">import</span> <span class="n">evidences</span>
+<span class="kn">from</span> <span class="nn">my_pkg.bar_evidence</span> <span class="kn">import</span> <span class="n">BarEvidence</span>
 <span class="o">...</span>
 <span class="n">test_bar_vs_baz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">system</span> <span class="ow">in</span> <span class="n">systems</span><span class="p">:</span>
         <span class="n">evidence_paths</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;bar&#39;</span><span class="p">:</span> <span class="s1">&#39;raw/foo/evidence_bar.json&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;bar&#39;</span><span class="p">:</span> <span class="n">BarEvidence</span><span class="o">.</span><span class="n">lazy_load</span><span class="p">(</span><span class="s1">&#39;foo/evidence_bar.json&#39;</span><span class="p">),</span>
             <span class="s1">&#39;baz&#39;</span><span class="p">:</span> <span class="s1">&#39;raw/foo/evidence_baz.json&#39;</span>
         <span class="p">}</span>
         <span class="k">with</span> <span class="n">evidences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_paths</span><span class="p">)</span> <span class="k">as</span> <span class="n">evidences</span><span class="p">:</span>
@@ -379,6 +403,23 @@ dictionary of evidence paths were provided.</p></li>
     <span class="k">for</span> <span class="n">system</span> <span class="ow">in</span> <span class="n">systems</span><span class="p">:</span>
         <span class="n">evidence_path</span> <span class="o">=</span> <span class="s1">&#39;raw/foo/evidence_bar.json&#39;</span>
         <span class="k">with</span> <span class="n">evidences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">evidence</span><span class="p">:</span>
+            <span class="c1"># Check code only executes if evidence is not stale.</span>
+            <span class="c1"># Perform your check logic</span>
+            <span class="n">failures</span><span class="p">,</span> <span class="n">warnings</span><span class="p">,</span> <span class="n">successes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_whatever</span><span class="p">(</span><span class="n">evidence</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_failures</span><span class="p">(</span><span class="s1">&#39;bar stuff&#39;</span><span class="p">,</span> <span class="n">failures</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_warnings</span><span class="p">(</span><span class="s1">&#39;bar stuff&#39;</span><span class="p">,</span> <span class="n">warnings</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_successes</span><span class="p">(</span><span class="s1">&#39;bar stuff&#39;</span><span class="p">,</span> <span class="n">successes</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">evidences</span></code> (<code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code> provided) usage example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="kn">from</span> <span class="nn">compliance.evidence</span> <span class="kn">import</span> <span class="n">evidences</span>
+<span class="kn">from</span> <span class="nn">my_pkg.bar_evidence</span> <span class="kn">import</span> <span class="n">BarEvidence</span>
+<span class="o">...</span>
+<span class="n">test_bar_stuff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">system</span> <span class="ow">in</span> <span class="n">systems</span><span class="p">:</span>
+        <span class="n">lazy_evidence</span> <span class="o">=</span> <span class="n">BarEvidence</span><span class="o">.</span><span class="n">lazy_load</span><span class="p">(</span><span class="s1">&#39;foo/evidence_bar.json&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">evidences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lazy_evidence</span><span class="p">)</span> <span class="k">as</span> <span class="n">evidence</span><span class="p">:</span>
             <span class="c1"># Check code only executes if evidence is not stale.</span>
             <span class="c1"># Perform your check logic</span>
             <span class="n">failures</span><span class="p">,</span> <span class="n">warnings</span><span class="p">,</span> <span class="n">successes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_whatever</span><span class="p">(</span><span class="n">evidence</span><span class="p">)</span>
@@ -559,13 +600,13 @@ file should be similar to this:</p>
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.7.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
     </div>
   </body>
 </html>

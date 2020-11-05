@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance package &#8212; Auditree Framework 1.6.5 documentation</title>
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <title>compliance package &#8212; Auditree Framework 1.7.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="modules.html" title="compliance"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.7.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
@@ -549,6 +549,24 @@ may be included.</p></li>
 </dd></dl>
 
 <dl class="py class">
+<dt id="compliance.evidence.LazyLoader">
+<em class="property">class </em><code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">LazyLoader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">ev_class</span></em><span class="sig-paren">)</span><a class="headerlink" href="#compliance.evidence.LazyLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py method">
+<dt id="compliance.evidence.LazyLoader.ev_class">
+<em class="property">property </em><code class="sig-name descname">ev_class</code><a class="headerlink" href="#compliance.evidence.LazyLoader.ev_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.evidence.LazyLoader.path">
+<em class="property">property </em><code class="sig-name descname">path</code><a class="headerlink" href="#compliance.evidence.LazyLoader.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="compliance.evidence.RawEvidence">
 <em class="property">class </em><code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">RawEvidence</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#RawEvidence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.RawEvidence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.evidence._BaseEvidence</span></code></p>
@@ -664,7 +682,7 @@ and set via <code class="docutils literal notranslate"><span class="pre">set_con
 
 <dl class="py class">
 <dt id="compliance.evidence.evidences">
-<em class="property">class </em><code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">evidences</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">evidence_paths</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#evidences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.evidences" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">evidences</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">from_evidences</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#evidences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.evidences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Helper context manager for a typical <code class="docutils literal notranslate"><span class="pre">test_</span></code> method implementation.</p>
 <p>Use when processing evidence by a check and the name(s) of the
@@ -750,6 +768,12 @@ Otherwise the execution stack is traversed to find the fetcher caller.</p></li>
 <dd class="field-even"><p>the evidence object.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="compliance.evidence.get_evidence_types">
+<code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">get_evidence_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#get_evidence_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.get_evidence_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a list of all valid evidence types.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -842,64 +866,64 @@ the calling <code class="docutils literal notranslate"><span class="pre">with</s
 
 <dl class="py function">
 <dt id="compliance.evidence.with_derived_evidences">
-<code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">with_derived_evidences</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">evidence_paths</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#with_derived_evidences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.with_derived_evidences" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">with_derived_evidences</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">from_evidences</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#with_derived_evidences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.with_derived_evidences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorate a typical <code class="docutils literal notranslate"><span class="pre">test_</span></code> check method processing temporary evidences.</p>
 <p>Use when processing derived evidence by a check and the name(s) of the
 evidence is/are static/known.  When the evidence names are dynamic use the
 <code class="docutils literal notranslate"><span class="pre">evidences</span></code> context manager instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>evidence_paths</strong> – relative paths to evidences required by the check.
-E.g. <code class="docutils literal notranslate"><span class="pre">source1/evidence.json</span></code> (this would point to
-<code class="docutils literal notranslate"><span class="pre">derived/source1/evidence.json</span></code>).</p>
+<dd class="field-odd"><p><strong>from_evidences</strong> – relative paths to evidences as strings or
+LazyLoader namedtuples that contain relative paths to evidences and
+evidence classes required by the check.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="compliance.evidence.with_external_evidences">
-<code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">with_external_evidences</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">evidence_paths</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#with_external_evidences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.with_external_evidences" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">with_external_evidences</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">from_evidences</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#with_external_evidences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.with_external_evidences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorate a typical <code class="docutils literal notranslate"><span class="pre">test_</span></code> check method processing external evidences.</p>
 <p>Use when processing external evidence by a check and the name(s) of the
 evidence is/are static/known.  When the evidence names are dynamic use the
 <code class="docutils literal notranslate"><span class="pre">evidences</span></code> context manager instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>evidence_paths</strong> – relative paths to evidences required by the check.
-E.g. <code class="docutils literal notranslate"><span class="pre">source1/evidence.json</span></code> (this would point to
-<code class="docutils literal notranslate"><span class="pre">external/source1/evidence.json</span></code>).</p>
+<dd class="field-odd"><p><strong>from_evidences</strong> – relative paths to evidences as strings or
+LazyLoader namedtuples that contain relative paths to evidences and
+evidence classes required by the check.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="compliance.evidence.with_raw_evidences">
-<code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">with_raw_evidences</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">evidence_paths</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#with_raw_evidences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.with_raw_evidences" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">with_raw_evidences</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">from_evidences</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#with_raw_evidences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.with_raw_evidences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorate a typical <code class="docutils literal notranslate"><span class="pre">test_</span></code> check method processing raw evidences.</p>
-<p>Use when processing raw evidence by a check and the name(s) of the evidence
-is/are static/known.  When the evidence names are dynamic use the
+<p>Use when processing raw evidence by a check and the name(s) of the
+evidence is/are static/known.  When the evidence names are dynamic use the
 <code class="docutils literal notranslate"><span class="pre">evidences</span></code> context manager instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>evidence_paths</strong> – relative paths to evidences required by the check.
-E.g. <code class="docutils literal notranslate"><span class="pre">source1/evidence.json</span></code> (this would point to
-<code class="docutils literal notranslate"><span class="pre">raw/source1/evidence.json</span></code>).</p>
+<dd class="field-odd"><p><strong>from_evidences</strong> – relative paths to evidences as strings or
+LazyLoader namedtuples that contain relative paths to evidences and
+evidence classes required by the check.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="compliance.evidence.with_tmp_evidences">
-<code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">with_tmp_evidences</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">evidence_paths</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#with_tmp_evidences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.with_tmp_evidences" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">with_tmp_evidences</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">from_evidences</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#with_tmp_evidences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.with_tmp_evidences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorate a typical <code class="docutils literal notranslate"><span class="pre">test_</span></code> check method processing derived evidences.</p>
 <p>Use when processing temporary evidence by a check and the name(s) of the
 evidence is/are static/known.  When the evidence names are dynamic use the
 <code class="docutils literal notranslate"><span class="pre">evidences</span></code> context manager instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>evidence_paths</strong> – relative paths to evidences required by the check.
-E.g. <code class="docutils literal notranslate"><span class="pre">source1/evidence.json</span></code> (this would point to
-<code class="docutils literal notranslate"><span class="pre">tmp/source1/evidence.json</span></code>).</p>
+<dd class="field-odd"><p><strong>from_evidences</strong> – relative paths to evidences as strings or
+LazyLoader namedtuples that contain relative paths to evidences and
+evidence classes required by the check.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1882,14 +1906,14 @@ compatibility with checks, reporting, and notifiers.</p>
         <li class="right" >
           <a href="modules.html" title="compliance"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.7.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
     </div>
   </body>
 </html>

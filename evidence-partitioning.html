@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Partitioned Evidence &#8212; Auditree Framework 1.6.5 documentation</title>
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <title>Partitioned Evidence &#8212; Auditree Framework 1.7.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="oscal.html" title="OSCAL Support"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.7.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Partitioned Evidence</a></li> 
       </ul>
     </div>  
@@ -172,7 +172,7 @@ object overrides partitioning by configuration.</p>
 </li>
 <li><p>Partitions yielded</p>
 <ul>
-<li><p>US/IL partition - <code class="docutils literal notranslate"><span class="pre">foo/&lt;us_il_hash&gt;_evidence.bar.json</span></code>:</p>
+<li><p>US/IL partition - <code class="docutils literal notranslate"><span class="pre">foo/&lt;us_il_hash&gt;_evidence_bar.json</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
   <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;IL&quot;</span><span class="p">},</span>
   <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;IL&quot;</span><span class="p">}</span>
@@ -180,14 +180,14 @@ object overrides partitioning by configuration.</p>
 </pre></div>
 </div>
 </li>
-<li><p>US/NY partition - <code class="docutils literal notranslate"><span class="pre">foo/&lt;us_ny_hash&gt;_evidence.bar.json</span></code>:</p>
+<li><p>US/NY partition - <code class="docutils literal notranslate"><span class="pre">foo/&lt;us_ny_hash&gt;_evidence_bar.json</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
   <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;NY&quot;</span><span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
 </div>
 </li>
-<li><p>UK/Essex partition - <code class="docutils literal notranslate"><span class="pre">foo/&lt;uk_essex_hash&gt;_evidence.bar.json</span></code>:</p>
+<li><p>UK/Essex partition - <code class="docutils literal notranslate"><span class="pre">foo/&lt;uk_essex_hash&gt;_evidence_bar.json</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
   <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;UK&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;Essex&quot;</span><span class="p">},</span>
   <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;UK&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;Essex&quot;</span><span class="p">}</span>
@@ -347,13 +347,13 @@ object overrides partitioning by configuration.</p>
         <li class="right" >
           <a href="oscal.html" title="OSCAL Support"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.7.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Partitioned Evidence</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
     </div>
   </body>
 </html>

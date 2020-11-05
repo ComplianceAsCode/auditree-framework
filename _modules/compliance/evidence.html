@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.evidence &#8212; Auditree Framework 1.6.5 documentation</title>
-    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <title>compliance.evidence &#8212; Auditree Framework 1.7.0 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.7.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.evidence</a></li> 
       </ul>
@@ -57,8 +57,9 @@
 
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">PurePath</span>
 
 <span class="kn">from</span> <span class="nn">compliance.check</span> <span class="kn">import</span> <span class="n">ComplianceCheck</span>
 <span class="kn">from</span> <span class="nn">compliance.config</span> <span class="kn">import</span> <span class="n">get_config</span>
@@ -76,6 +77,8 @@
 <span class="n">HOUR</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span>
 <span class="n">DAY</span> <span class="o">=</span> <span class="n">HOUR</span> <span class="o">*</span> <span class="mi">24</span>
 <span class="n">YEAR</span> <span class="o">=</span> <span class="n">DAY</span> <span class="o">*</span> <span class="mi">365</span>
+
+<span class="n">LazyLoader</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;LazyLoader&#39;</span><span class="p">,</span> <span class="s1">&#39;path ev_class&#39;</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">])</span>
 
 
 <span class="k">class</span> <span class="nc">_BaseEvidence</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -96,14 +99,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">ttl</span><span class="o">=</span><span class="n">DAY</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ttl</span> <span class="o">=</span> <span class="n">ttl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">category</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">substitute_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extension</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_content</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ttl</span> <span class="o">=</span> <span class="n">ttl</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_content</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_evidence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">evidence</span><span class="p">):</span>
@@ -118,25 +118,45 @@
         <span class="k">return</span> <span class="n">new_evidence</span>
 
     <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">lazy_load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_locker</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">locker</span><span class="p">):</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">substitute_config</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">locker</span><span class="o">.</span><span class="n">get_evidence</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">extension</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">rootdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;The root directory is not set.&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dir_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rootdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">PurePath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rootdir</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">substitute_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">PurePath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">extension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">PurePath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_content</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">content_as_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extension</span> <span class="o">!=</span> <span class="s1">&#39;json&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> does not have JSON content.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_content_as_json&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_content_as_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_content_as_json</span>
 
     <span class="k">def</span> <span class="nf">set_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">str_content</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_content</span> <span class="o">=</span> <span class="n">str_content</span>
@@ -469,41 +489,51 @@
 <span class="sd">    is yielded by this context manager.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evidence_paths</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">from_evidences</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct and initialize the evidences context manager.</span>
 
 <span class="sd">        :param obj: Either a check or locker object.  Needed for backward</span>
 <span class="sd">          compatibility of evidences context manager.</span>
-<span class="sd">        :param sources: The paths to the evidences within the evidence</span>
-<span class="sd">          locker.  This can be a list, a dict or a string.</span>
-<span class="sd">          For (list) example, ``[&#39;src/evidence.json&#39;, ...]``.</span>
-<span class="sd">          For (dict) example, ``{&#39;evidence1&#39;: &#39;src/evidence.json&#39;, ...}.</span>
-<span class="sd">          For (str) example, ``&#39;src/evidence.json&#39;``.</span>
+<span class="sd">        :param from_evidences: The paths to evidences within the evidence</span>
+<span class="sd">          locker.  It can be any of the following:</span>
+<span class="sd">          - A string path</span>
+<span class="sd">          - A LazyLoader namedtuple</span>
+<span class="sd">          - A list of string paths or LazyLoader namedtuples or a</span>
+<span class="sd">          combination of string paths and LazyLoader namedtuples</span>
+<span class="sd">          - A dictionary where a key is an evidence short name and a value</span>
+<span class="sd">          is either string path or a LazyLoader namedtuple</span>
+
+<span class="sd">          Using the LazyLoader namedtuple tells this context manager to cast</span>
+<span class="sd">          your evidence as a subclass of one of the framework&#39;s base evidence</span>
+<span class="sd">          classes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ComplianceCheck</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">check</span> <span class="o">=</span> <span class="n">obj</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">locker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="o">.</span><span class="n">locker</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">locker</span> <span class="o">=</span> <span class="n">obj</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">evidence_paths</span> <span class="o">=</span> <span class="n">evidence_paths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">from_evidences</span> <span class="o">=</span> <span class="n">from_evidences</span>
 
     <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform check evidences pre-processing.&quot;&quot;&quot;</span>
         <span class="n">evidence</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">evidence_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evidence_paths</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">evidence_paths</span><span class="p">:</span>
-                <span class="n">evidence</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_evidence_by_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="p">)</span>
-                <span class="n">evidence_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">evidence</span><span class="p">[</span><span class="n">path</span><span class="p">]</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evidence_paths</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">evidence_name</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">evidence_paths</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">evidence</span><span class="p">[</span><span class="n">evidence_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_evidence_by_path</span><span class="p">(</span>
-                    <span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span>
-                <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">from_evidences</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">from_evidence</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_evidences</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">from_evidence</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">from_evidence</span><span class="p">,</span> <span class="n">LazyLoader</span><span class="p">):</span>
+                    <span class="c1"># preserve original path to be used as key of evidence dict</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">from_evidence</span><span class="o">.</span><span class="n">path</span>
+                <span class="n">ev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_evidence</span><span class="p">(</span><span class="n">from_evidence</span><span class="p">)</span>
+                <span class="n">evidence</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="n">ev</span>
+                <span class="n">evidence_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ev</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">from_evidences</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">evidence_name</span><span class="p">,</span> <span class="n">from_evidence</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_evidences</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">evidence</span><span class="p">[</span><span class="n">evidence_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_evidence</span><span class="p">(</span><span class="n">from_evidence</span><span class="p">)</span>
                 <span class="n">evidence_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">evidence</span><span class="p">[</span><span class="n">evidence_name</span><span class="p">]</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evidence_paths</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">evidence</span> <span class="o">=</span> <span class="n">get_evidence_by_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evidence_paths</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">evidence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_evidence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">from_evidences</span><span class="p">)</span>
             <span class="n">evidence_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">evidence</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;check&#39;</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">ev_path</span> <span class="ow">in</span> <span class="n">evidence_list</span><span class="p">:</span>
@@ -512,7 +542,33 @@
 
     <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform check evidences post-processing.&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_get_evidence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_evidence</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve an evidence instance based on the from_evidence provided.</span>
+
+<span class="sd">        from_evidence can be either a path to the evidence in the locker as a</span>
+<span class="sd">        string or a LazyLoader namedtuple object that contains the path as a</span>
+<span class="sd">        string and an evidence class to cast the evidence as.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">from_evidence</span>
+        <span class="n">ev_class</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">from_evidence</span><span class="p">,</span> <span class="n">LazyLoader</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">from_evidence</span><span class="o">.</span><span class="n">path</span>
+            <span class="n">ev_class</span> <span class="o">=</span> <span class="n">from_evidence</span><span class="o">.</span><span class="n">ev_class</span>
+            <span class="n">ev_types</span> <span class="o">=</span> <span class="n">get_evidence_types</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">PurePath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">et</span> <span class="k">for</span> <span class="n">et</span> <span class="ow">in</span> <span class="n">ev_types</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">ev_type</span> <span class="ow">in</span> <span class="n">ev_types</span><span class="p">:</span>
+                    <span class="n">base_evidence_class</span> <span class="o">=</span> <span class="n">get_evidence_class</span><span class="p">(</span><span class="n">ev_type</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">ev_class</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">ev_class</span><span class="p">,</span> <span class="n">base_evidence_class</span><span class="p">):</span>
+                        <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">PurePath</span><span class="p">(</span><span class="n">ev_type</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+                        <span class="k">break</span>
+        <span class="n">evidence</span> <span class="o">=</span> <span class="n">get_evidence_by_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="p">)</span>
+        <span class="n">base_evidence_class</span> <span class="o">=</span> <span class="n">get_evidence_class</span><span class="p">(</span><span class="n">evidence</span><span class="o">.</span><span class="n">rootdir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ev_class</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">ev_class</span><span class="p">,</span> <span class="n">base_evidence_class</span><span class="p">):</span>
+            <span class="n">ev_class</span> <span class="o">=</span> <span class="n">base_evidence_class</span>
+        <span class="k">return</span> <span class="n">ev_class</span><span class="o">.</span><span class="n">from_evidence</span><span class="p">(</span><span class="n">evidence</span><span class="p">)</span></div>
 
 
 <span class="n">__init_map</span> <span class="o">=</span> <span class="p">{</span>
@@ -537,6 +593,11 @@
 <span class="sd">    :returns: the appropriate evidence class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">__init_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">evidence_type</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_evidence_types"><a class="viewcode-back" href="../../compliance.html#compliance.evidence.get_evidence_types">[docs]</a><span class="k">def</span> <span class="nf">get_evidence_types</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Provide a list of all valid evidence types.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">__init_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="get_evidence_by_path"><a class="viewcode-back" href="../../compliance.html#compliance.evidence.get_evidence_by_path">[docs]</a><span class="k">def</span> <span class="nf">get_evidence_by_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">locker</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -724,26 +785,26 @@
     <span class="k">return</span> <span class="n">decorator</span></div>
 
 
-<div class="viewcode-block" id="with_raw_evidences"><a class="viewcode-back" href="../../compliance.html#compliance.evidence.with_raw_evidences">[docs]</a><span class="k">def</span> <span class="nf">with_raw_evidences</span><span class="p">(</span><span class="o">*</span><span class="n">evidence_paths</span><span class="p">):</span>
+<div class="viewcode-block" id="with_raw_evidences"><a class="viewcode-back" href="../../compliance.html#compliance.evidence.with_raw_evidences">[docs]</a><span class="k">def</span> <span class="nf">with_raw_evidences</span><span class="p">(</span><span class="o">*</span><span class="n">from_evidences</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorate a typical ``test_`` check method processing raw evidences.</span>
 
-<span class="sd">    Use when processing raw evidence by a check and the name(s) of the evidence</span>
-<span class="sd">    is/are static/known.  When the evidence names are dynamic use the</span>
+<span class="sd">    Use when processing raw evidence by a check and the name(s) of the</span>
+<span class="sd">    evidence is/are static/known.  When the evidence names are dynamic use the</span>
 <span class="sd">    ``evidences`` context manager instead.</span>
 
-<span class="sd">    :param evidence_paths: relative paths to evidences required by the check.</span>
-<span class="sd">      E.g. ``source1/evidence.json`` (this would point to</span>
-<span class="sd">      ``raw/source1/evidence.json``).</span>
+<span class="sd">    :param from_evidences: relative paths to evidences as strings or</span>
+<span class="sd">      LazyLoader namedtuples that contain relative paths to evidences and</span>
+<span class="sd">      evidence classes required by the check.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_with_evidence_decorator</span><span class="p">(</span><span class="n">evidence_paths</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s1">&#39;raw&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_with_evidence_decorator</span><span class="p">(</span><span class="n">from_evidences</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s1">&#39;raw&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">decorator</span></div>
 
 
-<div class="viewcode-block" id="with_external_evidences"><a class="viewcode-back" href="../../compliance.html#compliance.evidence.with_external_evidences">[docs]</a><span class="k">def</span> <span class="nf">with_external_evidences</span><span class="p">(</span><span class="o">*</span><span class="n">evidence_paths</span><span class="p">):</span>
+<div class="viewcode-block" id="with_external_evidences"><a class="viewcode-back" href="../../compliance.html#compliance.evidence.with_external_evidences">[docs]</a><span class="k">def</span> <span class="nf">with_external_evidences</span><span class="p">(</span><span class="o">*</span><span class="n">from_evidences</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorate a typical ``test_`` check method processing external evidences.</span>
 
@@ -751,19 +812,19 @@
 <span class="sd">    evidence is/are static/known.  When the evidence names are dynamic use the</span>
 <span class="sd">    ``evidences`` context manager instead.</span>
 
-<span class="sd">    :param evidence_paths: relative paths to evidences required by the check.</span>
-<span class="sd">      E.g. ``source1/evidence.json`` (this would point to</span>
-<span class="sd">      ``external/source1/evidence.json``).</span>
+<span class="sd">    :param from_evidences: relative paths to evidences as strings or</span>
+<span class="sd">      LazyLoader namedtuples that contain relative paths to evidences and</span>
+<span class="sd">      evidence classes required by the check.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_with_evidence_decorator</span><span class="p">(</span><span class="n">evidence_paths</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s1">&#39;external&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_with_evidence_decorator</span><span class="p">(</span><span class="n">from_evidences</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s1">&#39;external&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">decorator</span></div>
 
 
 <div class="viewcode-block" id="with_derived_evidences"><a class="viewcode-back" href="../../compliance.html#compliance.evidence.with_derived_evidences">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s1">&#39;Decorator to be removed, use with_raw_evidences instead&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">with_derived_evidences</span><span class="p">(</span><span class="o">*</span><span class="n">evidence_paths</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">with_derived_evidences</span><span class="p">(</span><span class="o">*</span><span class="n">from_evidences</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorate a typical ``test_`` check method processing temporary evidences.</span>
 
@@ -771,19 +832,19 @@
 <span class="sd">    evidence is/are static/known.  When the evidence names are dynamic use the</span>
 <span class="sd">    ``evidences`` context manager instead.</span>
 
-<span class="sd">    :param evidence_paths: relative paths to evidences required by the check.</span>
-<span class="sd">      E.g. ``source1/evidence.json`` (this would point to</span>
-<span class="sd">      ``derived/source1/evidence.json``).</span>
+<span class="sd">    :param from_evidences: relative paths to evidences as strings or</span>
+<span class="sd">      LazyLoader namedtuples that contain relative paths to evidences and</span>
+<span class="sd">      evidence classes required by the check.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_with_evidence_decorator</span><span class="p">(</span><span class="n">evidence_paths</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s1">&#39;derived&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_with_evidence_decorator</span><span class="p">(</span><span class="n">from_evidences</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s1">&#39;derived&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">decorator</span></div>
 
 
 <div class="viewcode-block" id="with_tmp_evidences"><a class="viewcode-back" href="../../compliance.html#compliance.evidence.with_tmp_evidences">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s1">&#39;Decorator to be removed&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">with_tmp_evidences</span><span class="p">(</span><span class="o">*</span><span class="n">evidence_paths</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">with_tmp_evidences</span><span class="p">(</span><span class="o">*</span><span class="n">from_evidences</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorate a typical ``test_`` check method processing derived evidences.</span>
 
@@ -791,13 +852,13 @@
 <span class="sd">    evidence is/are static/known.  When the evidence names are dynamic use the</span>
 <span class="sd">    ``evidences`` context manager instead.</span>
 
-<span class="sd">    :param evidence_paths: relative paths to evidences required by the check.</span>
-<span class="sd">      E.g. ``source1/evidence.json`` (this would point to</span>
-<span class="sd">      ``tmp/source1/evidence.json``).</span>
+<span class="sd">    :param from_evidences: relative paths to evidences as strings or</span>
+<span class="sd">      LazyLoader namedtuples that contain relative paths to evidences and</span>
+<span class="sd">      evidence classes required by the check.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_with_evidence_decorator</span><span class="p">(</span><span class="n">evidence_paths</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_with_evidence_decorator</span><span class="p">(</span><span class="n">from_evidences</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">decorator</span></div>
 
@@ -814,26 +875,40 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">add_evidence</span><span class="p">(</span><span class="n">evidence</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_with_evidence_decorator</span><span class="p">(</span><span class="n">evidence_paths</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">type_str</span><span class="p">):</span>
-    <span class="n">prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">type_str</span><span class="si">}</span><span class="s1">/&#39;</span>
-    <span class="n">paths</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">p</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="k">else</span> <span class="n">p</span><span class="p">,</span>
-        <span class="n">evidence_paths</span>
-    <span class="p">)</span>
+<span class="k">def</span> <span class="nf">_with_evidence_decorator</span><span class="p">(</span><span class="n">from_evidences</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">type_str</span><span class="p">):</span>
+    <span class="n">from_evs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">from_ev</span> <span class="ow">in</span> <span class="n">from_evidences</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">from_ev</span>
+        <span class="c1"># Default the evidence class to evidence of type type_str.</span>
+        <span class="c1"># If from_ev is a LazyLoader and its evidence class is of the type</span>
+        <span class="c1"># type_str then set the evidence class to the from_ev evidence class.</span>
+        <span class="n">ev_class</span> <span class="o">=</span> <span class="n">get_evidence_class</span><span class="p">(</span><span class="n">type_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">from_ev</span><span class="p">,</span> <span class="n">LazyLoader</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">from_ev</span><span class="o">.</span><span class="n">path</span>
+            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">from_ev</span><span class="o">.</span><span class="n">ev_class</span><span class="p">,</span> <span class="n">ev_class</span><span class="p">):</span>
+                <span class="n">ev_class</span> <span class="o">=</span> <span class="n">from_ev</span><span class="o">.</span><span class="n">ev_class</span>
+        <span class="c1"># Ensure path is the full relative path including the type root.</span>
+        <span class="k">if</span> <span class="n">PurePath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">type_str</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">PurePath</span><span class="p">(</span><span class="n">type_str</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+        <span class="n">from_evs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LazyLoader</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ev_class</span><span class="p">))</span>
+
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">):</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">paths</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">from_evs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span>
 
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>  <span class="c1"># required for preserving the function context</span>
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_evidence_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrapper</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
-    <span class="n">wrapper</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+    <span class="n">wrapper</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">from_evs</span>
     <span class="k">return</span> <span class="n">wrapper</span>
 
 
-<span class="k">def</span> <span class="nf">_evidence_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_paths</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
-    <span class="n">evidences</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_evidence_by_path</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">evidence_paths</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">_evidence_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_evidences</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+    <span class="n">evidences</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">fe</span><span class="o">.</span><span class="n">ev_class</span><span class="o">.</span><span class="n">from_evidence</span><span class="p">(</span><span class="n">get_evidence_by_path</span><span class="p">(</span><span class="n">fe</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">fe</span> <span class="ow">in</span> <span class="n">from_evidences</span>
+    <span class="p">]</span>
     <span class="k">for</span> <span class="n">evidence</span> <span class="ow">in</span> <span class="n">evidences</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_evidence_metadata</span><span class="p">(</span><span class="n">evidence</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">evidences</span><span class="p">)</span>
@@ -868,14 +943,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.6.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.7.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.evidence</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
     </div>
   </body>
 </html>
