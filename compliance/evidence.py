@@ -521,7 +521,7 @@ class evidences(object):  # noqa: N801
                 for ev_type in ev_types:
                     base_evidence_class = get_evidence_class(ev_type)
                     if ev_class and issubclass(ev_class, base_evidence_class):
-                        path = str(PurePath(ev_type).joinpath(path))
+                        path = str(PurePath(ev_type, path))
                         break
         evidence = get_evidence_by_path(path, self.locker)
         base_evidence_class = get_evidence_class(evidence.rootdir)
@@ -847,7 +847,8 @@ def _with_evidence_decorator(from_evidences, f, type_str):
             if issubclass(from_ev.ev_class, ev_class):
                 ev_class = from_ev.ev_class
         # Ensure path is the full relative path including the type root.
-        path = str(PurePath(type_str).joinpath(*PurePath(path).parts[-2:]))
+        if PurePath(path).parts[0] != type_str:
+            path = str(PurePath(type_str, path))
         from_evs.append(LazyLoader(path, ev_class))
 
     if hasattr(f, 'args'):
