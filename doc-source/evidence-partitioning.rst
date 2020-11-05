@@ -131,20 +131,20 @@ Default Partition Root
 
 * Partitions yielded
 
-  * US/IL partition - ``foo/<us_il_hash>_evidence.bar.json``::
+  * US/IL partition - ``foo/<us_il_hash>_evidence_bar.json``::
 
       [
         {"foo": "...", "bar": "...", "country": "US", "region": "IL"},
         {"foo": "...", "bar": "...", "country": "US", "region": "IL"}
       ]
 
-  * US/NY partition - ``foo/<us_ny_hash>_evidence.bar.json``::
+  * US/NY partition - ``foo/<us_ny_hash>_evidence_bar.json``::
 
       [
         {"foo": "...", "bar": "...", "country": "US", "region": "NY"}
       ]
 
-  * UK/Essex partition - ``foo/<uk_essex_hash>_evidence.bar.json``::
+  * UK/Essex partition - ``foo/<uk_essex_hash>_evidence_bar.json``::
 
       [
         {"foo": "...", "bar": "...", "country": "UK", "region": "Essex"},

@@ -16,8 +16,9 @@
 
 import inspect
 import json
-import os
+from collections import namedtuple
 from functools import wraps
+from pathlib import PurePath
 
 from compliance.check import ComplianceCheck
 from compliance.config import get_config
@@ -35,6 +36,8 @@ from deprecated import deprecated
 HOUR = 60 * 60
 DAY = HOUR * 24
 YEAR = DAY * 365
+
+LazyLoader = namedtuple('LazyLoader', 'path ev_class', defaults=[None])
 
 
 class _BaseEvidence(object):
@@ -55,14 +58,11 @@ class _BaseEvidence(object):
     """
 
     def __init__(self, name, category, ttl=DAY, description='', **kwargs):
-        self.ttl = ttl
+        self._name = name
         self.category = category
-
-        self._name, self.extension = os.path.splitext(name)
-        self._name = substitute_config(self._name)
-        self.extension = self.extension.replace('.', '')
-        self._content = None
+        self.ttl = ttl
         self.description = description
+        self._content = None
 
     @classmethod
     def from_evidence(cls, evidence):
@@ -77,25 +77,45 @@ class _BaseEvidence(object):
         return new_evidence
 
     @classmethod
+    def lazy_load(cls, path):
+        return LazyLoader(path, cls)
+
+    @classmethod
     def from_locker(cls, path, locker):
         path = substitute_config(path)
         return cls(locker.get_evidence(path))
 
     @property
-    def name(self):
-        return self._name + '.' + self.extension
-
-    @property
-    def path(self):
-        return os.path.join(self.dir_path, self.name)
+    def rootdir(self):
+        raise NotImplementedError('The root directory is not set.')
 
     @property
     def dir_path(self):
-        return os.path.join(self.rootdir, self.category)
+        return str(PurePath(self.rootdir).joinpath(self.category))
+
+    @property
+    def name(self):
+        return substitute_config(self._name)
+
+    @property
+    def path(self):
+        return str(PurePath(self.dir_path).joinpath(self.name))
+
+    @property
+    def extension(self):
+        return PurePath(self.name).suffix.lstrip('.')
 
     @property
     def content(self):
         return self._content
+
+    @property
+    def content_as_json(self):
+        if self.extension != 'json':
+            raise ValueError(f'{self.name} does not have JSON content.')
+        if not hasattr(self, '_content_as_json'):
+            self._content_as_json = json.loads(self.content)
+        return self._content_as_json
 
     def set_content(self, str_content):
         self._content = str_content
@@ -428,41 +448,51 @@ class evidences(object):  # noqa: N801
     is yielded by this context manager.
     """
 
-    def __init__(self, obj, evidence_paths):
+    def __init__(self, obj, from_evidences):
         """
         Construct and initialize the evidences context manager.
 
         :param obj: Either a check or locker object.  Needed for backward
           compatibility of evidences context manager.
-        :param sources: The paths to the evidences within the evidence
-          locker.  This can be a list, a dict or a string.
-          For (list) example, ``['src/evidence.json', ...]``.
-          For (dict) example, ``{'evidence1': 'src/evidence.json', ...}.
-          For (str) example, ``'src/evidence.json'``.
+        :param from_evidences: The paths to evidences within the evidence
+          locker.  It can be any of the following:
+          - A string path
+          - A LazyLoader namedtuple
+          - A list of string paths or LazyLoader namedtuples or a
+          combination of string paths and LazyLoader namedtuples
+          - A dictionary where a key is an evidence short name and a value
+          is either string path or a LazyLoader namedtuple
+
+          Using the LazyLoader namedtuple tells this context manager to cast
+          your evidence as a subclass of one of the framework's base evidence
+          classes.
         """
         if isinstance(obj, ComplianceCheck):
             self.check = obj
             self.locker = self.check.locker
         else:
             self.locker = obj
-        self.evidence_paths = evidence_paths
+        self.from_evidences = from_evidences
 
     def __enter__(self):
         """Perform check evidences pre-processing."""
         evidence = {}
         evidence_list = []
-        if isinstance(self.evidence_paths, list):
-            for path in self.evidence_paths:
-                evidence[path] = get_evidence_by_path(path, self.locker)
-                evidence_list.append(evidence[path].path)
-        elif isinstance(self.evidence_paths, dict):
-            for evidence_name, path in self.evidence_paths.items():
-                evidence[evidence_name] = get_evidence_by_path(
-                    path, self.locker
-                )
+        if isinstance(self.from_evidences, list):
+            for from_evidence in self.from_evidences:
+                path = from_evidence
+                if isinstance(from_evidence, LazyLoader):
+                    # preserve original path to be used as key of evidence dict
+                    path = from_evidence.path
+                ev = self._get_evidence(from_evidence)
+                evidence[path] = ev
+                evidence_list.append(ev.path)
+        elif isinstance(self.from_evidences, dict):
+            for evidence_name, from_evidence in self.from_evidences.items():
+                evidence[evidence_name] = self._get_evidence(from_evidence)
                 evidence_list.append(evidence[evidence_name].path)
-        elif isinstance(self.evidence_paths, str):
-            evidence = get_evidence_by_path(self.evidence_paths, self.locker)
+        else:
+            evidence = self._get_evidence(self.from_evidences)
             evidence_list.append(evidence.path)
         if hasattr(self, 'check'):
             for ev_path in evidence_list:
@@ -472,6 +502,32 @@ class evidences(object):  # noqa: N801
     def __exit__(self, typ, val, traceback):
         """Perform check evidences post-processing."""
         pass
+
+    def _get_evidence(self, from_evidence):
+        """
+        Retrieve an evidence instance based on the from_evidence provided.
+
+        from_evidence can be either a path to the evidence in the locker as a
+        string or a LazyLoader namedtuple object that contains the path as a
+        string and an evidence class to cast the evidence as.
+        """
+        path = from_evidence
+        ev_class = None
+        if isinstance(from_evidence, LazyLoader):
+            path = from_evidence.path
+            ev_class = from_evidence.ev_class
+            ev_types = get_evidence_types()
+            if not any(PurePath(path).parts[0] == et for et in ev_types):
+                for ev_type in ev_types:
+                    base_evidence_class = get_evidence_class(ev_type)
+                    if ev_class and issubclass(ev_class, base_evidence_class):
+                        path = str(PurePath(ev_type, path))
+                        break
+        evidence = get_evidence_by_path(path, self.locker)
+        base_evidence_class = get_evidence_class(evidence.rootdir)
+        if not ev_class or not issubclass(ev_class, base_evidence_class):
+            ev_class = base_evidence_class
+        return ev_class.from_evidence(evidence)
 
 
 __init_map = {
@@ -496,6 +552,11 @@ def get_evidence_class(evidence_type):
     :returns: the appropriate evidence class.
     """
     return __init_map.get(evidence_type)
+
+
+def get_evidence_types():
+    """Provide a list of all valid evidence types."""
+    return list(__init_map.keys())
 
 
 def get_evidence_by_path(path, locker=None):
@@ -683,26 +744,26 @@ def store_derived_evidence(evidences, target):
     return decorator
 
 
-def with_raw_evidences(*evidence_paths):
+def with_raw_evidences(*from_evidences):
     """
     Decorate a typical ``test_`` check method processing raw evidences.
 
-    Use when processing raw evidence by a check and the name(s) of the evidence
-    is/are static/known.  When the evidence names are dynamic use the
+    Use when processing raw evidence by a check and the name(s) of the
+    evidence is/are static/known.  When the evidence names are dynamic use the
     ``evidences`` context manager instead.
 
-    :param evidence_paths: relative paths to evidences required by the check.
-      E.g. ``source1/evidence.json`` (this would point to
-      ``raw/source1/evidence.json``).
+    :param from_evidences: relative paths to evidences as strings or
+      LazyLoader namedtuples that contain relative paths to evidences and
+      evidence classes required by the check.
     """
 
     def decorator(f):
-        return _with_evidence_decorator(evidence_paths, f, 'raw')
+        return _with_evidence_decorator(from_evidences, f, 'raw')
 
     return decorator
 
 
-def with_external_evidences(*evidence_paths):
+def with_external_evidences(*from_evidences):
     """
     Decorate a typical ``test_`` check method processing external evidences.
 
@@ -710,19 +771,19 @@ def with_external_evidences(*evidence_paths):
     evidence is/are static/known.  When the evidence names are dynamic use the
     ``evidences`` context manager instead.
 
-    :param evidence_paths: relative paths to evidences required by the check.
-      E.g. ``source1/evidence.json`` (this would point to
-      ``external/source1/evidence.json``).
+    :param from_evidences: relative paths to evidences as strings or
+      LazyLoader namedtuples that contain relative paths to evidences and
+      evidence classes required by the check.
     """
 
     def decorator(f):
-        return _with_evidence_decorator(evidence_paths, f, 'external')
+        return _with_evidence_decorator(from_evidences, f, 'external')
 
     return decorator
 
 
 @deprecated(reason='Decorator to be removed, use with_raw_evidences instead')
-def with_derived_evidences(*evidence_paths):
+def with_derived_evidences(*from_evidences):
     """
     Decorate a typical ``test_`` check method processing temporary evidences.
 
@@ -730,19 +791,19 @@ def with_derived_evidences(*evidence_paths):
     evidence is/are static/known.  When the evidence names are dynamic use the
     ``evidences`` context manager instead.
 
-    :param evidence_paths: relative paths to evidences required by the check.
-      E.g. ``source1/evidence.json`` (this would point to
-      ``derived/source1/evidence.json``).
+    :param from_evidences: relative paths to evidences as strings or
+      LazyLoader namedtuples that contain relative paths to evidences and
+      evidence classes required by the check.
     """
 
     def decorator(f):
-        return _with_evidence_decorator(evidence_paths, f, 'derived')
+        return _with_evidence_decorator(from_evidences, f, 'derived')
 
     return decorator
 
 
 @deprecated(reason='Decorator to be removed')
-def with_tmp_evidences(*evidence_paths):
+def with_tmp_evidences(*from_evidences):
     """
     Decorate a typical ``test_`` check method processing derived evidences.
 
@@ -750,13 +811,13 @@ def with_tmp_evidences(*evidence_paths):
     evidence is/are static/known.  When the evidence names are dynamic use the
     ``evidences`` context manager instead.
 
-    :param evidence_paths: relative paths to evidences required by the check.
-      E.g. ``source1/evidence.json`` (this would point to
-      ``tmp/source1/evidence.json``).
+    :param from_evidences: relative paths to evidences as strings or
+      LazyLoader namedtuples that contain relative paths to evidences and
+      evidence classes required by the check.
     """
 
     def decorator(f):
-        return _with_evidence_decorator(evidence_paths, f, 'tmp')
+        return _with_evidence_decorator(from_evidences, f, 'tmp')
 
     return decorator
 
@@ -773,26 +834,40 @@ def _store_wrapper(self, evidence_path, func, type_name):
     self.locker.add_evidence(evidence)
 
 
-def _with_evidence_decorator(evidence_paths, f, type_str):
-    prefix = f'{type_str}/'
-    paths = map(
-        lambda p: (prefix + p) if not p.startswith(prefix) else p,
-        evidence_paths
-    )
+def _with_evidence_decorator(from_evidences, f, type_str):
+    from_evs = []
+    for from_ev in from_evidences:
+        path = from_ev
+        # Default the evidence class to evidence of type type_str.
+        # If from_ev is a LazyLoader and its evidence class is of the type
+        # type_str then set the evidence class to the from_ev evidence class.
+        ev_class = get_evidence_class(type_str)
+        if isinstance(from_ev, LazyLoader):
+            path = from_ev.path
+            if issubclass(from_ev.ev_class, ev_class):
+                ev_class = from_ev.ev_class
+        # Ensure path is the full relative path including the type root.
+        if PurePath(path).parts[0] != type_str:
+            path = str(PurePath(type_str, path))
+        from_evs.append(LazyLoader(path, ev_class))
+
     if hasattr(f, 'args'):
-        f.args.extend(list(paths))
+        f.args.extend(from_evs)
         return f
 
     @wraps(f)  # required for preserving the function context
     def wrapper(self, *args, **kwargs):
         return _evidence_wrapper(self, wrapper.args, f)
 
-    wrapper.args = list(paths)
+    wrapper.args = from_evs
     return wrapper
 
 
-def _evidence_wrapper(self, evidence_paths, func):
-    evidences = [get_evidence_by_path(p, self.locker) for p in evidence_paths]
+def _evidence_wrapper(self, from_evidences, func):
+    evidences = [
+        fe.ev_class.from_evidence(get_evidence_by_path(fe.path, self.locker))
+        for fe in from_evidences
+    ]
     for evidence in evidences:
         self.add_evidence_metadata(evidence.path)
     return func(self, *evidences)
