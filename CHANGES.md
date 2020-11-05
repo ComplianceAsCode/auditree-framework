@@ -1,3 +1,8 @@
+# [1.7.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.7.0)
+
+- [ADDED] Check evidence decorators and context manager now support subclassed evidence.
+- [ADDED] Evidence objects now have a content_as_json property.
+
 # [1.6.5](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.6.5)
 
 - [ADDED] Direct calls to the GH API can be made using the Github service now.
