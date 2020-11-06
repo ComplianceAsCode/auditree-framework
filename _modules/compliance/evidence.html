@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.evidence &#8212; Auditree Framework 1.7.0 documentation</title>
+    <title>compliance.evidence &#8212; Auditree Framework 1.7.1 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.7.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.evidence</a></li> 
       </ul>
@@ -565,6 +565,9 @@
                         <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">PurePath</span><span class="p">(</span><span class="n">ev_type</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
                         <span class="k">break</span>
         <span class="n">evidence</span> <span class="o">=</span> <span class="n">get_evidence_by_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">evidence</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">get_evidence_base_classes</span><span class="p">():</span>
+            <span class="c1"># Evidence returned from cache already cast</span>
+            <span class="n">ev_class</span> <span class="o">=</span> <span class="n">evidence</span><span class="o">.</span><span class="vm">__class__</span>
         <span class="n">base_evidence_class</span> <span class="o">=</span> <span class="n">get_evidence_class</span><span class="p">(</span><span class="n">evidence</span><span class="o">.</span><span class="n">rootdir</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ev_class</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">ev_class</span><span class="p">,</span> <span class="n">base_evidence_class</span><span class="p">):</span>
             <span class="n">ev_class</span> <span class="o">=</span> <span class="n">base_evidence_class</span>
@@ -598,6 +601,11 @@
 <div class="viewcode-block" id="get_evidence_types"><a class="viewcode-back" href="../../compliance.html#compliance.evidence.get_evidence_types">[docs]</a><span class="k">def</span> <span class="nf">get_evidence_types</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Provide a list of all valid evidence types.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">__init_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="get_evidence_base_classes"><a class="viewcode-back" href="../../compliance.html#compliance.evidence.get_evidence_base_classes">[docs]</a><span class="k">def</span> <span class="nf">get_evidence_base_classes</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Provide a list of all valid base evidence class objects.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">__init_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="get_evidence_by_path"><a class="viewcode-back" href="../../compliance.html#compliance.evidence.get_evidence_by_path">[docs]</a><span class="k">def</span> <span class="nf">get_evidence_by_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">locker</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -905,10 +913,13 @@
 
 
 <span class="k">def</span> <span class="nf">_evidence_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_evidences</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
-    <span class="n">evidences</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">fe</span><span class="o">.</span><span class="n">ev_class</span><span class="o">.</span><span class="n">from_evidence</span><span class="p">(</span><span class="n">get_evidence_by_path</span><span class="p">(</span><span class="n">fe</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">fe</span> <span class="ow">in</span> <span class="n">from_evidences</span>
-    <span class="p">]</span>
+    <span class="n">evidences</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">fe</span> <span class="ow">in</span> <span class="n">from_evidences</span><span class="p">:</span>
+        <span class="n">ev</span> <span class="o">=</span> <span class="n">get_evidence_by_path</span><span class="p">(</span><span class="n">fe</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">in</span> <span class="n">get_evidence_base_classes</span><span class="p">():</span>
+            <span class="c1"># Only cast if evidence retrieved is a base evidence class object</span>
+            <span class="n">ev</span> <span class="o">=</span> <span class="n">fe</span><span class="o">.</span><span class="n">ev_class</span><span class="o">.</span><span class="n">from_evidence</span><span class="p">(</span><span class="n">ev</span><span class="p">)</span>
+        <span class="n">evidences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ev</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">evidence</span> <span class="ow">in</span> <span class="n">evidences</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_evidence_metadata</span><span class="p">(</span><span class="n">evidence</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">evidences</span><span class="p">)</span>
@@ -943,7 +954,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.7.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.evidence</a></li> 
       </ul>
