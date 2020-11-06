@@ -524,6 +524,9 @@ class evidences(object):  # noqa: N801
                         path = str(PurePath(ev_type, path))
                         break
         evidence = get_evidence_by_path(path, self.locker)
+        if evidence.__class__ not in get_evidence_base_classes():
+            # Evidence returned from cache already cast
+            ev_class = evidence.__class__
         base_evidence_class = get_evidence_class(evidence.rootdir)
         if not ev_class or not issubclass(ev_class, base_evidence_class):
             ev_class = base_evidence_class
@@ -557,6 +560,11 @@ def get_evidence_class(evidence_type):
 def get_evidence_types():
     """Provide a list of all valid evidence types."""
     return list(__init_map.keys())
+
+
+def get_evidence_base_classes():
+    """Provide a list of all valid base evidence class objects."""
+    return list(__init_map.values())
 
 
 def get_evidence_by_path(path, locker=None):
@@ -864,10 +872,13 @@ def _with_evidence_decorator(from_evidences, f, type_str):
 
 
 def _evidence_wrapper(self, from_evidences, func):
-    evidences = [
-        fe.ev_class.from_evidence(get_evidence_by_path(fe.path, self.locker))
-        for fe in from_evidences
-    ]
+    evidences = []
+    for fe in from_evidences:
+        ev = get_evidence_by_path(fe.path, self.locker)
+        if ev.__class__ in get_evidence_base_classes():
+            # Only cast if evidence retrieved is a base evidence class object
+            ev = fe.ev_class.from_evidence(ev)
+        evidences.append(ev)
     for evidence in evidences:
         self.add_evidence_metadata(evidence.path)
     return func(self, *evidences)
