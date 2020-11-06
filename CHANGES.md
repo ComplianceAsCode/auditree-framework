@@ -1,3 +1,7 @@
+# [1.7.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.7.1)
+
+- [FIXED] Subclassed evidence support works with cached evidence now.
+
 # [1.7.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.7.0)
 
 - [ADDED] Check evidence decorators and context manager now support subclassed evidence.
