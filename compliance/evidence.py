@@ -37,7 +37,7 @@ HOUR = 60 * 60
 DAY = HOUR * 24
 YEAR = DAY * 365
 
-LazyLoader = namedtuple('LazyLoader', 'path ev_class', defaults=[None])
+LazyLoader = namedtuple('LazyLoader', 'path ev_class')
 
 
 class _BaseEvidence(object):

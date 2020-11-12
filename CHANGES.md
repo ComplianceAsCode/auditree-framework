@@ -1,3 +1,7 @@
+# [1.7.2](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.7.2)
+
+- [FIXED] LazyLoader namedtuple defaults removed; Framework compatible with Python 3.6 again.
+
 # [1.7.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.7.1)
 
 - [FIXED] Subclassed evidence support works with cached evidence now.
