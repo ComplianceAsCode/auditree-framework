@@ -235,9 +235,20 @@ due to an unavailable evidence dependency.
 Fetcher Execution
 =================
 
-The Auditree framework will run all fetchers (tests prefixed by ``fetch_``)
-that it can find.
+By default the Auditree framework will run all fetchers (tests prefixed by
+``fetch_``) that it can find.  However, it is possible to limit fetcher
+execution in bulk by using the ``--include`` and/or ``exclude`` CLI options
+while providing a file path/name to a JSON config file containing a list of
+fetchers to include/exclude.  The format of the JSON config file is a list of
+fetcher classes.  Where a fetcher class is represented as a string dot notation
+path to the fetcher class.
 
+Fetcher include/exclude JSON config file example::
+
+  [
+    "fetcher_pkg.path_to_my_checks.checks.fetch_module_foo.FooFetcherClass",
+    "fetcher_pkg.path_to_my_checks.checks.fetch_module_bar.BarFetcherClass"
+  ]
 
 Compliance Checks
 ~~~~~~~~~~~~~~~~~
