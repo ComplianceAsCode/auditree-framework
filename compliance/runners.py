@@ -181,6 +181,8 @@ class FetchMode(_BaseRunner):
                         self.load_errors.add(load_err)
                 except AttributeError:
                     pass
+        if not (self.opts.include or self.opts.exclude):
+            return fetchers
         include = {f'{f.__module__}.{f.__name__}' for f in fetchers}
         if self.opts.include:
             include = set(json.loads(open(self.opts.include).read()))
