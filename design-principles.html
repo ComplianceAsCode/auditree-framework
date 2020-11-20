@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Design Principles &#8212; Auditree Framework 1.7.2 documentation</title>
+    <title>Design Principles &#8212; Auditree Framework 1.8.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.7.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.8.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>  
@@ -257,8 +257,20 @@ due to an unavailable evidence dependency.</p>
 </div>
 <div class="section" id="fetcher-execution">
 <h3>Fetcher Execution<a class="headerlink" href="#fetcher-execution" title="Permalink to this headline">¶</a></h3>
-<p>The Auditree framework will run all fetchers (tests prefixed by <code class="docutils literal notranslate"><span class="pre">fetch_</span></code>)
-that it can find.</p>
+<p>By default the Auditree framework will run all fetchers (tests prefixed by
+<code class="docutils literal notranslate"><span class="pre">fetch_</span></code>) that it can find.  However, it is possible to limit fetcher
+execution in bulk by using the <code class="docutils literal notranslate"><span class="pre">--include</span></code> and/or <code class="docutils literal notranslate"><span class="pre">exclude</span></code> CLI options
+while providing a file path/name to a JSON config file containing a list of
+fetchers to include/exclude.  The format of the JSON config file is a list of
+fetcher classes.  Where a fetcher class is represented as a string dot notation
+path to the fetcher class.</p>
+<p>Fetcher include/exclude JSON config file example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="s2">&quot;fetcher_pkg.path_to_my_checks.checks.fetch_module_foo.FooFetcherClass&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;fetcher_pkg.path_to_my_checks.checks.fetch_module_bar.BarFetcherClass&quot;</span>
+<span class="p">]</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="compliance-checks">
@@ -600,7 +612,7 @@ file should be similar to this:</p>
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.7.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.8.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>
