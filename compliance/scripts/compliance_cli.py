@@ -107,6 +107,18 @@ class ComplianceCLI(Command):
             action='append',
             default=[]
         )
+        self.add_argument(
+            '--include',
+            help='Specifies the path/name of the fetcher include JSON file.',
+            metavar='fetchers.json',
+            default=None
+        )
+        self.add_argument(
+            '--exclude',
+            help='Specifies the path/name of the fetcher exclude JSON file.',
+            metavar='fetchers.json',
+            default=None
+        )
 
     def _validate_arguments(self, args):
         if 'stdout' not in args.notify:
@@ -117,6 +129,10 @@ class ComplianceCLI(Command):
             )
         if not args.fetch and not args.check:
             self.parser.error('--fetch or --check option is expected.')
+        if not args.fetch and (args.include or args.exclude):
+            self.parser.error(
+                '--include/--exclude options only valid with --fetch.'
+            )
         if not args.check and args.fix != 'off':
             self.parser.error('--fix option only valid with --check.')
 

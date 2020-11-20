@@ -15,6 +15,7 @@
 """Compliance automation flow management module."""
 
 import inspect
+import json
 import os
 import re
 import sys
@@ -180,7 +181,16 @@ class FetchMode(_BaseRunner):
                         self.load_errors.add(load_err)
                 except AttributeError:
                     pass
-        return fetchers
+        include = {f'{f.__module__}.{f.__name__}' for f in fetchers}
+        if self.opts.include:
+            include = set(json.loads(open(self.opts.include).read()))
+        exclude = set()
+        if self.opts.exclude:
+            exclude = set(json.loads(open(self.opts.exclude).read()))
+        return filter(
+            lambda f: f'{f.__module__}.{f.__name__}' in include - exclude,
+            fetchers
+        )
 
     def run_fetchers(self, reruns=None):
         """

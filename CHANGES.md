@@ -1,3 +1,7 @@
+# [1.8.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.8.0)
+
+- [ADDED] Selective fetcher bulk `--include` and `--exclude` execution is now possible.
+
 # [1.7.2](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.7.2)
 
 - [FIXED] LazyLoader namedtuple defaults removed; Framework compatible with Python 3.6 again.
