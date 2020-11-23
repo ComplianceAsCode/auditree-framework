@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.runners &#8212; Auditree Framework 1.8.0 documentation</title>
+    <title>compliance.runners &#8212; Auditree Framework 1.8.1 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.8.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.runners</a></li> 
       </ul>
@@ -230,9 +230,9 @@
         <span class="n">exclude</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">exclude</span><span class="p">:</span>
             <span class="n">exclude</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">exclude</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()))</span>
+        <span class="n">include</span> <span class="o">-=</span> <span class="n">exclude</span>
         <span class="k">return</span> <span class="nb">filter</span><span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span> <span class="ow">in</span> <span class="n">include</span> <span class="o">-</span> <span class="n">exclude</span><span class="p">,</span>
-            <span class="n">fetchers</span>
+            <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span> <span class="ow">in</span> <span class="n">include</span><span class="p">,</span> <span class="n">fetchers</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="FetchMode.run_fetchers"><a class="viewcode-back" href="../../compliance.html#compliance.runners.FetchMode.run_fetchers">[docs]</a>    <span class="k">def</span> <span class="nf">run_fetchers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reruns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -523,7 +523,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.8.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.runners</a></li> 
       </ul>
