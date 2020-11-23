@@ -189,9 +189,9 @@ class FetchMode(_BaseRunner):
         exclude = set()
         if self.opts.exclude:
             exclude = set(json.loads(open(self.opts.exclude).read()))
+        include -= exclude
         return filter(
-            lambda f: f'{f.__module__}.{f.__name__}' in include - exclude,
-            fetchers
+            lambda f: f'{f.__module__}.{f.__name__}' in include, fetchers
         )
 
     def run_fetchers(self, reruns=None):
