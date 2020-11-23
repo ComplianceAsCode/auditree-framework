@@ -1,3 +1,7 @@
+# [1.8.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.8.1)
+
+- [CHANGED] Improved selective fetcher bulk execution performance.
+
 # [1.8.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.8.0)
 
 - [ADDED] Selective fetcher bulk `--include` and `--exclude` execution is now possible.
