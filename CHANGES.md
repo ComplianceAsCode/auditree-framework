@@ -1,3 +1,7 @@
+# [1.9.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.9.0)
+
+- [ADDED] Storing raw evidence as binary content is now possible.
+
 # [1.8.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.8.1)
 
 - [CHANGED] Improved selective fetcher bulk execution performance.

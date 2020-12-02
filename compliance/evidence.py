@@ -143,6 +143,7 @@ class RawEvidence(_BaseEvidence):
         )
         self.part_fields = partition.get('fields')
         self.part_root = partition.get('root')
+        self.binary_content = kwargs.get('binary_content', False)
 
     @property
     def rootdir(self):
