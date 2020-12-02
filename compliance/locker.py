@@ -222,7 +222,8 @@ class Locker(object):
                     f.write(evidence.get_partition(key))
         else:
             full_path = os.path.join(self.local_path, evidence.path)
-            with open(full_path, 'w') as f:
+            mode = 'wb' if getattr(evidence, 'binary_content', False) else 'w'
+            with open(full_path, mode) as f:
                 f.write(evidence.content)
         if not evidence.path.startswith('tmp/'):
             self.index(evidence, checks, evidence_used)
