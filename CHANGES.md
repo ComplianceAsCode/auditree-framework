@@ -1,3 +1,7 @@
+# [1.9.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.9.1)
+
+- [FIXED] Github service `Github.get_issue_comments` returns all issue comments now.
+
 # [1.9.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.9.0)
 
 - [ADDED] Storing raw evidence as binary content is now possible.
