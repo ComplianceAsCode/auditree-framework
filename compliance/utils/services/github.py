@@ -231,8 +231,7 @@ class Github(object):
 
     def get_issue_comments(self, owner, repo, issue, parse_annotations=False):
         """Retrieve a repository issue's comments."""
-        comments = self._make_request(
-            'get',
+        comments = self._paginate_api(
             '/'.join(['repos', owner, repo, 'issues', str(issue), 'comments'])
         )
         if parse_annotations:
