@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.utils.services.github &#8212; Auditree Framework 1.9.0 documentation</title>
+    <title>compliance.utils.services.github &#8212; Auditree Framework 1.9.1 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.9.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils.services.github</a></li> 
       </ul>
@@ -272,8 +272,7 @@
 
 <div class="viewcode-block" id="Github.get_issue_comments"><a class="viewcode-back" href="../../../../compliance.utils.services.html#compliance.utils.services.github.Github.get_issue_comments">[docs]</a>    <span class="k">def</span> <span class="nf">get_issue_comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">parse_annotations</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve a repository issue&#39;s comments.&quot;&quot;&quot;</span>
-        <span class="n">comments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_request</span><span class="p">(</span>
-            <span class="s1">&#39;get&#39;</span><span class="p">,</span>
+        <span class="n">comments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paginate_api</span><span class="p">(</span>
             <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;repos&#39;</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="s1">&#39;issues&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">issue</span><span class="p">),</span> <span class="s1">&#39;comments&#39;</span><span class="p">])</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">parse_annotations</span><span class="p">:</span>
@@ -600,7 +599,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Auditree Framework 1.9.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils.services.github</a></li> 
       </ul>
