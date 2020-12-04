@@ -552,6 +552,12 @@ class GHIssuesNotifier(_BaseMDNotifier):
         if not results:
             return issues
         for check_path, result, message in results:
+            # If the 'checks' configuration element exists
+            # within an accreditation, only create issues
+            # for the set of checks therein.
+            if ('checks' in self._config[accred].keys()
+                    and check_path not in self._config[accred]['checks']):
+                continue
             now = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
             body = [f'## Compliance check alert - {now}']
             body.append(f'- Check: {check_path}')
