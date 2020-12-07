@@ -1,3 +1,7 @@
+# [1.10.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.10.0)
+
+- [CHANGED] GitHub Issues notifier can create issues for a subset of an accreditation's checks with a new configuration element.
+
 # [1.9.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.9.1)
 
 - [FIXED] Github service `Github.get_issue_comments` returns all issue comments now.
