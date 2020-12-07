@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Notifiers &#8212; Auditree Framework 1.9.1 documentation</title>
+    <title>Notifiers &#8212; Auditree Framework 1.10.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.9.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.10.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>  
@@ -385,11 +385,13 @@ list of projects boards and project columns to add the notification issues to.
 To specify a repository provide the GitHub “owner” and “repository”
 in the form of <code class="docutils literal notranslate"><span class="pre">owner/repository</span></code>.  Valid status values include “pass”,
 “warn”, “fail”, and “error”.  If no status configuration is provided then the
-“fail” status is used as the default.  Finally to specify project boards to
-assign issues to, set “project” to a dictionary where the keys are
-project names and the values are the column names.  The following is an example
-configuration for this notifier to be added to a configuration file and used
-with the <code class="docutils literal notranslate"><span class="pre">-C</span></code> option when executing your compliance checks:</p>
+“fail” status is used as the default.  You can also optionally limit your
+notifications to a set of checks within an accreditation by providing a list
+of check paths with a “checks” list. Finally to specify project boards to
+assign issues to, set “project” to a dictionary where the keys are project
+names and the values are the column names.  The following is an example
+configuration for this notifier to be added to a configuration file and
+used with the <code class="docutils literal notranslate"><span class="pre">-C</span></code> option when executing your compliance checks:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;notify&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;gh_issues&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -401,7 +403,11 @@ with the <code class="docutils literal notranslate"><span class="pre">-C</span><
       <span class="s2">&quot;accr2&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;repo&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;my-org/accr2-repo&quot;</span><span class="p">],</span>
         <span class="s2">&quot;project&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Some other super cool project&quot;</span><span class="p">:</span> <span class="s2">&quot;Backlog&quot;</span><span class="p">},</span>
-        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;checks&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="s2">&quot;chk_pkg.chk_cat_foo.checks.chk_module_foo.FooCheckClass&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;chk_pkg.chk_cat_foo.checks.chk_module_bar.BarCheckClass&quot;</span>
+        <span class="p">]</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -519,7 +525,7 @@ file:</p>
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.9.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.10.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>

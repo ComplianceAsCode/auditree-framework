@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.notify &#8212; Auditree Framework 1.9.1 documentation</title>
+    <title>compliance.notify &#8212; Auditree Framework 1.10.0 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.9.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.10.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.notify</a></li> 
       </ul>
@@ -593,6 +593,12 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">issues</span>
         <span class="k">for</span> <span class="n">check_path</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="c1"># If the &#39;checks&#39; configuration element exists</span>
+            <span class="c1"># within an accreditation, only create issues</span>
+            <span class="c1"># for the set of checks therein.</span>
+            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;checks&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accred</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                    <span class="ow">and</span> <span class="n">check_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">accred</span><span class="p">][</span><span class="s1">&#39;checks&#39;</span><span class="p">]):</span>
+                <span class="k">continue</span>
             <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S UTC&#39;</span><span class="p">)</span>
             <span class="n">body</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;## Compliance check alert - </span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
             <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- Check: </span><span class="si">{</span><span class="n">check_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -1260,7 +1266,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.9.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.10.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.notify</a></li> 
       </ul>
