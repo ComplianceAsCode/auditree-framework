@@ -298,11 +298,13 @@ list of projects boards and project columns to add the notification issues to.
 To specify a repository provide the GitHub "owner" and "repository"
 in the form of ``owner/repository``.  Valid status values include "pass",
 "warn", "fail", and "error".  If no status configuration is provided then the
-"fail" status is used as the default.  Finally to specify project boards to
-assign issues to, set "project" to a dictionary where the keys are
-project names and the values are the column names.  The following is an example
-configuration for this notifier to be added to a configuration file and used
-with the ``-C`` option when executing your compliance checks::
+"fail" status is used as the default.  You can also optionally limit your
+notifications to a set of checks within an accreditation by providing a list
+of check paths with a "checks" list. Finally to specify project boards to
+assign issues to, set "project" to a dictionary where the keys are project
+names and the values are the column names.  The following is an example
+configuration for this notifier to be added to a configuration file and
+used with the ``-C`` option when executing your compliance checks::
 
   {
     "notify": {
@@ -315,7 +317,11 @@ with the ``-C`` option when executing your compliance checks::
         "accr2": {
           "repo": ["my-org/accr2-repo"],
           "project": {"Some other super cool project": "Backlog"},
-          "status": ["error"]
+          "status": ["error"],
+          "checks": [
+            "chk_pkg.chk_cat_foo.checks.chk_module_foo.FooCheckClass",
+            "chk_pkg.chk_cat_foo.checks.chk_module_bar.BarCheckClass"
+          ]
         }
       }
     }
