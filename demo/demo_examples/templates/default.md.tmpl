@@ -1,0 +1,77 @@
+{#- -*- mode:jinja2; coding: utf-8 -*- -#}
+{#
+Copyright (c) 2020 IBM Corp. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+#}
+
+# {{ test.title }} Report {{ now.strftime('%Y-%m-%d') }}
+{% if test.total_issues_count(results) == 0 %}
+No issues found!
+{% else %}
+## Results
+
+{% if test.warnings_for_check_count(results) > 0 -%}
+* [Warnings](#warnings): {{ test.warnings_for_check_count(results) }}
+{% for k in all_warnings.keys() -%}
+    {% if all_warnings[k]|length > 0 -%}
+        {% set anchor = k.lower()|replace(' ', '-') %}
+  * [{{ k|capitalize }}](#{{ anchor }}): {{ all_warnings[k]|length }}
+    {%- endif %}
+{%- endfor -%}
+{% endif %}
+{% if test.failures_for_check_count(results) > 0 %}
+* [Failures](#failures): {{ test.failures_for_check_count(results) }}
+{% for k in all_failures.keys() -%}
+    {% if all_failures[k]|length > 0 -%}
+        {% set anchor = k.lower()|replace(' ', '-') %}
+  * [{{ k|capitalize }}](#{{ anchor }}): {{ all_failures[k]|length }}
+    {%- endif %}
+{%- endfor -%}
+{% endif -%}
+{% endif %}
+
+
+{% if test.warnings_for_check_count(results) > 0 -%}
+## Warnings
+
+{% for type in all_warnings.keys()|sort -%}
+{% if all_warnings[type]|length > 0 %}
+#### {{ type|capitalize }} ####
+{% for at in all_warnings[type]| sort %}
+{% if not link -%}
+* {{ at -}}
+{%- else -%}
+* [{{ at }}]({{ link }}/{{ at }})
+{%- endif %}
+{%- endfor %}
+{% endif -%}
+{% endfor %}
+{% endif %}
+
+{% if test.failures_for_check_count(results) > 0 -%}
+## Failures
+
+{% for type in all_failures.keys()|sort -%}
+{% if all_failures[type]|length > 0 %}
+#### {{ type|capitalize }} ####
+{% for at in all_failures[type]| sort %}
+{% if not link -%}
+* {{ at -}}
+{%- else -%}
+* [{{ at -}}]({{ link }}/{{ at }})
+{%- endif %}
+{%- endfor %}
+{% endif -%}
+{% endfor %}
+{% endif %}

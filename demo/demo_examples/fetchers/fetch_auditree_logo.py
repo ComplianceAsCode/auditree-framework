@@ -12,6 +12,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Compliance automation package."""
 
-__version__ = '1.10.1'
+from compliance.evidence import store_raw_evidence
+from compliance.fetch import ComplianceFetcher
+
+class ImageFetcher(ComplianceFetcher):
+    """Fetch the Auditree logo image and store as evidence."""
+
+    @store_raw_evidence('images/auditree_logo.png')
+    def fetch_auditree_logo(self):
+        """Fetch the Auditree logo."""
+        return open('at-logo.png', 'rb').read()

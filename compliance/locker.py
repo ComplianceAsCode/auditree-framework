@@ -502,7 +502,11 @@ class Locker(object):
             evidence.set_content(format_json(content))
         else:
             evidence.set_content(
-                self._get_file_content(evidence.path, evidence_dt)
+                self._get_file_content(
+                    evidence.path,
+                    evidence_dt,
+                    getattr(evidence, 'binary_content', False)
+                )
             )
         return evidence
 
@@ -787,9 +791,10 @@ class Locker(object):
             return True
         return False
 
-    def _get_file_content(self, file_path, file_dt=None):
+    def _get_file_content(self, file_path, file_dt=None, binary_content=False):
         if not file_dt:
-            return open(os.path.join(self.local_path, file_path)).read()
+            mode = 'rb' if binary_content else 'r'
+            return open(os.path.join(self.local_path, file_path), mode).read()
         commit = self.get_latest_commit(file_path, file_dt)
         if not commit:
             raise HistoricalEvidenceNotFoundError(
