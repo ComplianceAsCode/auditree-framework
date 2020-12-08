@@ -1,3 +1,10 @@
+# [1.10.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.10.1)
+
+- [FIXED] Reading raw evidence in checks is now supported.
+- [FIXED] Cleaned up Design Principles document formatting.
+- [FIXED] Virtual environment creation syntax corrected in Quick Start document.
+- [ADDED] Binary content fetcher and checks included in demo examples.
+
 # [1.10.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.10.0)
 
 - [CHANGED] GitHub Issues notifier can create issues for a subset of an accreditation's checks with a new configuration element.

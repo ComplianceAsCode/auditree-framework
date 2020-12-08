@@ -24,11 +24,24 @@ get_config().add_evidences(
             DAY,
             'Coordinated Universal Time'
         ),
+        RawEvidence(
+            'auditree_logo.png',
+            'images',
+            DAY,
+            'The Auditree logo image',
+            binary_content=True
+        ),
         ReportEvidence(
             'world_clock.md',
             'time',
             DAY,
             'World Clock Analysis report.'
+        ),
+        ReportEvidence(
+            'image_check.md',
+            'images',
+            DAY,
+            'Image Check Analysis report.'
         )
     ]
 )
