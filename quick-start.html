@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quick Start &#8212; Auditree Framework 1.10.0 documentation</title>
+    <title>Quick Start &#8212; Auditree Framework 1.10.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="index.html" title="Auditree framework documentation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.10.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.10.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Quick Start</a></li> 
       </ul>
     </div>  
@@ -54,7 +54,7 @@ checks.  Let’s use the fetchers and checks packaged up in the <code class="doc
 of the <code class="docutils literal notranslate"><span class="pre">auditree-framework</span></code> project as an example.  First things first, we need
 to ensure that we have a proper Python virtual environment configured and running:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd demo
-$ python -m venv
+$ python -m venv venv
 $ . ./venv/bin/activate
 $ pip install -r requirements.txt
 </pre></div>
@@ -62,14 +62,14 @@ $ pip install -r requirements.txt
 <p>A typical execution consists of two phases:</p>
 <ul>
 <li><p>Running the fetchers:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --fetch --evidence local -C auditree_demo.json
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --fetch --evidence local -C auditree_demo.json -v
 </pre></div>
 </div>
 <p>Running this command generates a Git repository locally at <code class="docutils literal notranslate"><span class="pre">/$TMPDIR/compliance</span></code>
 and it executes all fetchers found within the <code class="docutils literal notranslate"><span class="pre">demo_example</span></code> package.</p>
 </li>
 <li><p>Running the checks:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --check demo.arboretum.accred,demo.custom.accred --evidence local -C auditree_demo.json
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --check demo.arboretum.accred,demo.custom.accred --evidence local -C auditree_demo.json -v
 </pre></div>
 </div>
 <p>Running this command executes checks associated with the specified accreditations,
@@ -272,7 +272,7 @@ tool.</p></li>
         <li class="right" >
           <a href="index.html" title="Auditree framework documentation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.10.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.10.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Quick Start</a></li> 
       </ul>
     </div>

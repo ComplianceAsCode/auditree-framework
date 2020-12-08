@@ -31,13 +31,11 @@ evidence (see :py:mod:`compliance.evidence`):
 
 * :py:class:`~compliance.evidence.RawEvidence`: Gathered by
   fetchers and used by checks as *input*. For example, a list of users in
-  GitHub.
-
-   * Raw evidence can be `partitioned <https://complianceascode.github.io/auditree-framework/evidence-partitioning.html>`_ if it is JSON.
-
-   * All evidence is stored as string content by default.  Raw evidence can be
-   stored as binary content by setting the ``binary_content=True`` keyword
-   argument key/value pair when constructing a ``RawEvidence`` object.
+  GitHub.  If necessary, raw evidence can be
+  `partitioned <https://complianceascode.github.io/auditree-framework/evidence-partitioning.html>`_ if the content is valid JSON.  All evidence
+  content is stored as text by default but raw evidence content can be stored
+  as binary by setting the ``binary_content=True`` keyword argument key/value
+  pair when constructing a ``RawEvidence`` object.
 
 * :py:class:`~compliance.evidence.ExternalEvidence`: Planted in the locker
   with `plant <https://github.com/ComplianceAsCode/auditree-plant>`_

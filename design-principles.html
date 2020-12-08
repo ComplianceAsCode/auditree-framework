@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Design Principles &#8212; Auditree Framework 1.10.0 documentation</title>
+    <title>Design Principles &#8212; Auditree Framework 1.10.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.10.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.10.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>  
@@ -66,19 +66,14 @@ as fetchers and checks are loaded automatically by <code class="docutils literal
 <h2>Evidence<a class="headerlink" href="#evidence" title="Permalink to this headline">¶</a></h2>
 <p>Fetchers and checks manage evidence. We have defined three types of
 evidence (see <a class="reference internal" href="compliance.html#module-compliance.evidence" title="compliance.evidence"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compliance.evidence</span></code></a>):</p>
-<ul>
+<ul class="simple">
 <li><p><a class="reference internal" href="compliance.html#compliance.evidence.RawEvidence" title="compliance.evidence.RawEvidence"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawEvidence</span></code></a>: Gathered by
 fetchers and used by checks as <em>input</em>. For example, a list of users in
-GitHub.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>Raw evidence can be <a class="reference external" href="https://complianceascode.github.io/auditree-framework/evidence-partitioning.html">partitioned</a> if it is JSON.</p></li>
-<li><p>All evidence is stored as string content by default.  Raw evidence can be</p></li>
-</ul>
-<p>stored as binary content by setting the <code class="docutils literal notranslate"><span class="pre">binary_content=True</span></code> keyword
-argument key/value pair when constructing a <code class="docutils literal notranslate"><span class="pre">RawEvidence</span></code> object.</p>
-</div></blockquote>
-</li>
+GitHub.  If necessary, raw evidence can be
+<a class="reference external" href="https://complianceascode.github.io/auditree-framework/evidence-partitioning.html">partitioned</a> if the content is valid JSON.  All evidence
+content is stored as text by default but raw evidence content can be stored
+as binary by setting the <code class="docutils literal notranslate"><span class="pre">binary_content=True</span></code> keyword argument key/value
+pair when constructing a <code class="docutils literal notranslate"><span class="pre">RawEvidence</span></code> object.</p></li>
 <li><p><a class="reference internal" href="compliance.html#compliance.evidence.ExternalEvidence" title="compliance.evidence.ExternalEvidence"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExternalEvidence</span></code></a>: Planted in the locker
 with <a class="reference external" href="https://github.com/ComplianceAsCode/auditree-plant">plant</a>
 and used by checks as <em>input</em>. For example, a list of users in GitHub.</p></li>
@@ -623,7 +618,7 @@ file should be similar to this:</p>
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.10.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.10.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>

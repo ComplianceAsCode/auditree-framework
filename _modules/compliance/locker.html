@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.locker &#8212; Auditree Framework 1.10.0 documentation</title>
+    <title>compliance.locker &#8212; Auditree Framework 1.10.1 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.10.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.10.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.locker</a></li> 
       </ul>
@@ -543,7 +543,11 @@
             <span class="n">evidence</span><span class="o">.</span><span class="n">set_content</span><span class="p">(</span><span class="n">format_json</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">evidence</span><span class="o">.</span><span class="n">set_content</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_content</span><span class="p">(</span><span class="n">evidence</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_content</span><span class="p">(</span>
+                    <span class="n">evidence</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                    <span class="n">evidence_dt</span><span class="p">,</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="s1">&#39;binary_content&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">evidence</span></div>
 
@@ -828,9 +832,10 @@
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">_get_file_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">file_dt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_file_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">file_dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">binary_content</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">file_dt</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span> <span class="n">file_path</span><span class="p">))</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;rb&#39;</span> <span class="k">if</span> <span class="n">binary_content</span> <span class="k">else</span> <span class="s1">&#39;r&#39;</span>
+            <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span> <span class="n">file_path</span><span class="p">),</span> <span class="n">mode</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">commit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_latest_commit</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">file_dt</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">commit</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">HistoricalEvidenceNotFoundError</span><span class="p">(</span>
@@ -903,7 +908,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.10.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.10.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.locker</a></li> 
       </ul>

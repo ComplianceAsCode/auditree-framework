@@ -14,7 +14,7 @@ of the ``auditree-framework`` project as an example.  First things first, we nee
 to ensure that we have a proper Python virtual environment configured and running::
 
   $ cd demo
-  $ python -m venv
+  $ python -m venv venv
   $ . ./venv/bin/activate
   $ pip install -r requirements.txt
 
@@ -22,14 +22,14 @@ A typical execution consists of two phases:
 
 * Running the fetchers::
 
-    $ compliance --fetch --evidence local -C auditree_demo.json
+    $ compliance --fetch --evidence local -C auditree_demo.json -v
 
   Running this command generates a Git repository locally at ``/$TMPDIR/compliance``
   and it executes all fetchers found within the ``demo_example`` package.
 
 * Running the checks::
 
-    $ compliance --check demo.arboretum.accred,demo.custom.accred --evidence local -C auditree_demo.json
+    $ compliance --check demo.arboretum.accred,demo.custom.accred --evidence local -C auditree_demo.json -v
 
   Running this command executes checks associated with the specified accreditations,
   creates check result reports in the evidence locker, executes notifiers (you can
