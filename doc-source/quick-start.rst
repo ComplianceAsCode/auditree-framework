@@ -84,27 +84,35 @@ Using ``github`` as an example, add the following to your credentials file::
   token=XXX
 
 Once the credentials are set up, you can run fetchers and checks in ``no-push``
-or ``full-remote`` mode::
-
-  $ compliance --fetch --evidence no-push -C auditree_demo.json
+or ``full-remote`` mode.
 
 For a fetcher execution the Auditree framework will ``pull`` the repository to
 ``/$TMPDIR/compliance`` (only if it does not exist already), and then run all
 of the fetchers.  If evidence time to live (TTL) has not expired for a given
-evidence file then the associated fetcher will perform a no-op run.  It is
-important to note that nothing will be pushed at the end of a fetcher execution
-regardless of the ``--evidence`` option used.  This is handy for testing the
-current state of the evidence in your remote evidence locker.
+evidence file then the associated fetcher will perform a no-op run.
+
+It is important to note that when using the ``no-push`` option, your evidence
+locker will not be pushed to the remote evidence locker at the end of your fetcher
+execution.  This is handy for testing the current state of the evidence in your
+evidence locker::
+
+  $ compliance --fetch --evidence no-push -C auditree_demo.json
+
+However using the ``full-remote`` option will push your evidence locker to the
+remote locker::
+
+  $ compliance --fetch --evidence full-remote -C auditree_demo.json
 
 Likewise once the credentials are set up and you've executed your fetchers in
-either ``no-push`` or ``full-remote`` mode.  To execute checks in ``no-push``
-mode which will not push the evidence locker to the remote evidence locker::
+either ``no-push`` or ``full-remote`` mode you can now execute your checks in
+``no-push`` mode which will not push the evidence locker to the remote evidence
+locker::
 
   $ compliance --check demo.arboretum.accred,demo.custom.accred --evidence no-push -C auditree_demo.json
 
 
-To execute checks in ``full-remote`` mode which will push the evidence locker to
-the remote evidence locker::
+However using the ``full-remote`` option will push your evidence locker to the
+remote locker::
 
   $ compliance --check demo.arboretum.accred,demo.custom.accred --evidence full-remote -C auditree_demo.json
 

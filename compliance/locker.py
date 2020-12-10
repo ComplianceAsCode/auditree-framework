@@ -578,10 +578,16 @@ class Locker(object):
     def push(self):
         """Push the local git repository to the remote repository."""
         if self._do_push:
+            remote = self.repo.remote()
+            self.logger.info(
+                f'Syncing local locker with remote repo {self.repo_url}...'
+            )
+            remote.fetch()
+            remote.pull(rebase=True)
             self.logger.info(
                 f'Pushing local locker to remote repo {self.repo_url}...'
             )
-            push_info = self.repo.remotes[0].push()[0]
+            push_info = remote.push()[0]
             if push_info.flags >= git.remote.PushInfo.ERROR:
                 raise LockerPushError(push_info)
 

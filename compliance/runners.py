@@ -159,6 +159,13 @@ class FetchMode(_BaseRunner):
         super(FetchMode, self).__exit__(typ, val, traceback)
         # make sure that all added evidence are committed
         self.locker.checkin()
+        # Only push if fetchers are run separately from checks,
+        # otherwise push occurs after check processing is complete.
+        if not self.opts.check:
+            try:
+                self.locker.push()
+            except LockerPushError as lpe:
+                self.locker.logger.error(str(lpe))
 
     def get_fetchers(self):
         """Provide all compliance framework fetcher classes."""

@@ -1,3 +1,7 @@
+# [1.11.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.11.0)
+
+- [ADDED] Fetcher execution using `--evidence full-remote` mode pushes to remote locker now.
+
 # [1.10.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.10.1)
 
 - [FIXED] Reading raw evidence in checks is now supported.

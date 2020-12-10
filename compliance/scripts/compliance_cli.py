@@ -149,11 +149,6 @@ class ComplianceCLI(Command):
     def _run(self, args):
         success = True
         if args.fetch:
-            if args.evidence == 'full-remote':
-                self.out(
-                    'INFO: A remote locker sync will only occur '
-                    'after checks are executed in full-remote mode.'
-                )
             with FetchMode(args, self.extra_args) as fetch:
                 # Handle fetcher primary run.
                 self.out('\nFetcher Primary Run\n')
