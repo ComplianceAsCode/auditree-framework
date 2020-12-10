@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.locker &#8212; Auditree Framework 1.10.1 documentation</title>
+    <title>compliance.locker &#8212; Auditree Framework 1.11.0 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.10.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.locker</a></li> 
       </ul>
@@ -619,10 +619,16 @@
 <div class="viewcode-block" id="Locker.push"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.push">[docs]</a>    <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Push the local git repository to the remote repository.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_push</span><span class="p">:</span>
+            <span class="n">remote</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Syncing local locker with remote repo </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span><span class="si">}</span><span class="s1">...&#39;</span>
+            <span class="p">)</span>
+            <span class="n">remote</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+            <span class="n">remote</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="n">rebase</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s1">&#39;Pushing local locker to remote repo </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span><span class="si">}</span><span class="s1">...&#39;</span>
             <span class="p">)</span>
-            <span class="n">push_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">remotes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">push</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">push_info</span> <span class="o">=</span> <span class="n">remote</span><span class="o">.</span><span class="n">push</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">push_info</span><span class="o">.</span><span class="n">flags</span> <span class="o">&gt;=</span> <span class="n">git</span><span class="o">.</span><span class="n">remote</span><span class="o">.</span><span class="n">PushInfo</span><span class="o">.</span><span class="n">ERROR</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">LockerPushError</span><span class="p">(</span><span class="n">push_info</span><span class="p">)</span></div>
 
@@ -908,7 +914,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.10.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.locker</a></li> 
       </ul>

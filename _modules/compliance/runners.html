@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.runners &#8212; Auditree Framework 1.10.1 documentation</title>
+    <title>compliance.runners &#8212; Auditree Framework 1.11.0 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.10.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.runners</a></li> 
       </ul>
@@ -200,6 +200,13 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">FetchMode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
         <span class="c1"># make sure that all added evidence are committed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">checkin</span><span class="p">()</span>
+        <span class="c1"># Only push if fetchers are run separately from checks,</span>
+        <span class="c1"># otherwise push occurs after check processing is complete.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">check</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">push</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">LockerPushError</span> <span class="k">as</span> <span class="n">lpe</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">lpe</span><span class="p">))</span>
 
 <div class="viewcode-block" id="FetchMode.get_fetchers"><a class="viewcode-back" href="../../compliance.html#compliance.runners.FetchMode.get_fetchers">[docs]</a>    <span class="k">def</span> <span class="nf">get_fetchers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Provide all compliance framework fetcher classes.&quot;&quot;&quot;</span>
@@ -523,7 +530,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.10.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.runners</a></li> 
       </ul>
