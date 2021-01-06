@@ -85,7 +85,7 @@ for:
 
   All `git options <https://git-scm.com/docs/git-config>`_ are
   accepted. Set your git configuration with care, paying special
-  attention to those attributes within ``core`` section.
+  attention to those attributes within the ``core`` section.
 
 * Validating the ``ttl`` for a given evidence.  An optional evidence
   ``ttl`` tolerance value can be configured to be applied during
@@ -103,6 +103,28 @@ for:
      "locker": {
        "repo_url": "https://github.com/my-org/my-evidence-repo",
        "ttl_tolerance": 3600
+     }
+   }
+
+* It's generally a good idea to regularly "archive" an evidence locker in
+  favor of a fresh one.  A yearly locker archive/refresh is a good guideline
+  to follow.  However in cases where checks may need to reference historical
+  evidence, using a new locker will cause undesirable results in the short
+  term.  For cases like this referencing historical evidence from a previous
+  locker is possible by using the ``prev_repo_url`` option.  With that
+  option set, a check that is unable to find historical evidence in the
+  current evidence locker will be able to download the previous locker and
+  look for the historical evidence there.  This will continue to do this until
+  the new locker is primed with enough historical evidence to support all
+  checks.  Setting the option in your configuration JSON file would look
+  similar to:
+
+.. code-block:: json
+
+   {
+     "locker": {
+       "repo_url": "https://github.com/my-org/my-evidence-repo",
+       "prev_repo_url": "https://github.com/my-org/my-evidence-repo-old"
      }
    }
 

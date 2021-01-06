@@ -25,6 +25,7 @@ from datetime import datetime as dt
 from threading import Lock
 from urllib.parse import urlparse
 
+from compliance.config import get_config
 from compliance.evidence import TmpEvidence, get_evidence_class
 from compliance.utils.data_parse import (
     format_json, get_sha256_hash, parse_dot_key
@@ -86,17 +87,18 @@ class Locker(object):
         """
         self.repo_url = repo_url
         self.repo_url_with_creds = self.repo_url
-        if creds is not None:
+        self.creds = creds
+        if self.creds is not None:
             service_hostname = urlparse(self.repo_url).hostname
             token = None
             if 'github.com' in service_hostname:
-                token = creds['github'].token
+                token = self.creds['github'].token
             elif 'github' in service_hostname:
-                token = creds['github_enterprise'].token
+                token = self.creds['github_enterprise'].token
             elif 'bitbucket' in service_hostname:
-                token = creds['bitbucket'].token
+                token = self.creds['bitbucket'].token
             elif 'gitlab' in service_hostname:
-                token = creds['gitlab'].token
+                token = self.creds['gitlab'].token
             if token:
                 self.repo_url_with_creds = re.sub(
                     '://', f'://{token}@', self.repo_url_with_creds
@@ -112,10 +114,10 @@ class Locker(object):
         self._do_push = do_push
         self.ttl_tolerance = ttl_tolerance
         self.gitconfig = gitconfig or {}
-        self.logger = logging.getLogger(name='compliance.locker')
+        self.logger = logging.getLogger(name=f'compliance.locker.{self.name}')
         self._handler = logging.StreamHandler()
         self._handler.setFormatter(
-            logging.Formatter('%(levelname)s: %(message)s')
+            logging.Formatter('\n%(levelname)s: %(message)s')
         )
         self.logger.handlers.clear()
         self.logger.addHandler(self._handler)
@@ -413,7 +415,9 @@ class Locker(object):
         """
         return os.path.join(self.local_path, filename)
 
-    def get_remote_location(self, filename, include_commit=True, sha=None):
+    def get_remote_location(
+        self, filename, include_commit=True, sha=None, locker_url=None
+    ):
         """
         Provide the path for a file/commit SHA in the locker.
 
@@ -422,6 +426,7 @@ class Locker(object):
         :param filename: the name of a file in the locker.
         :param include_commit: if the latest commit SHA should be included.
         :param sha: use this commit SHA; requires include_commit to be False.
+        :param locker_url: use this locker_url instead of self.repo_url.
 
         :returns: the remote repository path to the filename provided.
         """
@@ -433,40 +438,58 @@ class Locker(object):
             ref = self.repo.head.commit.hexsha
         elif not include_commit and sha:
             ref = sha
-        return f'{self.repo_url}/blob/{ref}/{filename.strip("/")}'
+        repo_url = locker_url or self.repo_url
+        return f'{repo_url}/blob/{ref}/{filename.strip("/")}'
 
     def get_evidence(self, evidence_path, ignore_ttl=False, evidence_dt=None):
         """
         Provide the evidence from the locker.
 
-        The evidence may or may not exist in the locker.
+        The evidence may or may not exist in the locker.  If the evidence is
+        historical but not found in the immediate locker and a previous locker
+        URL is provided in the configuration then an attempt to get the
+        historical version of the evidence will be made from the previous
+        locker.
 
         :param evidence_path: string path of the evidence within the locker.
-          For example, `raw/service1/output.json`
+          For example, `raw/service1/output.json`.
+        :param ignore_ttl: boolean value to ignore evidence time to live.
+          Defaults to False.
+        :param evidence_dt: datetime of the evidence file version to retrieve.
+          Defaults to None which translates to "now".
 
         :returns: the populated evidence object.
         """
         evidence = None
         try:
-            metadata = self.get_evidence_metadata(evidence_path, evidence_dt)
-            class_type, category, evidence_name = evidence_path.split('/')
-            evidence_class_obj = get_evidence_class(class_type)
-            evidence = evidence_class_obj(
-                evidence_name,
-                category,
-                metadata['ttl'],
-                metadata['description'],
-                partition={
-                    'fields': metadata.get('partition_fields'),
-                    'root': metadata.get('partition_root')
-                }
+            evidence = self._get_evidence(
+                evidence_path, ignore_ttl, evidence_dt
             )
-        except TypeError:
-            raise EvidenceNotFoundError(
-                f'Evidence {evidence_path} is not valid '
-                'or not present within the locker'
+        except (EvidenceNotFoundError, HistoricalEvidenceNotFoundError):
+            prev_repo_url = get_config().get('locker.prev_repo_url')
+            if not (prev_repo_url and
+                    evidence_dt) or dt.utcnow().date() <= evidence_dt.date():
+                raise
+            # Try the previous locker
+            if not hasattr(self, '_prev_locker'):
+                self._prev_locker = Locker(
+                    f'{self.name}_prev',
+                    prev_repo_url,
+                    self.branch,
+                    self.creds
+                )
+            self.logger.info(
+                f'{evidence_dt.strftime("%Y-%m-%d")} historical evidence '
+                f'{evidence_path} not found in locker.  '
+                'Looking in previous locker...'
             )
-        return self.load_content(evidence, ignore_ttl, evidence_dt)
+            self._prev_locker.get_locker_repo('previous locker')
+            evidence = self._prev_locker._get_evidence(
+                evidence_path, ignore_ttl, evidence_dt
+            )
+            # Preserve previous locker for report metadata and TOC.
+            evidence.locker = self._prev_locker
+        return evidence
 
     def load_content(self, evidence, ignore_ttl=False, evidence_dt=None):
         """
@@ -533,17 +556,26 @@ class Locker(object):
 
     def checkout(self):
         """Pull (clone) the remote repository to the local git repository."""
+        self.get_locker_repo()
+        self.init_config()
+
+    def get_locker_repo(self, locker='evidence locker'):
+        """
+        Pull (clone) the remote repository to the local git repository.
+
+        :param locker: the locker "name" used in logging
+        """
         if os.path.isdir(os.path.join(self.local_path, '.git')):
-            self.logger.info(f'Using locker found in {self.local_path}...')
-            self.repo = git.Repo(self.local_path)
+            self.logger.info(f'Using {locker} found in {self.local_path}...')
+            if not hasattr(self, 'repo'):
+                self.repo = git.Repo(self.local_path)
         else:
             self.logger.info(
-                f'Cloning locker {self.repo_url} to {self.local_path}...'
+                f'Cloning {locker} {self.repo_url} to {self.local_path}...'
             )
             self.repo = git.Repo.clone_from(
                 self.repo_url_with_creds, self.local_path, branch=self.branch
             )
-        self.init_config()
 
     def init_config(self):
         """Apply the git configuration."""
@@ -759,6 +791,30 @@ class Locker(object):
             self.logger.info(f'Creating locker in {self.local_path}...')
             self.repo = git.Repo.init(self.local_path)
         self.init_config()
+
+    def _get_evidence(self, evidence_path, ignore_ttl=False, evidence_dt=None):
+        evidence = None
+        try:
+            metadata = self.get_evidence_metadata(evidence_path, evidence_dt)
+            class_type, category, evidence_name = evidence_path.split('/')
+            evidence_class_obj = get_evidence_class(class_type)
+            evidence = evidence_class_obj(
+                evidence_name,
+                category,
+                metadata['ttl'],
+                metadata['description'],
+                partition={
+                    'fields': metadata.get('partition_fields'),
+                    'root': metadata.get('partition_root')
+                }
+            )
+        except TypeError:
+            ev_dt_str = (evidence_dt or dt.utcnow()).strftime('%Y-%m-%d')
+            raise EvidenceNotFoundError(
+                f'Evidence {evidence_path} is not found in the locker '
+                f'for {ev_dt_str}.  It may not be a valid evidence path.'
+            )
+        return self.load_content(evidence, ignore_ttl, evidence_dt)
 
     def _get_partitioned_evidence_metadata(self, metadata, evidence_name):
         try:
