@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Design Principles &#8212; Auditree Framework 1.11.0 documentation</title>
+    <title>Design Principles &#8212; Auditree Framework 1.12.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
@@ -13,7 +13,6 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -35,7 +34,7 @@
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.12.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>  
@@ -118,7 +117,7 @@ example of this, your config file might look like:</p>
 </div>
 <p>All <a class="reference external" href="https://git-scm.com/docs/git-config">git options</a> are
 accepted. Set your git configuration with care, paying special
-attention to those attributes within <code class="docutils literal notranslate"><span class="pre">core</span></code> section.</p>
+attention to those attributes within the <code class="docutils literal notranslate"><span class="pre">core</span></code> section.</p>
 </li>
 <li><p>Validating the <code class="docutils literal notranslate"><span class="pre">ttl</span></code> for a given evidence.  An optional evidence
 <code class="docutils literal notranslate"><span class="pre">ttl</span></code> tolerance value can be configured to be applied during
@@ -134,6 +133,28 @@ your configuration JSON file like so:</p></li>
   <span class="nt">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="nt">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence-repo&quot;</span><span class="p">,</span>
     <span class="nt">&quot;ttl_tolerance&quot;</span><span class="p">:</span> <span class="mi">3600</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>It’s generally a good idea to regularly “archive” an evidence locker in
+favor of a fresh one.  A yearly locker archive/refresh is a good guideline
+to follow.  However in cases where checks may need to reference historical
+evidence, using a new locker will cause undesirable results in the short
+term.  For cases like this referencing historical evidence from a previous
+locker is possible by using the <code class="docutils literal notranslate"><span class="pre">prev_repo_url</span></code> option.  With that
+option set, a check that is unable to find historical evidence in the
+current evidence locker will be able to download the previous locker and
+look for the historical evidence there.  This will continue to do this until
+the new locker is primed with enough historical evidence to support all
+checks.  Setting the option in your configuration JSON file would look
+similar to:</p></li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence-repo&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;prev_repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence-repo-old&quot;</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -618,13 +639,13 @@ file should be similar to this:</p>
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.12.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+        &#169; Copyright 2021, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>
 </html>

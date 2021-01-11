@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.report &#8212; Auditree Framework 1.11.0 documentation</title>
+    <title>compliance.report &#8212; Auditree Framework 1.12.0 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     
@@ -13,7 +13,6 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -27,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.12.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.report</a></li> 
       </ul>
@@ -166,9 +165,10 @@
             <span class="k">for</span> <span class="n">ev</span> <span class="ow">in</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;evidence&#39;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">ev_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">ev</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
                 <span class="n">ev_descr</span> <span class="o">=</span> <span class="n">ev</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">ev_path</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">ev_locker_url</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;locker_url&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">repo_url</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">ev</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;partitions&#39;</span><span class="p">):</span>
                     <span class="n">ev_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_remote_location</span><span class="p">(</span>
-                        <span class="n">ev</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">],</span> <span class="kc">False</span><span class="p">,</span> <span class="n">ev</span><span class="p">[</span><span class="s1">&#39;commit_sha&#39;</span><span class="p">]</span>
+                        <span class="n">ev</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">],</span> <span class="kc">False</span><span class="p">,</span> <span class="n">ev</span><span class="p">[</span><span class="s1">&#39;commit_sha&#39;</span><span class="p">],</span> <span class="n">ev_locker_url</span>
                     <span class="p">)</span>
                     <span class="n">evidences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="p">{</span>
@@ -183,7 +183,8 @@
                         <span class="n">ev_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_remote_location</span><span class="p">(</span>
                             <span class="nb">str</span><span class="p">(</span><span class="n">ev_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">hash_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">ev_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span>
                             <span class="kc">False</span><span class="p">,</span>
-                            <span class="n">part</span><span class="p">[</span><span class="s1">&#39;commit_sha&#39;</span><span class="p">]</span>
+                            <span class="n">part</span><span class="p">[</span><span class="s1">&#39;commit_sha&#39;</span><span class="p">],</span>
+                            <span class="n">ev_locker_url</span>
                         <span class="p">)</span>
                         <span class="n">evidences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="p">{</span>
@@ -382,14 +383,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.12.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.report</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+        &#169; Copyright 2021, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>
 </html>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.check &#8212; Auditree Framework 1.11.0 documentation</title>
+    <title>compliance.check &#8212; Auditree Framework 1.12.0 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     
@@ -13,7 +13,6 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -27,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.12.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.check</a></li> 
       </ul>
@@ -335,33 +334,38 @@
 <span class="sd">        :param evidence_dt: the evidence date.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">evidence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_evidence</span><span class="p">(</span><span class="n">evidence_path</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_evidence_metadata</span><span class="p">(</span><span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_evidence_metadata</span><span class="p">(</span>
+            <span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="s1">&#39;locker&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">evidence</span></div>
 
-<div class="viewcode-block" id="ComplianceCheck.add_evidence_metadata"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.add_evidence_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">add_evidence_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ComplianceCheck.add_evidence_metadata"><a class="viewcode-back" href="../../compliance.html#compliance.check.ComplianceCheck.add_evidence_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">add_evidence_metadata</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">evidence_locker</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Add evidence metadata to the evidences property of each check.</span>
+<span class="sd">        Add evidence metadata to the evidence_metadata property of each check.</span>
 
 <span class="sd">        :param evidence_path: the evidence path.</span>
 <span class="sd">        :param evidence_dt: the evidence date.</span>
+<span class="sd">        :param evidence_locker: the locker the evidence was retrieved from.</span>
+<span class="sd">          Use when historical evidence is found in a secondary locker.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_evidence_metadata</span><span class="p">(</span>
-            <span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span>
-        <span class="p">)</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">evidence_path</span>
+        <span class="n">locker</span> <span class="o">=</span> <span class="n">evidence_locker</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">locker</span><span class="o">.</span><span class="n">get_evidence_metadata</span><span class="p">(</span><span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="p">)</span>
+        <span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">evidence_path</span><span class="p">,</span> <span class="s1">&#39;locker_url&#39;</span><span class="p">:</span> <span class="n">locker</span><span class="o">.</span><span class="n">repo_url</span><span class="p">})</span>
         <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;partitions&#39;</span><span class="p">):</span>
             <span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">=</span> <span class="n">evidence_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">partitions</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">part_hash</span><span class="p">,</span> <span class="n">part_key</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;partitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">partitions</span><span class="p">[</span><span class="n">part_hash</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="n">part_key</span><span class="p">,</span>
-                    <span class="s1">&#39;commit_sha&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_latest_commit</span><span class="p">(</span>
+                    <span class="s1">&#39;commit_sha&#39;</span><span class="p">:</span> <span class="n">locker</span><span class="o">.</span><span class="n">get_latest_commit</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">part_hash</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">evidence_dt</span>
                     <span class="p">)</span><span class="o">.</span><span class="n">hexsha</span>
                 <span class="p">}</span>
             <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;partitions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">partitions</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;commit_sha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="o">.</span><span class="n">get_latest_commit</span><span class="p">(</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;commit_sha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">locker</span><span class="o">.</span><span class="n">get_latest_commit</span><span class="p">(</span>
                 <span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span>
             <span class="p">)</span><span class="o">.</span><span class="n">hexsha</span>
         <span class="n">metadata</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;tombstones&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -422,14 +426,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.12.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.check</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+        &#169; Copyright 2021, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>
 </html>

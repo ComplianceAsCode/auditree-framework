@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.locker &#8212; Auditree Framework 1.11.0 documentation</title>
+    <title>compliance.locker &#8212; Auditree Framework 1.12.0 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     
@@ -13,7 +13,6 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -27,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.12.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.locker</a></li> 
       </ul>
@@ -66,6 +65,7 @@
 <span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
 
+<span class="kn">from</span> <span class="nn">compliance.config</span> <span class="kn">import</span> <span class="n">get_config</span>
 <span class="kn">from</span> <span class="nn">compliance.evidence</span> <span class="kn">import</span> <span class="n">TmpEvidence</span><span class="p">,</span> <span class="n">get_evidence_class</span>
 <span class="kn">from</span> <span class="nn">compliance.utils.data_parse</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">format_json</span><span class="p">,</span> <span class="n">get_sha256_hash</span><span class="p">,</span> <span class="n">parse_dot_key</span>
@@ -127,17 +127,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span> <span class="o">=</span> <span class="n">repo_url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">repo_url_with_creds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span>
-        <span class="k">if</span> <span class="n">creds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">creds</span> <span class="o">=</span> <span class="n">creds</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">creds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">service_hostname</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span><span class="p">)</span><span class="o">.</span><span class="n">hostname</span>
             <span class="n">token</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="s1">&#39;github.com&#39;</span> <span class="ow">in</span> <span class="n">service_hostname</span><span class="p">:</span>
-                <span class="n">token</span> <span class="o">=</span> <span class="n">creds</span><span class="p">[</span><span class="s1">&#39;github&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">token</span>
+                <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">creds</span><span class="p">[</span><span class="s1">&#39;github&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">token</span>
             <span class="k">elif</span> <span class="s1">&#39;github&#39;</span> <span class="ow">in</span> <span class="n">service_hostname</span><span class="p">:</span>
-                <span class="n">token</span> <span class="o">=</span> <span class="n">creds</span><span class="p">[</span><span class="s1">&#39;github_enterprise&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">token</span>
+                <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">creds</span><span class="p">[</span><span class="s1">&#39;github_enterprise&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">token</span>
             <span class="k">elif</span> <span class="s1">&#39;bitbucket&#39;</span> <span class="ow">in</span> <span class="n">service_hostname</span><span class="p">:</span>
-                <span class="n">token</span> <span class="o">=</span> <span class="n">creds</span><span class="p">[</span><span class="s1">&#39;bitbucket&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">token</span>
+                <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">creds</span><span class="p">[</span><span class="s1">&#39;bitbucket&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">token</span>
             <span class="k">elif</span> <span class="s1">&#39;gitlab&#39;</span> <span class="ow">in</span> <span class="n">service_hostname</span><span class="p">:</span>
-                <span class="n">token</span> <span class="o">=</span> <span class="n">creds</span><span class="p">[</span><span class="s1">&#39;gitlab&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">token</span>
+                <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">creds</span><span class="p">[</span><span class="s1">&#39;gitlab&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">token</span>
             <span class="k">if</span> <span class="n">token</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">repo_url_with_creds</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
                     <span class="s1">&#39;://&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;://</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s1">@&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_url_with_creds</span>
@@ -153,10 +154,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_do_push</span> <span class="o">=</span> <span class="n">do_push</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ttl_tolerance</span> <span class="o">=</span> <span class="n">ttl_tolerance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gitconfig</span> <span class="o">=</span> <span class="n">gitconfig</span> <span class="ow">or</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;compliance.locker&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;compliance.locker.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(levelname)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">%(levelname)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handler</span><span class="p">)</span>
@@ -454,7 +455,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Locker.get_remote_location"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.get_remote_location">[docs]</a>    <span class="k">def</span> <span class="nf">get_remote_location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">include_commit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sha</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Locker.get_remote_location"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.get_remote_location">[docs]</a>    <span class="k">def</span> <span class="nf">get_remote_location</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">include_commit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sha</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">locker_url</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Provide the path for a file/commit SHA in the locker.</span>
 
@@ -463,6 +466,7 @@
 <span class="sd">        :param filename: the name of a file in the locker.</span>
 <span class="sd">        :param include_commit: if the latest commit SHA should be included.</span>
 <span class="sd">        :param sha: use this commit SHA; requires include_commit to be False.</span>
+<span class="sd">        :param locker_url: use this locker_url instead of self.repo_url.</span>
 
 <span class="sd">        :returns: the remote repository path to the filename provided.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -474,40 +478,58 @@
             <span class="n">ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">commit</span><span class="o">.</span><span class="n">hexsha</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">include_commit</span> <span class="ow">and</span> <span class="n">sha</span><span class="p">:</span>
             <span class="n">ref</span> <span class="o">=</span> <span class="n">sha</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span><span class="si">}</span><span class="s1">/blob/</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">filename</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span></div>
+        <span class="n">repo_url</span> <span class="o">=</span> <span class="n">locker_url</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">repo_url</span><span class="si">}</span><span class="s1">/blob/</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">filename</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span></div>
 
 <div class="viewcode-block" id="Locker.get_evidence"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.get_evidence">[docs]</a>    <span class="k">def</span> <span class="nf">get_evidence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_path</span><span class="p">,</span> <span class="n">ignore_ttl</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Provide the evidence from the locker.</span>
 
-<span class="sd">        The evidence may or may not exist in the locker.</span>
+<span class="sd">        The evidence may or may not exist in the locker.  If the evidence is</span>
+<span class="sd">        historical but not found in the immediate locker and a previous locker</span>
+<span class="sd">        URL is provided in the configuration then an attempt to get the</span>
+<span class="sd">        historical version of the evidence will be made from the previous</span>
+<span class="sd">        locker.</span>
 
 <span class="sd">        :param evidence_path: string path of the evidence within the locker.</span>
-<span class="sd">          For example, `raw/service1/output.json`</span>
+<span class="sd">          For example, `raw/service1/output.json`.</span>
+<span class="sd">        :param ignore_ttl: boolean value to ignore evidence time to live.</span>
+<span class="sd">          Defaults to False.</span>
+<span class="sd">        :param evidence_dt: datetime of the evidence file version to retrieve.</span>
+<span class="sd">          Defaults to None which translates to &quot;now&quot;.</span>
 
 <span class="sd">        :returns: the populated evidence object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">evidence</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_evidence_metadata</span><span class="p">(</span><span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="p">)</span>
-            <span class="n">class_type</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">evidence_name</span> <span class="o">=</span> <span class="n">evidence_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
-            <span class="n">evidence_class_obj</span> <span class="o">=</span> <span class="n">get_evidence_class</span><span class="p">(</span><span class="n">class_type</span><span class="p">)</span>
-            <span class="n">evidence</span> <span class="o">=</span> <span class="n">evidence_class_obj</span><span class="p">(</span>
-                <span class="n">evidence_name</span><span class="p">,</span>
-                <span class="n">category</span><span class="p">,</span>
-                <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ttl&#39;</span><span class="p">],</span>
-                <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span>
-                <span class="n">partition</span><span class="o">=</span><span class="p">{</span>
-                    <span class="s1">&#39;fields&#39;</span><span class="p">:</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;partition_fields&#39;</span><span class="p">),</span>
-                    <span class="s1">&#39;root&#39;</span><span class="p">:</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;partition_root&#39;</span><span class="p">)</span>
-                <span class="p">}</span>
+            <span class="n">evidence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_evidence</span><span class="p">(</span>
+                <span class="n">evidence_path</span><span class="p">,</span> <span class="n">ignore_ttl</span><span class="p">,</span> <span class="n">evidence_dt</span>
             <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">EvidenceNotFoundError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Evidence </span><span class="si">{</span><span class="n">evidence_path</span><span class="si">}</span><span class="s1"> is not valid &#39;</span>
-                <span class="s1">&#39;or not present within the locker&#39;</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">EvidenceNotFoundError</span><span class="p">,</span> <span class="n">HistoricalEvidenceNotFoundError</span><span class="p">):</span>
+            <span class="n">prev_repo_url</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;locker.prev_repo_url&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">prev_repo_url</span> <span class="ow">and</span>
+                    <span class="n">evidence_dt</span><span class="p">)</span> <span class="ow">or</span> <span class="n">dt</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">evidence_dt</span><span class="o">.</span><span class="n">date</span><span class="p">():</span>
+                <span class="k">raise</span>
+            <span class="c1"># Try the previous locker</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_prev_locker&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_prev_locker</span> <span class="o">=</span> <span class="n">Locker</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_prev&#39;</span><span class="p">,</span>
+                    <span class="n">prev_repo_url</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">branch</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">creds</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">evidence_dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1"> historical evidence &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">evidence_path</span><span class="si">}</span><span class="s1"> not found in locker.  &#39;</span>
+                <span class="s1">&#39;Looking in previous locker...&#39;</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_content</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="n">ignore_ttl</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prev_locker</span><span class="o">.</span><span class="n">get_locker_repo</span><span class="p">(</span><span class="s1">&#39;previous locker&#39;</span><span class="p">)</span>
+            <span class="n">evidence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prev_locker</span><span class="o">.</span><span class="n">_get_evidence</span><span class="p">(</span>
+                <span class="n">evidence_path</span><span class="p">,</span> <span class="n">ignore_ttl</span><span class="p">,</span> <span class="n">evidence_dt</span>
+            <span class="p">)</span>
+            <span class="c1"># Preserve previous locker for report metadata and TOC.</span>
+            <span class="n">evidence</span><span class="o">.</span><span class="n">locker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prev_locker</span>
+        <span class="k">return</span> <span class="n">evidence</span></div>
 
 <div class="viewcode-block" id="Locker.load_content"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.load_content">[docs]</a>    <span class="k">def</span> <span class="nf">load_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence</span><span class="p">,</span> <span class="n">ignore_ttl</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -574,17 +596,26 @@
 
 <div class="viewcode-block" id="Locker.checkout"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.checkout">[docs]</a>    <span class="k">def</span> <span class="nf">checkout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Pull (clone) the remote repository to the local git repository.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_locker_repo</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_config</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Locker.get_locker_repo"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.get_locker_repo">[docs]</a>    <span class="k">def</span> <span class="nf">get_locker_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locker</span><span class="o">=</span><span class="s1">&#39;evidence locker&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pull (clone) the remote repository to the local git repository.</span>
+
+<span class="sd">        :param locker: the locker &quot;name&quot; used in logging</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span> <span class="s1">&#39;.git&#39;</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using locker found in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="si">}</span><span class="s1">...&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">repo</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using </span><span class="si">{</span><span class="n">locker</span><span class="si">}</span><span class="s1"> found in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="si">}</span><span class="s1">...&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;repo&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">repo</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Cloning locker </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="si">}</span><span class="s1">...&#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Cloning </span><span class="si">{</span><span class="n">locker</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="si">}</span><span class="s1">...&#39;</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">repo</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="o">.</span><span class="n">clone_from</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">repo_url_with_creds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span> <span class="n">branch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">branch</span>
-            <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init_config</span><span class="p">()</span></div>
+            <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Locker.init_config"><a class="viewcode-back" href="../../compliance.html#compliance.locker.Locker.init_config">[docs]</a>    <span class="k">def</span> <span class="nf">init_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Apply the git configuration.&quot;&quot;&quot;</span>
@@ -801,6 +832,30 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">repo</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_config</span><span class="p">()</span>
 
+    <span class="k">def</span> <span class="nf">_get_evidence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence_path</span><span class="p">,</span> <span class="n">ignore_ttl</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">evidence</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_evidence_metadata</span><span class="p">(</span><span class="n">evidence_path</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="p">)</span>
+            <span class="n">class_type</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">evidence_name</span> <span class="o">=</span> <span class="n">evidence_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+            <span class="n">evidence_class_obj</span> <span class="o">=</span> <span class="n">get_evidence_class</span><span class="p">(</span><span class="n">class_type</span><span class="p">)</span>
+            <span class="n">evidence</span> <span class="o">=</span> <span class="n">evidence_class_obj</span><span class="p">(</span>
+                <span class="n">evidence_name</span><span class="p">,</span>
+                <span class="n">category</span><span class="p">,</span>
+                <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ttl&#39;</span><span class="p">],</span>
+                <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span>
+                <span class="n">partition</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s1">&#39;fields&#39;</span><span class="p">:</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;partition_fields&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;root&#39;</span><span class="p">:</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;partition_root&#39;</span><span class="p">)</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">ev_dt_str</span> <span class="o">=</span> <span class="p">(</span><span class="n">evidence_dt</span> <span class="ow">or</span> <span class="n">dt</span><span class="o">.</span><span class="n">utcnow</span><span class="p">())</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">EvidenceNotFoundError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Evidence </span><span class="si">{</span><span class="n">evidence_path</span><span class="si">}</span><span class="s1"> is not found in the locker &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;for </span><span class="si">{</span><span class="n">ev_dt_str</span><span class="si">}</span><span class="s1">.  It may not be a valid evidence path.&#39;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_content</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="n">ignore_ttl</span><span class="p">,</span> <span class="n">evidence_dt</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_get_partitioned_evidence_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">evidence_name</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">part</span><span class="p">,</span> <span class="n">ev_name</span> <span class="o">=</span> <span class="n">evidence_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -914,14 +969,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.12.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.locker</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+        &#169; Copyright 2021, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>
 </html>

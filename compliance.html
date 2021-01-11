@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance package &#8212; Auditree Framework 1.11.0 documentation</title>
+    <title>compliance package &#8212; Auditree Framework 1.12.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
@@ -13,7 +13,6 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -35,7 +34,7 @@
         <li class="right" >
           <a href="modules.html" title="compliance"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.12.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
@@ -95,13 +94,15 @@
 <p>Compliance check automation TestCase class.</p>
 <dl class="py method">
 <dt id="compliance.check.ComplianceCheck.add_evidence_metadata">
-<code class="sig-name descname">add_evidence_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">evidence_path</span></em>, <em class="sig-param"><span class="n">evidence_dt</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.add_evidence_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.add_evidence_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add evidence metadata to the evidences property of each check.</p>
+<code class="sig-name descname">add_evidence_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">evidence_path</span></em>, <em class="sig-param"><span class="n">evidence_dt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">evidence_locker</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.add_evidence_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.add_evidence_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add evidence metadata to the evidence_metadata property of each check.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>evidence_path</strong> – the evidence path.</p></li>
 <li><p><strong>evidence_dt</strong> – the evidence date.</p></li>
+<li><p><strong>evidence_locker</strong> – the locker the evidence was retrieved from.
+Use when historical evidence is found in a secondary locker.</p></li>
 </ul>
 </dd>
 </dl>
@@ -873,7 +874,7 @@ the calling <code class="docutils literal notranslate"><span class="pre">with</s
 <dl class="py function">
 <dt id="compliance.evidence.with_derived_evidences">
 <code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">with_derived_evidences</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">from_evidences</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#with_derived_evidences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.with_derived_evidences" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decorate a typical <code class="docutils literal notranslate"><span class="pre">test_</span></code> check method processing temporary evidences.</p>
+<dd><p>Decorate a typical <code class="docutils literal notranslate"><span class="pre">test_</span></code> check method processing derived evidences.</p>
 <p>Use when processing derived evidence by a check and the name(s) of the
 evidence is/are static/known.  When the evidence names are dynamic use the
 <code class="docutils literal notranslate"><span class="pre">evidences</span></code> context manager instead.</p>
@@ -921,7 +922,7 @@ evidence classes required by the check.</p>
 <dl class="py function">
 <dt id="compliance.evidence.with_tmp_evidences">
 <code class="sig-prename descclassname">compliance.evidence.</code><code class="sig-name descname">with_tmp_evidences</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">from_evidences</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#with_tmp_evidences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.evidence.with_tmp_evidences" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decorate a typical <code class="docutils literal notranslate"><span class="pre">test_</span></code> check method processing derived evidences.</p>
+<dd><p>Decorate a typical <code class="docutils literal notranslate"><span class="pre">test_</span></code> check method processing temporary evidences.</p>
 <p>Use when processing temporary evidence by a check and the name(s) of the
 evidence is/are static/known.  When the evidence names are dynamic use the
 <code class="docutils literal notranslate"><span class="pre">evidences</span></code> context manager instead.</p>
@@ -1216,11 +1217,21 @@ failed to execute due to a dependency error.</p>
 <dt id="compliance.locker.Locker.get_evidence">
 <code class="sig-name descname">get_evidence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">evidence_path</span></em>, <em class="sig-param"><span class="n">ignore_ttl</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">evidence_dt</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_evidence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.locker.Locker.get_evidence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide the evidence from the locker.</p>
-<p>The evidence may or may not exist in the locker.</p>
+<p>The evidence may or may not exist in the locker.  If the evidence is
+historical but not found in the immediate locker and a previous locker
+URL is provided in the configuration then an attempt to get the
+historical version of the evidence will be made from the previous
+locker.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>evidence_path</strong> – string path of the evidence within the locker.
-For example, <cite>raw/service1/output.json</cite></p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>evidence_path</strong> – string path of the evidence within the locker.
+For example, <cite>raw/service1/output.json</cite>.</p></li>
+<li><p><strong>ignore_ttl</strong> – boolean value to ignore evidence time to live.
+Defaults to False.</p></li>
+<li><p><strong>evidence_dt</strong> – datetime of the evidence file version to retrieve.
+Defaults to None which translates to “now”.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>the populated evidence object.</p>
@@ -1315,8 +1326,19 @@ locker.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="compliance.locker.Locker.get_locker_repo">
+<code class="sig-name descname">get_locker_repo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">locker</span><span class="o">=</span><span class="default_value">'evidence locker'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_locker_repo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.locker.Locker.get_locker_repo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pull (clone) the remote repository to the local git repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>locker</strong> – the locker “name” used in logging</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="compliance.locker.Locker.get_remote_location">
-<code class="sig-name descname">get_remote_location</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">include_commit</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sha</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_remote_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.locker.Locker.get_remote_location" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_remote_location</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">include_commit</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sha</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">locker_url</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_remote_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compliance.locker.Locker.get_remote_location" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide the path for a file/commit SHA in the locker.</p>
 <p>The file may or may not exist in the locker.</p>
 <dl class="field-list simple">
@@ -1325,6 +1347,7 @@ locker.</p>
 <li><p><strong>filename</strong> – the name of a file in the locker.</p></li>
 <li><p><strong>include_commit</strong> – if the latest commit SHA should be included.</p></li>
 <li><p><strong>sha</strong> – use this commit SHA; requires include_commit to be False.</p></li>
+<li><p><strong>locker_url</strong> – use this locker_url instead of self.repo_url.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1912,14 +1935,14 @@ compatibility with checks, reporting, and notifiers.</p>
         <li class="right" >
           <a href="modules.html" title="compliance"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.11.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.12.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+        &#169; Copyright 2021, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>
 </html>
