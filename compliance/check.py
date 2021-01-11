@@ -294,33 +294,38 @@ class ComplianceCheck(unittest.TestCase):
         :param evidence_dt: the evidence date.
         """
         evidence = self.locker.get_evidence(evidence_path, True, evidence_dt)
-        self.add_evidence_metadata(evidence_path, evidence_dt)
+        self.add_evidence_metadata(
+            evidence_path, evidence_dt, getattr(evidence, 'locker', None)
+        )
         return evidence
 
-    def add_evidence_metadata(self, evidence_path, evidence_dt=None):
+    def add_evidence_metadata(
+        self, evidence_path, evidence_dt=None, evidence_locker=None
+    ):
         """
-        Add evidence metadata to the evidences property of each check.
+        Add evidence metadata to the evidence_metadata property of each check.
 
         :param evidence_path: the evidence path.
         :param evidence_dt: the evidence date.
+        :param evidence_locker: the locker the evidence was retrieved from.
+          Use when historical evidence is found in a secondary locker.
         """
-        metadata = self.locker.get_evidence_metadata(
-            evidence_path, evidence_dt
-        )
-        metadata['path'] = evidence_path
+        locker = evidence_locker or self.locker
+        metadata = locker.get_evidence_metadata(evidence_path, evidence_dt)
+        metadata.update({'path': evidence_path, 'locker_url': locker.repo_url})
         if metadata.get('partitions'):
             path, file_name = evidence_path.rsplit('/', 1)
             partitions = {}
             for part_hash, part_key in metadata['partitions'].items():
                 partitions[part_hash] = {
                     'key': part_key,
-                    'commit_sha': self.locker.get_latest_commit(
+                    'commit_sha': locker.get_latest_commit(
                         f'{path}/{part_hash}_{file_name}', evidence_dt
                     ).hexsha
                 }
             metadata['partitions'] = partitions
         else:
-            metadata['commit_sha'] = self.locker.get_latest_commit(
+            metadata['commit_sha'] = locker.get_latest_commit(
                 evidence_path, evidence_dt
             ).hexsha
         metadata.pop('tombstones', None)

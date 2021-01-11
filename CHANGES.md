@@ -1,3 +1,11 @@
+# [1.12.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.12.0)
+
+- [ADDED] Referencing historical evidence from a previous locker is now supported.
+- [ADDED] The optional `locker.prev_repo_url` configuration element was added.
+- [ADDED] Evidence used by checks found in reports metadata includes the locker URL field now.
+- [ADDED] Links to evidence used by checks found in the table of contents point to the appropriate lockers.
+- [ADDED] Evidence used by checks found in check_results.json includes the locker URL field now.
+
 # [1.11.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.11.0)
 
 - [ADDED] Fetcher execution using `--evidence full-remote` mode pushes to remote locker now.
