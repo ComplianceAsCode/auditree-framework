@@ -125,9 +125,10 @@ class ReportBuilder(object):
             for ev in meta.get('evidence', []):
                 ev_path = pathlib.Path(ev['path'])
                 ev_descr = ev['description'] or ev_path.name
+                ev_locker_url = ev.get('locker_url', self.locker.repo_url)
                 if not ev.get('partitions'):
                     ev_url = self.locker.get_remote_location(
-                        ev['path'], False, ev['commit_sha']
+                        ev['path'], False, ev['commit_sha'], ev_locker_url
                     )
                     evidences.append(
                         {
@@ -142,7 +143,8 @@ class ReportBuilder(object):
                         ev_url = self.locker.get_remote_location(
                             str(ev_path.parent / f'{hash_key}_{ev_path.name}'),
                             False,
-                            part['commit_sha']
+                            part['commit_sha'],
+                            ev_locker_url
                         )
                         evidences.append(
                             {

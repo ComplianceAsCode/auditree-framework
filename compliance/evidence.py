@@ -794,7 +794,7 @@ def with_external_evidences(*from_evidences):
 @deprecated(reason='Decorator to be removed, use with_raw_evidences instead')
 def with_derived_evidences(*from_evidences):
     """
-    Decorate a typical ``test_`` check method processing temporary evidences.
+    Decorate a typical ``test_`` check method processing derived evidences.
 
     Use when processing derived evidence by a check and the name(s) of the
     evidence is/are static/known.  When the evidence names are dynamic use the
@@ -814,7 +814,7 @@ def with_derived_evidences(*from_evidences):
 @deprecated(reason='Decorator to be removed')
 def with_tmp_evidences(*from_evidences):
     """
-    Decorate a typical ``test_`` check method processing derived evidences.
+    Decorate a typical ``test_`` check method processing temporary evidences.
 
     Use when processing temporary evidence by a check and the name(s) of the
     evidence is/are static/known.  When the evidence names are dynamic use the

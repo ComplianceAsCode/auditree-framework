@@ -41,6 +41,7 @@ class ComplianceCheckTest(unittest.TestCase):
         # Ensures that the check object has a (mocked) locker attribute/object
         # on it as expected.
         self.check.locker = create_autospec(Locker)
+        self.check.locker.repo_url = 'https://my.locker.url'
 
     def test_title(self):
         """Check title raises an exception in the base class."""
@@ -178,7 +179,8 @@ class ComplianceCheckTest(unittest.TestCase):
                     'path': 'raw/foo/foo.json',
                     'commit_sha': 'mycommitsha',
                     'foo': 'bar',
-                    'last_update': '2019-11-15'
+                    'last_update': '2019-11-15',
+                    'locker_url': 'https://my.locker.url'
                 }
             }
         )
@@ -227,7 +229,8 @@ class ComplianceCheckTest(unittest.TestCase):
                         }
                     },
                     'foo': 'bar',
-                    'last_update': '2019-11-15'
+                    'last_update': '2019-11-15',
+                    'locker_url': 'https://my.locker.url'
                 }
             }
         )
