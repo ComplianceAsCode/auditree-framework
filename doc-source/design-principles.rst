@@ -128,6 +128,25 @@ for:
      }
    }
 
+* A locker can grow large, causing CI/CD jobs to run longer than desired
+  due to locker download time.  So in addition to a sound locker archiving
+  strategy, it is also possible to configure your locker to only download
+  recent commits by using the ``shallow_days`` option.  When ``shallow_days``
+  is supplied, only commits since the current date minus the number of days set
+  as ``shallow_days`` are included in the locker download.  The option applies
+  to both the locker and the previous locker (if applicable).  Setting the
+  option in your configuration JSON file would look similar to::
+
+.. code-block:: json
+
+   {
+     "locker": {
+       "repo_url": "https://github.com/my-org/my-evidence-repo",
+       "prev_repo_url": "https://github.com/my-org/my-evidence-repo-old",
+       "shallow_days": 10
+     }
+   }
+
 
 .. _fetchers:
 
