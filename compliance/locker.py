@@ -21,7 +21,7 @@ import re
 import shutil
 import tempfile
 import time
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 from threading import Lock
 from urllib.parse import urlparse
 
@@ -573,8 +573,17 @@ class Locker(object):
             self.logger.info(
                 f'Cloning {locker} {self.repo_url} to {self.local_path}...'
             )
+            kwargs = {'branch': self.branch}
+            shallow_days = get_config().get('locker.shallow_days', -1)
+            if shallow_days >= 0:
+                since_dt = dt.utcnow() - timedelta(days=shallow_days + 1)
+                since = since_dt.strftime('%Y/%m/%d')
+                kwargs['shallow_since'] = since
+                self.logger.info(
+                    f'{locker.title()} contains commits since {since}...'
+                )
             self.repo = git.Repo.clone_from(
-                self.repo_url_with_creds, self.local_path, branch=self.branch
+                self.repo_url_with_creds, self.local_path, **kwargs
             )
 
     def init_config(self):
