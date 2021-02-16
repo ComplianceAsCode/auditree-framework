@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Design Principles &#8212; Auditree Framework 1.12.0 documentation</title>
+    <title>Design Principles &#8212; Auditree Framework 1.13.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
@@ -34,7 +34,7 @@
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.12.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.13.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>  
@@ -155,6 +155,25 @@ similar to:</p></li>
   <span class="nt">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="nt">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence-repo&quot;</span><span class="p">,</span>
     <span class="nt">&quot;prev_repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence-repo-old&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>A locker can grow large, causing CI/CD jobs to run longer than desired
+due to locker download time.  So in addition to a sound locker archiving
+strategy, it is also possible to configure your locker to only download
+recent commits by using the <code class="docutils literal notranslate"><span class="pre">shallow_days</span></code> option.  When <code class="docutils literal notranslate"><span class="pre">shallow_days</span></code>
+is supplied, only commits since the current date minus the number of days set
+as <code class="docutils literal notranslate"><span class="pre">shallow_days</span></code> are included in the locker download.  The option applies
+to both the locker and the previous locker (if applicable).  Setting the
+option in your configuration JSON file would look similar to:</p></li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence-repo&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;prev_repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/my-org/my-evidence-repo-old&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;shallow_days&quot;</span><span class="p">:</span> <span class="mi">10</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -639,13 +658,13 @@ file should be similar to this:</p>
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.12.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.13.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
     </div>
   </body>
 </html>
