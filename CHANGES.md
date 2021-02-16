@@ -1,3 +1,7 @@
+# [1.13.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.13.0)
+
+- [ADDED] Configurable shallow cloning of locker is now supported.
+
 # [1.12.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.12.0)
 
 - [ADDED] Referencing historical evidence from a previous locker is now supported.
