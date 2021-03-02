@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.14.0)
+
+- [ADDED] The `filtered_content` attribute has been added to `RawEvidence`.
+- [ADDED] Locker clone duration logging has been added.
+- [FIXED] The `binary_content` attribute on raw evidence is retained as metadata now.
+- [FIXED] All partitioned evidence defined via constructor correctly retains attributes now.
+
 # [1.13.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.13.0)
 
 - [ADDED] Configurable shallow cloning of locker is now supported.
