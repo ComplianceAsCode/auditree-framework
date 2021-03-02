@@ -26,7 +26,7 @@ from threading import Lock
 from urllib.parse import urlparse
 
 from compliance.config import get_config
-from compliance.evidence import TmpEvidence, get_evidence_class
+from compliance.evidence import CONTENT_FLAGS, TmpEvidence, get_evidence_class
 from compliance.utils.data_parse import (
     format_json, get_sha256_hash, parse_dot_key
 )
@@ -302,6 +302,9 @@ class Locker(object):
                 repo_files.append(self.get_file(evidence.path))
             if tombstones:
                 metadata[evidence.name]['tombstones'] = tombstones
+            for content_flag in CONTENT_FLAGS:
+                if getattr(evidence, content_flag, False):
+                    metadata[evidence.name][content_flag] = True
             if checks is not None:
                 metadata[evidence.name]['checks'] = checks
             if evidence_used is not None:
@@ -575,16 +578,20 @@ class Locker(object):
             )
             kwargs = {'branch': self.branch}
             shallow_days = get_config().get('locker.shallow_days', -1)
+            addl_msg = None
             if shallow_days >= 0:
                 since_dt = dt.utcnow() - timedelta(days=shallow_days + 1)
                 since = since_dt.strftime('%Y/%m/%d')
                 kwargs['shallow_since'] = since
-                self.logger.info(
-                    f'{locker.title()} contains commits since {since}...'
-                )
+                addl_msg = f'{locker.title()} contains commits since {since}'
+            start = time.perf_counter()
             self.repo = git.Repo.clone_from(
                 self.repo_url_with_creds, self.local_path, **kwargs
             )
+            duration = time.perf_counter() - start
+            self.logger.info(f'{locker.title()} cloned in {duration:.3f}s')
+            if addl_msg:
+                self.logger.info(addl_msg)
 
     def init_config(self):
         """Apply the git configuration."""
@@ -815,7 +822,9 @@ class Locker(object):
                 partition={
                     'fields': metadata.get('partition_fields'),
                     'root': metadata.get('partition_root')
-                }
+                },
+                binary_content=metadata.get('binary_content', False),
+                filtered_content=metadata.get('filtered_content', False)
             )
         except TypeError:
             ev_dt_str = (evidence_dt or dt.utcnow()).strftime('%Y-%m-%d')
