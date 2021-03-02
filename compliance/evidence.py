@@ -37,6 +37,8 @@ HOUR = 60 * 60
 DAY = HOUR * 24
 YEAR = DAY * 365
 
+CONTENT_FLAGS = ['binary_content', 'filtered_content']
+
 LazyLoader = namedtuple('LazyLoader', 'path ev_class')
 
 
@@ -66,11 +68,21 @@ class _BaseEvidence(object):
 
     @classmethod
     def from_evidence(cls, evidence):
+        kwargs = {}
+        for content_flag in CONTENT_FLAGS:
+            if hasattr(evidence, content_flag):
+                kwargs[content_flag] = getattr(evidence, content_flag)
+        if hasattr(evidence, 'part_fields') or hasattr(evidence, 'part_root'):
+            kwargs['partition'] = {
+                'fields': getattr(evidence, 'part_fields', None),
+                'root': getattr(evidence, 'part_root', None)
+            }
         new_evidence = cls(
             evidence.name,
             evidence.category,
             evidence.ttl,
-            evidence.description
+            evidence.description,
+            **kwargs
         )
         if evidence.content:
             new_evidence.set_content(evidence.content)
@@ -144,6 +156,7 @@ class RawEvidence(_BaseEvidence):
         self.part_fields = partition.get('fields')
         self.part_root = partition.get('root')
         self.binary_content = kwargs.get('binary_content', False)
+        self.filtered_content = kwargs.get('filtered_content', False)
 
     @property
     def rootdir(self):
