@@ -14,6 +14,7 @@
 # limitations under the License.
 """Compliance Github service helper."""
 
+import datetime
 import json
 import random
 from collections import OrderedDict
@@ -412,6 +413,68 @@ class Github(object):
         if path:
             opts['path'] = path
         return self._make_request('get', f'repos/{repo}/commits', params=opts)
+
+    def get_pull_requests(self, repo, since=None, **kwargs):
+        """
+        Retrieve a repository's pull request information.
+
+        :param repo: the organization/repository as a string.
+        :param since: the starting date/time of a pull request as a datetime.
+
+        :returns: the repo branch's pull request information
+        """
+        api_url = '/'.join(['repos', repo, 'pulls'])
+        pull_requests = []
+
+        self.session.headers.update(
+            {'Accept': 'application/vnd.github.v3+json'}
+        )
+
+        if since is None:
+            pull_requests = self._paginate_api(api_url, **kwargs)
+        else:
+            # sort in github API should be set to created.
+            sort = kwargs.get('sort', None)
+            if sort is None or sort != 'created':
+                kwargs['sort'] = 'created'
+
+            # Retrieve pull request information and
+            # filter the information by created_at field
+            params = kwargs
+            params['page'] = params.get('page', 1)
+            response = self._make_request(
+                'get', api_url, parse=False, params=params
+            )
+
+            max_page = 1
+            if 'Link' in response.headers:
+                # Link is only present if there are multiple pages
+                link = response.headers['Link']
+                urls = link.replace('>', '').replace('<', '').split()
+                parsed_url = urlparse(urls[2].strip(';'))
+                max_page = int(parse_qs(parsed_url.query)['page'][0])
+
+            while response:
+                for pull_request in response.json():
+                    created_at = pull_request['created_at']
+                    created_at = datetime.datetime.strptime(
+                        created_at, '%Y-%m-%dT%H:%M:%SZ'
+                    )
+
+                    if created_at < since:
+                        break
+
+                    pull_requests.append(pull_request)
+
+                params['page'] += 1
+                if params['page'] > max_page:
+                    response = False
+                else:
+                    response = self._make_request(
+                        'get', api_url, parse=False, params=params
+                    )
+
+        return pull_requests
 
     def get_branch_protection_details(self, repo, branch='master'):
         """
