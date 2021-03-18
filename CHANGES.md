@@ -1,3 +1,7 @@
+# [1.15.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.15.0)
+
+- [ADDED] Support github pulls API.
+
 # [1.14.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.14.0)
 
 - [ADDED] The `filtered_content` attribute has been added to `RawEvidence`.
