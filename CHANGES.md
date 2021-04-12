@@ -1,3 +1,7 @@
+# [1.15.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.15.0)
+
+- [FIXED] The evidences context manager now raises an exception when no evidence is found.
+
 # [1.14.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.14.0)
 
 - [ADDED] The `filtered_content` attribute has been added to `RawEvidence`.
