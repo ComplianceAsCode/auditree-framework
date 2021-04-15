@@ -14,7 +14,7 @@
 # limitations under the License.
 """Compliance Github service helper."""
 
-import datetime
+from datetime import datetime
 import json
 import random
 from collections import OrderedDict
