@@ -423,7 +423,7 @@ class Github(object):
 
         :returns: the repo branch's pull request information
         """
-        api_url = '/'.join(['repos', repo, 'pulls'])
+        api_url = f'repos/{repo.strip("/")}/pulls'
         pull_requests = []
 
         self.session.headers.update(
