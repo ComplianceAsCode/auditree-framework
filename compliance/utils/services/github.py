@@ -14,10 +14,10 @@
 # limitations under the License.
 """Compliance Github service helper."""
 
-from datetime import datetime
 import json
 import random
 from collections import OrderedDict
+from datetime import datetime
 from urllib.parse import parse_qs, urlparse
 
 from compliance.utils.credentials import Config
