@@ -511,6 +511,8 @@ class evidences(object):  # noqa: N801
         if hasattr(self, 'check'):
             for ev_path in evidence_list:
                 self.check.add_evidence_metadata(ev_path)
+        if not evidence:
+            raise EvidenceNotFoundError('No evidence found!')
         return evidence
 
     def __exit__(self, typ, val, traceback):
