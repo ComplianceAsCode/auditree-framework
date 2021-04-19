@@ -1,3 +1,7 @@
+# [1.16.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.16.0)
+
+- [ADDED] Support github pulls API.
+
 # [1.15.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.15.0)
 
 - [FIXED] The evidences context manager now raises an exception when no evidence is found.
