@@ -243,6 +243,44 @@ class LockerTest(unittest.TestCase):
                 locker.get_abandoned_evidences()
             )
 
+    def test_empty_evidence(self):
+        """Test that all empty evidence is identified."""
+        with Locker(name=REPO_DIR) as locker:
+            populated = RawEvidence(
+                'populated.json', 'test_category', DAY, 'Populated evidence'
+            )
+            populated.set_content('{"key": "value1"}')
+            locker.add_evidence(populated)
+            populated0 = RawEvidence(
+                'populated0.json', 'test_category', DAY, 'Populated with zero'
+            )
+            populated0.set_content('0')
+            locker.add_evidence(populated0)
+            white_space = RawEvidence(
+                'white_space.txt', 'test_category', DAY, 'Whitespace only'
+            )
+            white_space.set_content(' ')
+            locker.add_evidence(white_space)
+            empty_dict = RawEvidence(
+                'empty_dict.json', 'test_category', DAY, 'Empty dictionary'
+            )
+            empty_dict.set_content('{}')
+            locker.add_evidence(empty_dict)
+            empty_list = RawEvidence(
+                'empty_list.json', 'test_category', DAY, 'Empty list'
+            )
+            empty_list.set_content('[]')
+            locker.add_evidence(empty_list)
+            locker.checkin()
+            self.assertCountEqual(
+                locker.get_empty_evidences(),
+                [
+                    'raw/test_category/white_space.txt',
+                    'raw/test_category/empty_dict.json',
+                    'raw/test_category/empty_list.json'
+                ]
+            )
+
     def test_add_partitioned_evidence(self):
         """Test that partitioned evidence is added to locker as expected."""
         with Locker(name=REPO_DIR) as locker:
