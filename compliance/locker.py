@@ -22,6 +22,7 @@ import shutil
 import tempfile
 import time
 from datetime import datetime as dt, timedelta
+from pathlib import PurePath
 from threading import Lock
 from urllib.parse import urlparse
 
@@ -254,6 +255,8 @@ class Locker(object):
                 'ttl': evidence.ttl,
                 'description': evidence.description
             }
+            if evidence.is_empty:
+                metadata[evidence.name]['empty'] = True
             tombstones = None
             if getattr(evidence, 'is_partitioned', False):
                 unpartitioned = self.get_file(evidence.path)
@@ -692,14 +695,14 @@ class Locker(object):
 
     def get_abandoned_evidences(self, threshold=None):
         """
-        Provide a list of evidence where the update ``threshold`` has passed.
+        Provide a set of evidence where the update ``threshold`` has passed.
 
         :param int threshold: the time in seconds after TTL expires that
           evidence can remain un-updated before it is considered abandoned.
           The abandoned evidence threshold defaults to 30 days if none is
           provided.
 
-        :returns: a list of abandoned evidence files.
+        :returns: a set of abandoned evidence file relative paths.
         """
         abandoned_evidence = []
         tree = self.repo.head.commit.tree
@@ -712,6 +715,26 @@ class Locker(object):
             if self._evidence_abandoned(metadata, threshold):
                 abandoned_evidence.append(f.path)
         return set(abandoned_evidence)
+
+    def get_empty_evidences(self):
+        """
+        Provide a list of evidence paths to empty evidence files.
+
+        Evidence content is deemed empty based on an evidence object's
+        is_empty property.  This information is stored in evidence metadata.
+
+        :returns: a list of empty evidence file relative paths.
+        """
+        empty_evidence = []
+        tree = self.repo.head.commit.tree
+        for idx_file in [f for f in tree.traverse() if is_index_file(f.path)]:
+            metadata = json.loads(idx_file.data_stream.read())
+            for ev_name, ev_meta in metadata.items():
+                if ev_meta.get('empty', False):
+                    empty_evidence.append(
+                        str(PurePath(PurePath(idx_file.path).parent, ev_name))
+                    )
+        return empty_evidence
 
     def delete_repo_locally(self):
         """Remove the local git repository."""
