@@ -129,6 +129,13 @@ class _BaseEvidence(object):
             self._content_as_json = json.loads(self.content)
         return self._content_as_json
 
+    @property
+    def is_empty(self):
+        return not self.content or not self.content.strip() or (
+            self.extension == 'json' and self.content_as_json != 0
+            and not self.content_as_json
+        )
+
     def set_content(self, str_content):
         self._content = str_content
         if self.extension == 'json':

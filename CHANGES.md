@@ -1,3 +1,8 @@
+# [1.16.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.16.0)
+
+- [ADDED] Locker get_empty_evidences method added to return all empty evidence paths.
+- [ADDED] Evidence base class has override-able is_empty property.
+
 # [1.15.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.15.0)
 
 - [FIXED] The evidences context manager now raises an exception when no evidence is found.
