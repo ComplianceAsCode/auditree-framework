@@ -281,6 +281,25 @@ class LockerTest(unittest.TestCase):
                 ]
             )
 
+    def test_large_files(self):
+        """Test paths to large files are returned."""
+        with Locker(name=REPO_DIR) as locker:
+            large = RawEvidence(
+                'large.txt', 'test_category', DAY, 'Large evidence'
+            )
+            large.set_content('X' * 10000)
+            locker.add_evidence(large)
+            small = RawEvidence(
+                'small.txt', 'test_category', DAY, 'Small evidence'
+            )
+            small.set_content('X' * 10)
+            locker.add_evidence(small)
+            locker.checkin()
+            self.assertEqual(
+                locker.get_large_files(9999),
+                {'raw/test_category/large.txt': 10000}
+            )
+
     def test_add_partitioned_evidence(self):
         """Test that partitioned evidence is added to locker as expected."""
         with Locker(name=REPO_DIR) as locker:
