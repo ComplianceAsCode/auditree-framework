@@ -1,3 +1,8 @@
+# [1.17.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.17.0)
+
+- [ADDED] Locker get_large_files method added to return large files in the locker.
+- [ADDED] Logging of large files added to remote push operation.
+
 # [1.16.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.16.0)
 
 - [ADDED] Locker get_empty_evidences method added to return all empty evidence paths.

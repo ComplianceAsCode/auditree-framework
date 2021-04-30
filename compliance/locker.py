@@ -45,6 +45,10 @@ DAY = 60 * 60 * 24
 AE_DEFAULT = 30 * DAY
 READMES = ['README.md', 'readme.md', 'Readme.md']
 AE_EXEMPT = [INDEX_FILE] + READMES
+NOT_EVIDENCE = AE_EXEMPT
+KB = 1000
+MB = KB * 1000
+LF_DEFAULT = 50 * MB
 
 
 class Locker(object):
@@ -635,6 +639,7 @@ class Locker(object):
             )
             remote.fetch()
             remote.pull(rebase=True)
+            self._log_large_files()
             self.logger.info(
                 f'Pushing local locker to remote repo {self.repo_url}...'
             )
@@ -704,37 +709,42 @@ class Locker(object):
 
         :returns: a set of abandoned evidence file relative paths.
         """
-        abandoned_evidence = []
-        tree = self.repo.head.commit.tree
-        for f in tree.traverse():
-            if (f.type != 'blob' or f.path.startswith('notifications/')
-                    or f.path == 'check_results.json'
-                    or f.path.split('/').pop() in AE_EXEMPT):
-                continue
+        abandoned_evidence = set()
+        for f in self._get_git_files('evidence'):
             metadata = self.get_evidence_metadata(f.path, dt.utcnow())
             if self._evidence_abandoned(metadata, threshold):
-                abandoned_evidence.append(f.path)
-        return set(abandoned_evidence)
+                abandoned_evidence.add(f.path)
+        return abandoned_evidence
 
     def get_empty_evidences(self):
         """
         Provide a list of evidence paths to empty evidence files.
 
-        Evidence content is deemed empty based on an evidence object's
+        Evidence content is considered empty based on an evidence object's
         is_empty property.  This information is stored in evidence metadata.
 
         :returns: a list of empty evidence file relative paths.
         """
         empty_evidence = []
-        tree = self.repo.head.commit.tree
-        for idx_file in [f for f in tree.traverse() if is_index_file(f.path)]:
-            metadata = json.loads(idx_file.data_stream.read())
-            for ev_name, ev_meta in metadata.items():
+        for f in self._get_git_files('index'):
+            for ev_name, ev_meta in json.loads(f.data_stream.read()).items():
                 if ev_meta.get('empty', False):
                     empty_evidence.append(
-                        str(PurePath(PurePath(idx_file.path).parent, ev_name))
+                        str(PurePath(f.path).with_name(ev_name))
                     )
         return empty_evidence
+
+    def get_large_files(self, size=LF_DEFAULT):
+        """
+        Provide a dictionary of "large" evidence locker files.
+
+        A "large" file is one whose size is > the ``size`` argument provided.
+
+        :param int size: file size threshold.
+
+        :returns: a dictionary of file paths and sizes of "large" files.
+        """
+        return {f.path: f.size for f in self._get_git_files() if f.size > size}
 
     def delete_repo_locally(self):
         """Remove the local git repository."""
@@ -935,7 +945,52 @@ class Locker(object):
         if not ignore_ttl and ttl_expired:
             raise StaleEvidenceError(f'Evidence {evidence.path} is stale')
 
+    def _get_git_files(self, file_type='all'):
+        iz = {
+            'all': lambda g: g.type == 'blob',
+            'evidence': is_evidence_file,
+            'index': is_index_file
+        }
+        return filter(iz[file_type], self.repo.head.commit.tree.traverse())
 
-def is_index_file(path):
-    """Confirm whether the supplied path is to an index file."""
-    return os.path.basename(path) == INDEX_FILE
+    def _log_large_files(self):
+        large_files = self.get_large_files(
+            get_config().get('locker.large_file_threshold', LF_DEFAULT)
+        )
+        if large_files:
+            msg = ['LARGE FILES (Hosting service may reject due to size):\n']
+            for fpath, size in large_files.items():
+                formatted_size = f'{size/MB:.1f} MB'
+                if formatted_size == '0.0 MB':
+                    formatted_size = f'{str(size)} Bytes'
+                msg.append(f'      {fpath} is {formatted_size}')
+            self.logger.info('\n'.join(msg) + '\n')
+
+
+def is_evidence_file(git_obj):
+    """
+    Confirm whether the supplied git object is an evidence file.
+
+    :param git_obj: A GitPython object
+
+    :returns: True or False (Object is or isn't an evidence file)
+    """
+    return (
+        git_obj.type == 'blob'
+        and not git_obj.path.startswith('notifications/')
+        and git_obj.path != 'check_results.json'
+        and PurePath(git_obj.path).name not in NOT_EVIDENCE
+    )
+
+
+def is_index_file(obj):
+    """
+    Confirm whether the supplied object is, or points to, an index file.
+
+    :param obj: Either a GitPython object or a relative file path as a string
+
+    :returns: True or False (Object is or isn't an index file)
+    """
+    if isinstance(obj, str):
+        return PurePath(obj).name == INDEX_FILE
+    return obj.type == 'blob' and PurePath(obj.path).name == INDEX_FILE
