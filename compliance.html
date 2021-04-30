@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance package &#8212; Auditree Framework 1.16.0 documentation</title>
+    <title>compliance package &#8212; Auditree Framework 1.17.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
@@ -34,7 +34,7 @@
         <li class="right" >
           <a href="modules.html" title="compliance"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.16.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.17.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
@@ -1217,7 +1217,7 @@ failed to execute due to a dependency error.</p>
 <dt id="compliance.locker.Locker.get_empty_evidences">
 <code class="sig-name descname"><span class="pre">get_empty_evidences</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_empty_evidences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.get_empty_evidences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a list of evidence paths to empty evidence files.</p>
-<p>Evidence content is deemed empty based on an evidence object’s
+<p>Evidence content is considered empty based on an evidence object’s
 is_empty property.  This information is stored in evidence metadata.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1317,6 +1317,21 @@ locker.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>the full path to the evidence’s index file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.locker.Locker.get_large_files">
+<code class="sig-name descname"><span class="pre">get_large_files</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50000000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_large_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.get_large_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a dictionary of “large” evidence locker files.</p>
+<p>A “large” file is one whose size is &gt; the <code class="docutils literal notranslate"><span class="pre">size</span></code> argument provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>size</strong> (<em>int</em>) – file size threshold.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a dictionary of file paths and sizes of “large” files.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1510,9 +1525,31 @@ updated evidence.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="compliance.locker.is_evidence_file">
+<code class="sig-prename descclassname"><span class="pre">compliance.locker.</span></code><code class="sig-name descname"><span class="pre">is_evidence_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">git_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#is_evidence_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.is_evidence_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confirm whether the supplied git object is an evidence file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>git_obj</strong> – A GitPython object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True or False (Object is or isn’t an evidence file)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="compliance.locker.is_index_file">
-<code class="sig-prename descclassname"><span class="pre">compliance.locker.</span></code><code class="sig-name descname"><span class="pre">is_index_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#is_index_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.is_index_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Confirm whether the supplied path is to an index file.</p>
+<code class="sig-prename descclassname"><span class="pre">compliance.locker.</span></code><code class="sig-name descname"><span class="pre">is_index_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#is_index_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.is_index_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confirm whether the supplied object is, or points to, an index file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>obj</strong> – Either a GitPython object or a relative file path as a string</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True or False (Object is or isn’t an index file)</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -1948,7 +1985,7 @@ compatibility with checks, reporting, and notifiers.</p>
         <li class="right" >
           <a href="modules.html" title="compliance"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.16.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.17.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
