@@ -16,9 +16,9 @@
 
 import inspect
 import json
-import os
 from collections import OrderedDict
 from copy import deepcopy
+from pathlib import Path
 
 from compliance.utils.credentials import Config
 
@@ -105,7 +105,7 @@ class ComplianceConfig(object):
             self._config = self.DEFAULTS.copy()
             return
         try:
-            self._config = json.loads(open(config_file).read())
+            self._config = json.loads(Path(config_file).read_text())
         except ValueError as err:
             err.args += (config_file, )
             raise
@@ -156,7 +156,7 @@ class ComplianceConfig(object):
 
     def get_template_dir(self, test_obj=None):
         """
-        Provide the full path to the template directory for the test object.
+        Provide absolute path to the template directory for the test object.
 
         The associated path will be the first directory found named
         ``templates`` in the test object absolute path traversed in reverse.
@@ -166,16 +166,13 @@ class ComplianceConfig(object):
         :param test_obj: a :class:`compliance.ComplianceTest` object from
           where the template directory search will start from.
         """
-        path = os.path.abspath(os.curdir)
+        paths = [Path().resolve()] + list(Path().resolve().parents)
         if test_obj is not None:
-            path = inspect.getfile(test_obj.__class__)
-        while True:
-            if path == '/':
-                return None
-            result = os.path.join(path, 'templates')
-            if os.path.isdir(result):
-                return result
-            path = os.path.dirname(path)
+            paths = list(Path(inspect.getfile(test_obj.__class__)).parents)
+        for path in paths[:-1]:
+            templates = Path(path, 'templates')
+            if templates.is_dir():
+                return str(templates)
 
 
 __config = None

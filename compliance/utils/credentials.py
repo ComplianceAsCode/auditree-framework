@@ -15,9 +15,10 @@
 """Compliance credentials configuration."""
 
 import logging
-import os
 from collections import OrderedDict, namedtuple
 from configparser import RawConfigParser
+from os import environ
+from pathlib import Path
 
 # used to differentiate a user passing None vs
 # not passing a value for an optional argument
@@ -36,7 +37,7 @@ class Config():
         :param cfg_file: The path to the RawConfigParser compatible config file
         """
         self._cfg = RawConfigParser()
-        self._cfg.read(os.path.expanduser(cfg_file))
+        self._cfg.read(str(Path(cfg_file).expanduser()))
         self._cfg_file = cfg_file
 
     def __getitem__(self, section):
@@ -70,13 +71,12 @@ class Config():
                 raise exc
 
         env_vars = [
-            k for k in os.environ.keys()
-            if k.startswith(f'{section.upper()}_')
+            k for k in environ.keys() if k.startswith(f'{section.upper()}_')
         ]
         env_keys = [
             k.split(section.upper())[1].lstrip('_').lower() for k in env_vars
         ]
-        env_values = [os.environ[e] for e in env_vars]
+        env_values = [environ[e] for e in env_vars]
         if env_vars:
             logger.debug(
                 f'Loading credentials from ENV vars: {", ".join(env_vars)}'

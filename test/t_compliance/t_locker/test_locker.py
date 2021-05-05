@@ -16,11 +16,11 @@
 
 import json
 import logging
-import os
 import shutil
 import tempfile
 import unittest
 from datetime import datetime
+from pathlib import Path, PurePath
 from unittest.mock import MagicMock, create_autospec, patch
 
 from compliance.config import ComplianceConfig
@@ -33,23 +33,20 @@ from compliance.utils.data_parse import get_sha256_hash
 from git import Repo
 
 REPO_DIR = 'test_locker_repo'
-FILES_DIR = os.path.join(tempfile.gettempdir(), 'test_locker_files')
 logger = logging.getLogger()
 
 
 def setup_temp():
     """Initialize tmp folder for each test."""
     clean_temp()
-    os.mkdir(FILES_DIR)
-    os.mkdir(os.path.join(tempfile.gettempdir(), REPO_DIR))
+    Path(tempfile.gettempdir(), REPO_DIR).mkdir()
 
 
 def clean_temp():
     """Clean up tmp folder for each test."""
     shutil.rmtree(
-        os.path.join(tempfile.gettempdir(), REPO_DIR), ignore_errors=True
+        str(Path(tempfile.gettempdir(), REPO_DIR)), ignore_errors=True
     )
-    shutil.rmtree(FILES_DIR, ignore_errors=True)
 
 
 class LockerTest(unittest.TestCase):
@@ -82,7 +79,7 @@ class LockerTest(unittest.TestCase):
         locker.checkout()
         git_mock.clone_from.assert_called_with(
             url,
-            os.path.join(tempfile.gettempdir(), 'locker-demo.git'),
+            str(PurePath(tempfile.gettempdir(), 'locker-demo.git')),
             branch='master'
         )
 
@@ -90,58 +87,41 @@ class LockerTest(unittest.TestCase):
         """Test putting RawEvidence into the locker."""
         locker = Locker(name=REPO_DIR)
         with locker:
-            f = tempfile.mkstemp(
-                prefix='testfile', suffix='.json', dir=FILES_DIR
-            )
-            evidence_name = os.path.split(f[1])[1]
             evidence = RawEvidence(
-                evidence_name, 'test_category', DAY, 'This tests evidence.py'
+                'my_raw_ev.json', 'test_category', DAY, 'My raw evidence'
             )
             test_content = '{"Squirtle": true, "Pikachu": 1, "Bulbasaur": 2}'
             evidence.set_content(test_content)
-
             locker.add_evidence(evidence)
-
         self.assertEqual(len(locker.touched_files), 1)
 
     def test_report_evidence(self):
         """Test putting ReportEvidence into the locker."""
         locker = Locker(name=REPO_DIR)
         with locker:
-            f = tempfile.mkstemp(
-                prefix='testfile', suffix='.json', dir=FILES_DIR
-            )
-            evidence_name = os.path.split(f[1])[1]
             evidence = ReportEvidence(
-                evidence_name, 'test_category', DAY, 'This tests evidence.py'
+                'my_rpt_ev.json', 'test_category', DAY, 'My report evidence'
             )
             test_content = '{"BLAH": "Test"}'
             evidence.set_content(test_content)
-
             locker.add_evidence(evidence)
-
         self.assertEqual(len(locker.touched_files), 1)
 
     def test_tmp_evidence(self):
         """Test putting TmpEvidence into the locker."""
         locker = Locker(name=REPO_DIR)
         with locker:
-            f = tempfile.mkstemp(
-                prefix='testfile', suffix='.json', dir=FILES_DIR
-            )
-            evidence_name = os.path.split(f[1])[1]
             tmp_evidence = TmpEvidence(
-                evidence_name, 'test_category', DAY, 'This tests evidence.py'
+                'my_tmp_ev.json', 'test_category', DAY, 'My tmp evidence'
             )
             raw_evidence = RawEvidence(
-                evidence_name, 'test_category', DAY, 'This tests evidence.py'
+                'my_raw_ev.json', 'test_category', DAY, 'My raw evidence'
             )
             test_content = '{"BLAH": "Test"}'
             tmp_evidence.set_content(test_content)
             raw_evidence.set_content(test_content)
             locker.add_evidence(tmp_evidence)
             locker.add_evidence(raw_evidence)
-
         self.assertEqual(len(locker.touched_files), 1)
 
     @patch('compliance.check.get_config')
@@ -155,12 +135,8 @@ class LockerTest(unittest.TestCase):
         check_mock.return_value = config
         evidence_mock.return_value = config
         with Locker(name=REPO_DIR, do_push=True) as locker:
-            f = tempfile.mkstemp(
-                prefix='testfile', suffix='.json', dir=FILES_DIR
-            )
-            test_evidence_name = os.path.split(f[1])[1]
             evidence = RawEvidence(
-                test_evidence_name,
+                'my_raw_evidence.json',
                 'test_category',
                 DAY,
                 'This tests if the validation works'
@@ -169,15 +145,12 @@ class LockerTest(unittest.TestCase):
             test_content = '{"Squirtle": true, "Pikachu": 1, "Bulbasaur": 2}'
             evidence.set_content(test_content)
             locker.add_evidence(evidence)
-            evidence = get_evidence_by_path(
-                os.path.join(
-                    evidence.rootdir, evidence.category, evidence.name
-                )
-            )
+            path = PurePath(evidence.rootdir, evidence.category, evidence.name)
+            evidence = get_evidence_by_path(str(path))
             self.assertTrue(isinstance(evidence, RawEvidence))
             validation.return_value = True
             locker.get_evidence(
-                os.path.join('raw', 'test_category', test_evidence_name)
+                str(PurePath('raw', 'test_category', 'my_raw_evidence.json'))
             )
 
     @patch('compliance.utils.credentials.Config')
@@ -186,7 +159,7 @@ class LockerTest(unittest.TestCase):
         """Test that credentials are present in REPO URL."""
         url = 'https://test:pass@github.com/my-example-org/test.git'
         repo_mock = MagicMock()
-        repo_mock.git_dir = os.path.join(tempfile.gettempdir(), REPO_DIR)
+        repo_mock.git_dir = str(PurePath(tempfile.gettempdir(), REPO_DIR))
         repo_mock.remotes = [repo_mock]
         git_mock.clone_from.return_value = repo_mock
 
@@ -231,12 +204,9 @@ class LockerTest(unittest.TestCase):
             )
             # Test abandoned
             self.assertEqual(set(), locker.get_abandoned_evidences())
-            with open(locker.get_index_file(evidence_three), 'w') as f:
-                meta = (
-                    '{"test_three.json":'
-                    '{"last_update":"2017-10-01T00:00:00.0"} }'
-                )
-                f.write(meta)
+            Path(locker.get_index_file(evidence_three)).write_text(
+                '{"test_three.json": {"last_update":"2017-10-01T00:00:00.0"} }'
+            )
             locker.checkin()
             self.assertEqual(
                 {'raw/test_category_two/test_three.json'},
@@ -312,24 +282,24 @@ class LockerTest(unittest.TestCase):
             )
             data = [
                 {
-                    'fname': 'simon', 'lname': 'metson'
+                    'fname': 'walter', 'lname': 'sobchak'
                 }, {
-                    'fname': 'al', 'lname': 'finkel'
+                    'fname': 'jeff', 'lname': 'lebowski'
                 }
             ]
             evidence.set_content(json.dumps(data))
             locker.add_evidence(evidence)
-            location = os.path.join(locker.local_path, evidence.dir_path)
-            self.assertTrue(location.endswith('/raw/cat_foo'))
-            finkel_hash = get_sha256_hash('finkel', 10)
-            metson_hash = get_sha256_hash('metson', 10)
+            loc = Path(locker.local_path, evidence.dir_path)
+            self.assertTrue(str(loc).endswith('/raw/cat_foo'))
+            lebowski_hash = get_sha256_hash('lebowski', 10)
+            sobchak_hash = get_sha256_hash('sobchak', 10)
             expected = [
                 'index.json',
-                f'{finkel_hash}_foo.json',
-                f'{metson_hash}_foo.json'
+                f'{lebowski_hash}_foo.json',
+                f'{sobchak_hash}_foo.json'
             ]
-            self.assertEqual(set(os.listdir(location)), set(expected))
-            meta = json.loads(open(os.path.join(location, expected[0])).read())
+            self.assertEqual({d.name for d in loc.iterdir()}, set(expected))
+            meta = json.loads(Path(loc, expected[0]).read_text())
             self.assertEqual(len(meta.keys()), 1)
             self.assertEqual(
                 set(meta['foo.json'].keys()),
@@ -346,21 +316,21 @@ class LockerTest(unittest.TestCase):
             self.assertIsNone(meta['foo.json']['partition_root'])
             self.assertEqual(len(meta['foo.json']['partitions']), 2)
             self.assertEqual(
-                meta['foo.json']['partitions'][finkel_hash], ['finkel']
+                meta['foo.json']['partitions'][lebowski_hash], ['lebowski']
             )
             self.assertEqual(
-                meta['foo.json']['partitions'][metson_hash], ['metson']
+                meta['foo.json']['partitions'][sobchak_hash], ['sobchak']
             )
             self.assertEqual(
-                json.loads(open(os.path.join(location, expected[1])).read()),
+                json.loads(Path(loc, expected[1]).read_text()),
                 [{
-                    'fname': 'al', 'lname': 'finkel'
+                    'fname': 'jeff', 'lname': 'lebowski'
                 }]
             )
             self.assertEqual(
-                json.loads(open(os.path.join(location, expected[2])).read()),
+                json.loads(Path(loc, expected[2]).read_text()),
                 [{
-                    'fname': 'simon', 'lname': 'metson'
+                    'fname': 'walter', 'lname': 'sobchak'
                 }]
             )
 
@@ -376,9 +346,9 @@ class LockerTest(unittest.TestCase):
             )
             data = [
                 {
-                    'fname': 'simon', 'lname': 'metson'
+                    'fname': 'walter', 'lname': 'sobchak'
                 }, {
-                    'fname': 'al', 'lname': 'finkel'
+                    'fname': 'jeff', 'lname': 'lebowski'
                 }
             ]
             evidence.set_content(json.dumps(data))
@@ -388,18 +358,18 @@ class LockerTest(unittest.TestCase):
             self.assertTrue(partitioned.is_partitioned)
             content = json.loads(partitioned.content)
             self.assertEqual(len(content), 2)
-            self.assertIn({'fname': 'simon', 'lname': 'metson'}, content)
-            self.assertIn({'fname': 'al', 'lname': 'finkel'}, content)
+            self.assertIn({'fname': 'walter', 'lname': 'sobchak'}, content)
+            self.assertIn({'fname': 'jeff', 'lname': 'lebowski'}, content)
             self.assertEqual(
-                json.loads(partitioned.get_partition(['metson'])),
+                json.loads(partitioned.get_partition(['sobchak'])),
                 [{
-                    'fname': 'simon', 'lname': 'metson'
+                    'fname': 'walter', 'lname': 'sobchak'
                 }]
             )
             self.assertEqual(
-                json.loads(partitioned.get_partition(['finkel'])),
+                json.loads(partitioned.get_partition(['lebowski'])),
                 [{
-                    'fname': 'al', 'lname': 'finkel'
+                    'fname': 'jeff', 'lname': 'lebowski'
                 }]
             )
             self.assertEqual(
@@ -414,9 +384,9 @@ class LockerTest(unittest.TestCase):
             )
             data = [
                 {
-                    'fname': 'simon', 'lname': 'metson'
+                    'fname': 'walter', 'lname': 'sobchak'
                 }, {
-                    'fname': 'al', 'lname': 'finkel'
+                    'fname': 'jeff', 'lname': 'lebowski'
                 }
             ]
             evidence.set_content(json.dumps(data))
@@ -426,8 +396,8 @@ class LockerTest(unittest.TestCase):
             self.assertFalse(partitioned.is_partitioned)
             content = json.loads(partitioned.content)
             self.assertEqual(len(content), 2)
-            self.assertIn({'fname': 'simon', 'lname': 'metson'}, content)
-            self.assertIn({'fname': 'al', 'lname': 'finkel'}, content)
+            self.assertIn({'fname': 'walter', 'lname': 'sobchak'}, content)
+            self.assertIn({'fname': 'jeff', 'lname': 'lebowski'}, content)
 
     def test_abandoned_partitioned_evidence(self):
         """Test that ensures abandoned partitioned evidence is found."""
@@ -441,9 +411,9 @@ class LockerTest(unittest.TestCase):
             )
             data = [
                 {
-                    'fname': 'simon', 'lname': 'metson'
+                    'fname': 'walter', 'lname': 'sobchak'
                 }, {
-                    'fname': 'al', 'lname': 'finkel'
+                    'fname': 'jeff', 'lname': 'lebowski'
                 }
             ]
             evidence.set_content(json.dumps(data))
@@ -455,18 +425,19 @@ class LockerTest(unittest.TestCase):
                 'foo.json': {
                     'last_update': '2017-10-01T00:00:00.0',
                     'partitions': {
-                        '1197ced566_foo.json': 'meh',
-                        '3eeaf57767_foo.json': 'bleh'
+                        'f60fa4f29c_foo.json': 'meh',
+                        '59b70fc55f_foo.json': 'bleh'
                     }
                 }
             }
-            with open(locker.get_index_file(evidence), 'w') as f:
-                f.write(json.dumps(abandoned_meta))
+            Path(locker.get_index_file(evidence)).write_text(
+                json.dumps(abandoned_meta)
+            )
             locker.checkin()
             self.assertEqual(
                 {
-                    'raw/cat_foo/1197ced566_foo.json',
-                    'raw/cat_foo/3eeaf57767_foo.json'
+                    'raw/cat_foo/f60fa4f29c_foo.json',
+                    'raw/cat_foo/59b70fc55f_foo.json'
                 },
                 locker.get_abandoned_evidences()
             )
