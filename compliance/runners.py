@@ -16,12 +16,12 @@
 
 import inspect
 import json
-import os
 import re
 import sys
 import time
 import unittest
 from collections import defaultdict
+from pathlib import Path
 
 from compliance.check import ComplianceCheck
 from compliance.config import get_config
@@ -88,38 +88,23 @@ class _BaseRunner(object):
                 yield test
 
     def _load_compliance_config(self):
-        creds_path = os.path.expanduser(self.opts.creds_path)
-        if not os.path.isfile(creds_path):
-            raise ValueError(f'{creds_path} does not exist.')
+        creds_path = Path(self.opts.creds_path).expanduser()
+        if not creds_path.is_file():
+            raise ValueError(f'{creds_path} file does not exist.')
         self.config = get_config()
-        self.config.creds_path = creds_path
+        self.config.creds_path = str(creds_path)
         self.config.load(self.opts.compliance_config)
 
     def _init_dirs(self):
         self.dirs = set()
-        for p in self.extra_opts:
-            if os.path.isdir(p):
-                self.dirs.add(get_toplevel_dirpath(os.path.abspath(p)))
-            elif os.path.isfile(p):
-                dirpath = get_toplevel_dirpath(os.path.abspath(p))
+        for p in [Path(path).resolve() for path in self.extra_opts + ['.']]:
+            if p.exists():
+                dirpath = get_toplevel_dirpath(p)
                 if dirpath is None:
                     continue
                 self.dirs.add(dirpath)
-            else:
-                self.dirs.add('.')
-
         if not self.dirs:
-            self.dirs.add(os.path.abspath('.'))
-
-        at_least_one_valid_dir = any(
-            (get_toplevel_dirpath(d) is not None for d in self.dirs)
-        )
-        if not at_least_one_valid_dir:
-            raise ValueError(
-                'None of the paths provided are valid directories.  '
-                'Please provide at least one directory containing a '
-                '"controls.json" file.'
-            )
+            raise ValueError('Could not find a controls.json file.')
         for d in self.dirs:
             load_evidences_modules(d)
 
@@ -192,10 +177,10 @@ class FetchMode(_BaseRunner):
             return fetchers
         include = {f'{f.__module__}.{f.__name__}' for f in fetchers}
         if self.opts.include:
-            include = set(json.loads(open(self.opts.include).read()))
+            include = set(json.loads(Path(self.opts.include).read_text()))
         exclude = set()
         if self.opts.exclude:
-            exclude = set(json.loads(open(self.opts.exclude).read()))
+            exclude = set(json.loads(Path(self.opts.exclude).read_text()))
         include -= exclude
         return filter(
             lambda f: f'{f.__module__}.{f.__name__}' in include, fetchers
@@ -214,7 +199,7 @@ class FetchMode(_BaseRunner):
         fetchers = unittest.TestSuite()
         if reruns is None:
             fetcher_overrides = [
-                fo for fo in self.extra_opts if not os.path.isdir(fo)
+                fo for fo in self.extra_opts if not Path(fo).resolve().exists()
             ]
             if fetcher_overrides:
                 fetchers.addTests(loader.loadTestsFromNames(fetcher_overrides))

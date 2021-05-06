@@ -16,13 +16,12 @@
 
 import json
 import logging
-import os
 import re
 import shutil
 import tempfile
 import time
 from datetime import datetime as dt, timedelta
-from pathlib import PurePath
+from pathlib import Path, PurePath
 from threading import Lock
 from urllib.parse import urlparse
 
@@ -112,10 +111,10 @@ class Locker(object):
         if name is not None:
             self.name = name
         elif repo_url is not None and name is None:
-            self.name = os.path.split(self.repo_url)[1]
+            self.name = repo_url.rsplit('/', 1)[1]
         elif repo_url is None and name is None:
             self.name = 'example'
-        self.local_path = os.path.join(tempfile.gettempdir(), self.name)
+        self.local_path = str(PurePath(tempfile.gettempdir(), self.name))
         self._do_push = do_push
         self.ttl_tolerance = ttl_tolerance
         self.gitconfig = gitconfig or {}
@@ -148,15 +147,14 @@ class Locker(object):
         ]
         touched_files = []
         for f in index_files:
-            index_dir = os.path.dirname(f)
-            content = json.loads(open(os.path.join(self.local_path, f)).read())
+            content = json.loads(Path(self.local_path, f).read_text())
             for t, desc in content.items():
                 if type(desc) is dict:
                     ts = desc.get('last_update')
                 else:
                     ts = desc
                 if ts == self.commit_date:
-                    touched_files.append(os.path.join(index_dir, t))
+                    touched_files.append(str(PurePath(f).with_name(t)))
         return touched_files
 
     def reset_depenency_rerun(self):
@@ -216,22 +214,16 @@ class Locker(object):
         if evidence.content is None:
             raise ValueError(f'Evidence {evidence.name} has no content')
 
-        if not os.path.isdir(os.path.join(self.local_path, evidence.dir_path)):
-            os.makedirs(os.path.join(self.local_path, evidence.dir_path))
+        path = Path(self.local_path, evidence.dir_path)
+        path.mkdir(parents=True, exist_ok=True)
         if getattr(evidence, 'is_partitioned', False):
             for key in evidence.partition_keys:
-                full_path = os.path.join(
-                    self.local_path,
-                    evidence.dir_path,
-                    f'{get_sha256_hash(key, 10)}_{evidence.name}'
-                )
-                with open(full_path, 'w') as f:
-                    f.write(evidence.get_partition(key))
+                ev_name = f'{get_sha256_hash(key, 10)}_{evidence.name}'
+                Path(path, ev_name).write_text(evidence.get_partition(key))
+        elif not getattr(evidence, 'binary_content', False):
+            Path(path, evidence.name).write_text(evidence.content)
         else:
-            full_path = os.path.join(self.local_path, evidence.path)
-            mode = 'wb' if getattr(evidence, 'binary_content', False) else 'w'
-            with open(full_path, mode) as f:
-                f.write(evidence.content)
+            Path(path, evidence.name).write_bytes(evidence.content)
         if not evidence.path.startswith('tmp/'):
             self.index(evidence, checks, evidence_used)
 
@@ -246,12 +238,11 @@ class Locker(object):
           applicable for check generated ReportEvidence.
         """
         with self.lock:
-            index_file = self.get_index_file(evidence)
-            repo_files = [index_file]
-            if not os.path.exists(index_file):
-                metadata = {}
-            else:
-                metadata = json.loads(open(index_file).read())
+            index_file = Path(self.get_index_file(evidence))
+            repo_files = [str(index_file)]
+            metadata = {}
+            if index_file.is_file():
+                metadata = json.loads(index_file.read_text())
             ev_meta = metadata.get(evidence.name, {})
             old_parts = ev_meta.get('partitions', {}).keys()
             metadata[evidence.name] = {
@@ -264,7 +255,7 @@ class Locker(object):
             tombstones = None
             if getattr(evidence, 'is_partitioned', False):
                 unpartitioned = self.get_file(evidence.path)
-                if os.path.isfile(unpartitioned):
+                if Path(unpartitioned).is_file():
                     # Remove/tombstone unpartitioned evidence file
                     # replaced by partitioned evidence files
                     self.repo.index.remove([unpartitioned], working_tree=True)
@@ -316,8 +307,7 @@ class Locker(object):
                 metadata[evidence.name]['checks'] = checks
             if evidence_used is not None:
                 metadata[evidence.name]['evidence'] = evidence_used
-            with open(index_file, 'w') as f:
-                f.write(format_json(metadata))
+            index_file.write_text(format_json(metadata))
             self.repo.index.add(repo_files)
 
     def remove_partitions(self, evidence, hashes):
@@ -333,16 +323,9 @@ class Locker(object):
         """
         if not hashes:
             return
-        self.repo.index.remove(
-            [
-                os.path.join(
-                    self.local_path,
-                    evidence.dir_path,
-                    f'{part_hash}_{evidence.name}'
-                ) for part_hash in hashes
-            ],
-            working_tree=True
-        )
+        path = PurePath(self.local_path, evidence.dir_path)
+        ev_files = [str(path.joinpath(f'{h}_{evidence.name}')) for h in hashes]
+        self.repo.index.remove(ev_files, working_tree=True)
 
     def create_tombstone_metadata(self, candidate, metadata, reason):
         """
@@ -410,8 +393,8 @@ class Locker(object):
 
         :returns: the full path to the evidence's index file.
         """
-        path = evidence_path.rsplit('/', 1).pop(0)
-        return os.path.join(self.local_path, path, INDEX_FILE)
+        path = PurePath(self.local_path, evidence_path).with_name(INDEX_FILE)
+        return str(path)
 
     def get_file(self, filename):
         """
@@ -423,7 +406,7 @@ class Locker(object):
 
         :returns: the path to the filename provided.
         """
-        return os.path.join(self.local_path, filename)
+        return str(PurePath(self.local_path, filename))
 
     def get_remote_location(
         self, filename, include_commit=True, sha=None, locker_url=None
@@ -441,8 +424,7 @@ class Locker(object):
         :returns: the remote repository path to the filename provided.
         """
         if not self.repo_url_with_creds:
-            return os.path.join(self.local_path, filename)
-
+            return self.get_file(filename)
         ref = self.branch
         if include_commit:
             ref = self.repo.head.commit.hexsha
@@ -553,8 +535,7 @@ class Locker(object):
         :returns: True/False time to live validation.
         """
         if isinstance(evidence, TmpEvidence):
-            full_path = os.path.join(self.local_path, evidence.path)
-            return os.path.exists(full_path)
+            return Path(self.local_path, evidence.path).is_file()
         try:
             self._validate_evidence(evidence, ignore_ttl)
             return True
@@ -575,7 +556,7 @@ class Locker(object):
 
         :param locker: the locker "name" used in logging
         """
-        if os.path.isdir(os.path.join(self.local_path, '.git')):
+        if Path(self.local_path, '.git').is_dir():
             self.logger.info(f'Using {locker} found in {self.local_path}...')
             if not hasattr(self, 'repo'):
                 self.repo = git.Repo(self.local_path)
@@ -649,36 +630,33 @@ class Locker(object):
 
     def add_content_to_locker(self, content, folder='', filename=None):
         """
-        Add non-evidence related content to the local locker.
+        Add non-evidence text content to the local locker.
 
         :param content: the content to add to the local locker.
         :param folder: the folder in the local locker to add the content to.
         :param filename: the name of the file in the local locker.
         """
-        path = os.path.join(self.local_path, folder)
-        if not os.path.exists(path):
-            os.mkdir(path)
         if not filename:
-            raise ValueError('Filename cannot be empty.')
-        results_file = os.path.join(path, filename)
-        with open(results_file, 'w+') as f:
-            f.write(content)
-        self.repo.index.add([results_file])
+            raise ValueError('You must provide a filename.')
+        path = Path(self.local_path, folder)
+        path.mkdir(parents=True, exist_ok=True)
+        results_file = Path(path, filename)
+        results_file.write_text(content)
+        self.repo.index.add([str(results_file)])
 
     def get_content_from_locker(self, folder='', filename=None):
         """
-        Read non-evidence related content from the local locker.
+        Read non-evidence text content from the local locker.
 
         :param folder: the folder in the local locker to get the content from.
         :param filename: the name of the file in the local locker.
         """
         if not filename:
-            raise ValueError('Filename cannot be empty.')
-        file_path = os.path.join(self.local_path, folder, filename)
+            raise ValueError('You must provide a filename.')
+        file_path = Path(self.local_path, folder, filename)
         content = None
-        if os.path.exists(file_path):
-            with open(file_path) as f:
-                content = f.read()
+        if file_path.is_file():
+            content = file_path.read_text()
         return content
 
     def get_reports_metadata(self):
@@ -688,14 +666,10 @@ class Locker(object):
         :returns: reports metadata.
         """
         metadata = {}
-        rpts = os.walk(os.path.join(self.local_path, 'reports'))
-        for path in [rpath for rpath, _, files in rpts if INDEX_FILE in files]:
-            with open(os.path.join(path, INDEX_FILE), 'r') as f:
-                for rpt_name, rpt_metadata in json.loads(f.read()).items():
-                    rpt_path = os.path.join(
-                        path.split(self.local_path).pop(), rpt_name
-                    )
-                    metadata[rpt_path] = rpt_metadata
+        for idx in Path(self.local_path, 'reports').rglob(INDEX_FILE):
+            for rpt_name, rpt_metadata in json.loads(idx.read_text()).items():
+                rpt_path = idx.relative_to(self.local_path).with_name(rpt_name)
+                metadata[str(rpt_path)] = rpt_metadata
         return metadata
 
     def get_abandoned_evidences(self, threshold=None):
@@ -790,12 +764,12 @@ class Locker(object):
 
         :returns: the metadata for the evidence specified.
         """
-        pkg_index_path = self.get_index_file_by_path(evidence_path)
-        if not os.path.exists(pkg_index_path):
+        pkg_index_path = Path(self.get_index_file_by_path(evidence_path))
+        if not pkg_index_path.is_file():
             return
         ev_path, ev_name = evidence_path.rsplit('/', 1)
         if evidence_dt:
-            pkg_index_path = os.path.join(ev_path, INDEX_FILE)
+            pkg_index_path = str(PurePath(ev_path, INDEX_FILE))
             commit = self.get_latest_commit(pkg_index_path, evidence_dt)
             if not commit:
                 return
@@ -803,7 +777,7 @@ class Locker(object):
                 commit.tree[pkg_index_path].data_stream.read()
             )
         else:
-            metadata = json.loads(open(pkg_index_path).read())
+            metadata = json.loads(pkg_index_path.read_text())
         return metadata.get(
             ev_name,
             self._get_partitioned_evidence_metadata(metadata, ev_name)
@@ -833,7 +807,7 @@ class Locker(object):
         return
 
     def _repo_init(self):
-        if os.path.isdir(os.path.join(self.local_path, '.git')):
+        if Path(self.local_path, '.git').is_dir():
             self.logger.info(f'Using locker found in {self.local_path}...')
             self.repo = git.Repo(self.local_path)
         else:
@@ -906,8 +880,8 @@ class Locker(object):
 
     def _get_file_content(self, file_path, file_dt=None, binary_content=False):
         if not file_dt:
-            mode = 'rb' if binary_content else 'r'
-            return open(os.path.join(self.local_path, file_path), mode).read()
+            p = Path(self.local_path, file_path)
+            return p.read_text() if not binary_content else p.read_bytes()
         commit = self.get_latest_commit(file_path, file_dt)
         if not commit:
             raise HistoricalEvidenceNotFoundError(
@@ -927,15 +901,14 @@ class Locker(object):
         if getattr(evidence, 'is_partitioned', False):
             for part_hash in metadata['partitions'].keys():
                 paths.append(
-                    os.path.join(
+                    PurePath(
                         evidence.dir_path, f'{part_hash}_{evidence.name}'
                     )
                 )
         else:
-            paths.append(evidence.path)
+            paths.append(PurePath(evidence.path))
         for path in paths:
-            full_path = os.path.join(self.local_path, path)
-            if not os.path.exists(full_path):
+            if not Path(self.local_path, path).is_file():
                 raise ValueError(
                     f'Evidence {path} was not found in the locker'
                 )

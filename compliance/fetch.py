@@ -14,10 +14,10 @@
 # limitations under the License.
 """Compliance fetcher automation module."""
 
-import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 from compliance.config import get_config
 from compliance.utils.http import BaseSession
@@ -121,10 +121,8 @@ def fetch(url, name):
     """
     r = requests.get(url)
     r.raise_for_status()
-    path = os.path.join(tempfile.gettempdir(), name)
-
-    with open(path, 'wb') as f:
+    path = Path(tempfile.gettempdir(), name)
+    with path.open('wb') as f:
         r.raw.decode_content = True
         shutil.copyfileobj(r.raw, f)
-
     return path

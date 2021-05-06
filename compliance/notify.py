@@ -17,10 +17,10 @@
 import copy
 import json
 import logging
-import os
 import sys
 import time
 from datetime import datetime
+from pathlib import PurePath
 from urllib.parse import urlparse
 
 from compliance.config import get_config
@@ -413,7 +413,7 @@ class LockerNotifier(_BaseMDNotifier):
         )
         self.locker.checkin(
             'Locker notification sent at local time '
-            f'{time.ctime(time.time())}\n\n{os.path.join(folder, filename)}'
+            f'{time.ctime(time.time())}\n\n{PurePath(folder, filename)}'
         )
         self.locker.push()
 

@@ -17,8 +17,8 @@
 import copy
 import itertools
 import json
-import os
 from collections import defaultdict
+from pathlib import Path
 
 
 class ControlDescriptor(object):
@@ -33,11 +33,11 @@ class ControlDescriptor(object):
         self._controls = {}
         self._paths = []
         for d in dirs or ['.']:
-            json_file = os.path.join(os.path.abspath(d), 'controls.json')
-            if not os.path.isfile(json_file):
+            json_file = Path(d, 'controls.json').resolve()
+            if not json_file.is_file():
                 continue
-            self._controls.update(json.loads(open(json_file).read()))
-            self._paths.append(json_file)
+            self._controls.update(json.loads(json_file.read_text()))
+            self._paths.append(str(json_file))
 
     @property
     def paths(self):
