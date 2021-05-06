@@ -1,3 +1,8 @@
+# [1.18.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.18.0)
+
+- [CHANGED] Now using `pathlib` exclusively for operating system filepath and file functionality.
+- [FIXED] README table of contents generation multi-blank line bug is resolved.
+
 # [1.17.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.17.0)
 
 - [ADDED] Locker get_large_files method added to return large files in the locker.

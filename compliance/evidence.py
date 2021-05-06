@@ -103,7 +103,7 @@ class _BaseEvidence(object):
 
     @property
     def dir_path(self):
-        return str(PurePath(self.rootdir).joinpath(self.category))
+        return str(PurePath(self.rootdir, self.category))
 
     @property
     def name(self):
@@ -111,7 +111,7 @@ class _BaseEvidence(object):
 
     @property
     def path(self):
-        return str(PurePath(self.dir_path).joinpath(self.name))
+        return str(PurePath(self.dir_path, self.name))
 
     @property
     def extension(self):
