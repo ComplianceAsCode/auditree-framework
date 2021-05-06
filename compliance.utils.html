@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.utils package &#8212; Auditree Framework 1.17.0 documentation</title>
+    <title>compliance.utils package &#8212; Auditree Framework 1.18.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
@@ -34,7 +34,7 @@
         <li class="right" >
           <a href="compliance.scripts.html" title="compliance.scripts package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.17.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.18.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" accesskey="U">compliance package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils package</a></li> 
@@ -231,24 +231,27 @@ notation.  For example “foo.bar”.</p></li>
 <dl class="py function">
 <dt id="compliance.utils.path.get_toplevel_dirpath">
 <code class="sig-prename descclassname"><span class="pre">compliance.utils.path.</span></code><code class="sig-name descname"><span class="pre">get_toplevel_dirpath</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/path.html#get_toplevel_dirpath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.path.get_toplevel_dirpath" title="Permalink to this definition">¶</a></dt>
-<dd><p>Provide the toplevel directory for the given path.</p>
-<p>The toplevel directory will be the one containing <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> file.
-This function returns <code class="docutils literal notranslate"><span class="pre">None</span></code> if toplevel path could not be calculated.</p>
+<dd><p>Provide the top level directory for the given path.</p>
+<p>The top level directory contains the <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> file.
+This function returns <code class="docutils literal notranslate"><span class="pre">None</span></code> if a top level path can not be found.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> – absolute or relative path to file or dir.</p>
+<dd class="field-odd"><p><strong>path</strong> – absolute or relative path to a file or directory.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the absolute path to the top level directory.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="compliance.utils.path.load_evidences_modules">
-<code class="sig-prename descclassname"><span class="pre">compliance.utils.path.</span></code><code class="sig-name descname"><span class="pre">load_evidences_modules</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">toplevel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/path.html#load_evidences_modules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.path.load_evidences_modules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load the all evidences modules found at toplevel directory.</p>
+<code class="sig-prename descclassname"><span class="pre">compliance.utils.path.</span></code><code class="sig-name descname"><span class="pre">load_evidences_modules</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/path.html#load_evidences_modules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.path.load_evidences_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load all evidences modules found within the <code class="docutils literal notranslate"><span class="pre">path</span></code> directory structure.</p>
 <p>This function prevents double loading.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>toplevel</strong> – path to the toplevel directory.</p>
+<dd class="field-odd"><p><strong>path</strong> – absolute path to a top level directory.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -256,7 +259,7 @@ This function returns <code class="docutils literal notranslate"><span class="pr
 <dl class="py function">
 <dt id="compliance.utils.path.substitute_config">
 <code class="sig-prename descclassname"><span class="pre">compliance.utils.path.</span></code><code class="sig-name descname"><span class="pre">substitute_config</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_tmpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/path.html#substitute_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.path.substitute_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Substitue the config values on the given path template.</p>
+<dd><p>Substitute the config values on the given path template.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>path_tmpl</strong> – a string template of a path</p>
@@ -361,7 +364,7 @@ path structure is different from the suggested one.</p>
         <li class="right" >
           <a href="compliance.scripts.html" title="compliance.scripts package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.17.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.18.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils package</a></li> 
