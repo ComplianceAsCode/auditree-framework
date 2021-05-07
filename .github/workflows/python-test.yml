@@ -1,4 +1,4 @@
-name: format | lint | test
+name: format | lint | security | test
 on: [push, pull_request]
 jobs:
   lint_unit_tests_coverage:
@@ -21,6 +21,9 @@ jobs:
     - name: Run linter
       run: |
         make code-lint
+    - name: Run security check
+      run: |
+        make code-security
     - name: Run unit tests with coverage
       run: |
         git config --global user.email "you@example.com"

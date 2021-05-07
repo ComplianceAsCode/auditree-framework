@@ -23,9 +23,8 @@ from compliance.config import ComplianceConfig
 from compliance.controls import ControlDescriptor
 from compliance.notify import FindingsNotifier
 
+from ibm_cloud_sdk_core.api_exception import ApiException
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
-
-from ibm_security_advisor_findings_api_sdk import ApiException
 
 from requests.models import Response
 
