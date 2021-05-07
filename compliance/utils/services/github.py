@@ -15,7 +15,7 @@
 """Compliance Github service helper."""
 
 import json
-import random
+import secrets
 from collections import OrderedDict
 from urllib.parse import parse_qs, urlparse
 
@@ -332,9 +332,9 @@ class Github(object):
     def rand_color(self):
         """Generate a random color for labels."""
         return (
-            f'{random.randint(0, 255):02X}'
-            f'{random.randint(0, 255):02X}'
-            f'{random.randint(0, 255):02X}'
+            f'{secrets.randbelow(255):02X}'
+            f'{secrets.randbelow(255):02X}'
+            f'{secrets.randbelow(255):02X}'
         )
 
     def create_label(self, repo, name, org=False):

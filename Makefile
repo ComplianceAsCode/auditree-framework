@@ -34,6 +34,9 @@ code-format:
 code-lint:
 	pre-commit run flake8 --all-files
 
+code-security:
+	pre-commit run bandit --all-files
+
 test::
 	pytest --cov compliance test -v
 

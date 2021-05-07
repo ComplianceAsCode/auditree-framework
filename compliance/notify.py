@@ -28,9 +28,10 @@ from compliance.utils.services import pagerduty
 from compliance.utils.services.github import Github
 from compliance.utils.test import parse_test_id
 
+from ibm_cloud_sdk_core.api_exception import ApiException
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
-from ibm_security_advisor_findings_api_sdk import ApiException, FindingsApiV1
+from ibm_cloud_security_advisor import FindingsApiV1
 
 import requests
 

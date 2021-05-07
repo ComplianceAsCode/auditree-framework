@@ -124,7 +124,7 @@ channel monitoring rotation management::
 
 
 This notifier also needs to know the credentials for sending message
-to your Slack organisation. Include the following in your credentials
+to your Slack organization. Include the following in your credentials
 file::
 
   [slack]
@@ -161,7 +161,7 @@ option when executing your compliance checks.
 
 Note that you have two options to configure the PagerDuty notifier:
 
-* Provide a list of checks by class path within an accreditation. This allows you 
+* Provide a list of checks by class path within an accreditation. This allows you
 to define which checks within the accreditation will trigger PageDuty notifications::
 
   {
@@ -181,13 +181,22 @@ accreditations::
 
   {
     "pagerduty": {
-      "my.accred1": "SERVICE_ID" 
+      "my.accred1": "SERVICE_ID"
     }
   }
 
 Note that the ``service_id`` field is the service id from PagerDuty, e.g. ``PABC123``.
 The PagerDuty notifier loads the active incidents to determine if
 it needs to create a new incident or update an existing one by using the ``service_id``.
+To get your service ID, go to your service in the PagerDuty dashboard and the
+service ID will be the last path element (7 characters) of the URL.  For example
+for ``https://my-service/PABC123``, the service ID is ``PABC123``.
+
+This notifier also needs to know the credentials for sending message to PagerDuty.
+Include the following in your credentials file::
+
+  [pagerduty]
+  events_integration_key=XXX
 
 GitHub Issue
 ------------
