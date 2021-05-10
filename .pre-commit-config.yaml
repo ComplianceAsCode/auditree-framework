@@ -34,3 +34,10 @@ repos:
         ]
         files: "^(compliance|test)"
         stages: [commit]
+-   repo: https://github.com/PyCQA/bandit
+    rev: 1.7.0
+    hooks:
+    -   id: bandit
+        args: [--recursive]
+        files: "^(compliance|test)"
+        stages: [commit]

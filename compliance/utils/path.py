@@ -14,11 +14,12 @@
 # limitations under the License.
 """Compliance automation path formatting utilities module."""
 
-import imp
+import importlib
 import sys
 from pathlib import Path
 
 from compliance.config import get_config
+from compliance.utils.data_parse import get_sha256_hash
 
 FETCH_PREFIX = 'fetch_'
 CHECK_PREFIX = 'test_'
@@ -49,20 +50,22 @@ def load_evidences_modules(path):
     """
     Load all evidences modules found within the ``path`` directory structure.
 
-    This function prevents double loading.
-
     :param path: absolute path to a top level directory.
     """
-    subdirs = [p.parent for p in Path(path).rglob('evidences') if p.is_dir()]
-    for subdir in subdirs:
+    for ev_mod in [p for p in Path(path).rglob('evidences') if p.is_dir()]:
+        module_name = f'evidences.{get_sha256_hash(ev_mod.parts, size=10)}'
+        spec = None
         try:
-            mod_data = imp.find_module('evidences', [str(subdir)])
+            spec = importlib.util.spec_from_file_location(
+                module_name, str(Path(ev_mod, '__init__.py'))
+            )
         except ImportError:
             continue
-        module_name = f'{subdir.name}.evidences'
-        if module_name in sys.modules:
+        if spec is None or module_name in sys.modules:
             continue
-        imp.load_module(module_name, *mod_data)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
 
 
 def substitute_config(path_tmpl):

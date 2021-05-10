@@ -1,3 +1,11 @@
+# [1.19.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.19.0)
+
+- [ADDED] Pre-commit hook for running `bandit` as part of CI/CD was added.
+- [CHANGED] Replaced the deprecated `imp` library with `importlib`.
+- [CHANGED] Replaced the deprecated `ibm_security_advisor_findings_api_sdk` library with `ibm_cloud_security_advisor`.
+- [FIXED] Added clarifying PagerDuty notifier documentation content.
+- [FIXED] Addressed `bandit` (minor) security issue findings.
+
 # [1.18.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.18.0)
 
 - [CHANGED] Now using `pathlib` exclusively for operating system filepath and file functionality.
