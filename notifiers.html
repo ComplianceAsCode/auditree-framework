@@ -4,12 +4,13 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Notifiers &#8212; Auditree Framework 1.18.0 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Notifiers &#8212; Auditree Framework 1.19.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -34,7 +35,7 @@
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.18.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.19.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>  
@@ -44,7 +45,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="notifiers">
+  <section id="notifiers">
 <span id="notifiers-description"></span><h1>Notifiers<a class="headerlink" href="#notifiers" title="Permalink to this headline">¶</a></h1>
 <p>The last phase in a typical framework check run is the notification
 system.  Multiple notifiers can be targeted as part of this phase by using
@@ -103,7 +104,7 @@ warnings, the number of issues fixed by fixers (if applicable), links to report
 evidences generated (if applicable) and a link to the check runbook that
 contains remediation instructions (if applicable).</p>
 <p>The following sections describe the notifiers supported by the framework.</p>
-<div class="section" id="file-descriptor">
+<section id="file-descriptor">
 <h2>File descriptor<a class="headerlink" href="#file-descriptor" title="Permalink to this headline">¶</a></h2>
 <p>File descriptor notifications are written directly to standard output.  Among
 other things, this is useful for testing purposes.  The file descriptor
@@ -111,8 +112,8 @@ notifier is also the default notifier and does not need to be specifically
 set using the <code class="docutils literal notranslate"><span class="pre">--notify</span></code> command line parameter.</p>
 <p>Notifications are grouped by accreditation and check result (passing, warning,
 failure, error).</p>
-</div>
-<div class="section" id="slack">
+</section>
+<section id="slack">
 <h2>Slack<a class="headerlink" href="#slack" title="Permalink to this headline">¶</a></h2>
 <p>This configurable notifier will notify Slack channels (including user personal
 channels if desired) per accreditation.  If configured, it will also manage
@@ -157,7 +158,7 @@ channel monitoring rotation management:</p>
 </pre></div>
 </div>
 <p>This notifier also needs to know the credentials for sending message
-to your Slack organisation. Include the following in your credentials
+to your Slack organization. Include the following in your credentials
 file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">slack</span><span class="p">]</span>
 <span class="n">webhook</span><span class="o">=</span><span class="n">XXX</span>
@@ -183,8 +184,8 @@ specify the channel ID:</p>
 <p>Channel ID <code class="docutils literal notranslate"><span class="pre">11223344</span></code> can be obtained quickly from the URL to a
 message of the target private channel. Of course, the Slack App needs
 to be part of the private channel.</p>
-</div>
-<div class="section" id="pagerduty">
+</section>
+<section id="pagerduty">
 <h2>PagerDuty<a class="headerlink" href="#pagerduty" title="Permalink to this headline">¶</a></h2>
 <p>This configurable notifier will send alerts to PagerDuty.
 The following is an example configuration for this notifier
@@ -221,9 +222,18 @@ option when executing your compliance checks.</p>
 </div>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">service_id</span></code> field is the service id from PagerDuty, e.g. <code class="docutils literal notranslate"><span class="pre">PABC123</span></code>.
 The PagerDuty notifier loads the active incidents to determine if
-it needs to create a new incident or update an existing one by using the <code class="docutils literal notranslate"><span class="pre">service_id</span></code>.</p>
+it needs to create a new incident or update an existing one by using the <code class="docutils literal notranslate"><span class="pre">service_id</span></code>.
+To get your service ID, go to your service in the PagerDuty dashboard and the
+service ID will be the last path element (7 characters) of the URL.  For example
+for <code class="docutils literal notranslate"><span class="pre">https://my-service/PABC123</span></code>, the service ID is <code class="docutils literal notranslate"><span class="pre">PABC123</span></code>.</p>
+<p>This notifier also needs to know the credentials for sending message to PagerDuty.
+Include the following in your credentials file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">pagerduty</span><span class="p">]</span>
+<span class="n">events_integration_key</span><span class="o">=</span><span class="n">XXX</span>
+</pre></div>
 </div>
-<div class="section" id="github-issue">
+</section>
+<section id="github-issue">
 <h2>GitHub Issue<a class="headerlink" href="#github-issue" title="Permalink to this headline">¶</a></h2>
 <p>Depending on the configuration this notifier will create or update a GitHub
 issue per check or as a summary issue per accreditation. If an open issue
@@ -239,7 +249,7 @@ credentials file as shown below:</p>
 <span class="n">token</span><span class="o">=</span><span class="n">my</span><span class="o">-</span><span class="n">gh</span><span class="o">-</span><span class="n">personal</span><span class="o">-</span><span class="n">access</span><span class="o">-</span><span class="n">token</span>
 </pre></div>
 </div>
-<div class="section" id="gh-summary-issue-by-accreditation">
+<section id="gh-summary-issue-by-accreditation">
 <h3>GH Summary Issue by Accreditation<a class="headerlink" href="#gh-summary-issue-by-accreditation" title="Permalink to this headline">¶</a></h3>
 <p>A configuration element for each accreditation is necessary to send summary
 issue notifications using this notifier. Summary notifications send all
@@ -373,8 +383,8 @@ compliance checks:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="gh-issue-per-check">
+</section>
+<section id="gh-issue-per-check">
 <h3>GH Issue Per Check<a class="headerlink" href="#gh-issue-per-check" title="Permalink to this headline">¶</a></h3>
 <p>A configuration element for each accreditation is necessary to send
 notifications per check using this notifier.  Each accreditation configuration
@@ -413,9 +423,9 @@ used with the <code class="docutils literal notranslate"><span class="pre">-C</s
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="evidence-locker">
+</section>
+</section>
+<section id="evidence-locker">
 <h2>Evidence Locker<a class="headerlink" href="#evidence-locker" title="Permalink to this headline">¶</a></h2>
 <p>This notifier will take your check execution for all accreditations and put
 a summary markdown file <code class="docutils literal notranslate"><span class="pre">notifications/alerts_summary.md</span></code> into your evidence
@@ -423,8 +433,8 @@ locker.  The summary markdown file will <strong>only</strong> be pushed to the r
 evidence locker if the <code class="docutils literal notranslate"><span class="pre">full-remote</span></code> argument is applied to the <code class="docutils literal notranslate"><span class="pre">evidence</span></code>
 option when executing your checks otherwise the file will remain in the local
 evidence locker.  No additional configuration is required for this notifier.</p>
-</div>
-<div class="section" id="security-advisor-findings">
+</section>
+<section id="security-advisor-findings">
 <h2>Security Advisor Findings<a class="headerlink" href="#security-advisor-findings" title="Permalink to this headline">¶</a></h2>
 <p>This configurable notifier will post findings to Security Advisor Findings API
 per accreditation. The following is an example configuration for this notifier
@@ -455,8 +465,8 @@ file:</p>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">api_key</span></code> is your IBM Cloud Platform API Key.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -524,13 +534,13 @@ file:</p>
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.18.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.19.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>

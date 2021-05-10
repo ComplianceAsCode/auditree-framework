@@ -4,12 +4,13 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Design Principles &#8212; Auditree Framework 1.18.0 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Design Principles &#8212; Auditree Framework 1.19.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -34,7 +35,7 @@
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.18.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.19.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>  
@@ -44,7 +45,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="design-principles">
+  <section id="design-principles">
 <span id="id1"></span><h1>Design Principles<a class="headerlink" href="#design-principles" title="Permalink to this headline">¶</a></h1>
 <p>The tool is divided in two main parts:</p>
 <ul class="simple">
@@ -61,7 +62,7 @@ functions to access third-party services.</p></li>
 </ul>
 <p>Both fetch and check phases are run by unittest. This is very convenient
 as fetchers and checks are loaded automatically by <code class="docutils literal notranslate"><span class="pre">unittest</span></code>.</p>
-<div class="section" id="evidence">
+<section id="evidence">
 <h2>Evidence<a class="headerlink" href="#evidence" title="Permalink to this headline">¶</a></h2>
 <p>Fetchers and checks manage evidence. We have defined three types of
 evidence (see <a class="reference internal" href="compliance.html#module-compliance.evidence" title="compliance.evidence"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compliance.evidence</span></code></a>):</p>
@@ -90,8 +91,8 @@ expired <code class="docutils literal notranslate"><span class="pre">ttl</span><
 state.  This provides value when monitoring evidence content for completness.
 The property can be overridden to define “empty” for any given evidence.  By default evidence is considered empty if it has no content, is all whitespace,
 or if it is JSON and is an empty dictionary or list (<code class="docutils literal notranslate"><span class="pre">{}</span></code>, <code class="docutils literal notranslate"><span class="pre">[]</span></code>).</p>
-</div>
-<div class="section" id="evidence-locker">
+</section>
+<section id="evidence-locker">
 <h2>Evidence Locker<a class="headerlink" href="#evidence-locker" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">Locker</span></code> is a helper for storing evidence securely in a Git
 repository. <a class="reference internal" href="compliance.html#compliance.locker.Locker" title="compliance.locker.Locker"><code class="xref py py-class docutils literal notranslate"><span class="pre">Locker</span></code></a> is responsible
@@ -204,8 +205,8 @@ to:</p>
 <p>This should hopefully add some detail to a remote Git push rejection.</p>
 </li>
 </ul>
-</div>
-<div class="section" id="compliance-fetchers">
+</section>
+<section id="compliance-fetchers">
 <span id="fetchers"></span><h2>Compliance Fetchers<a class="headerlink" href="#compliance-fetchers" title="Permalink to this headline">¶</a></h2>
 <p>All the fetchers should be implemented as a child class of
 <a class="reference internal" href="compliance.html#compliance.fetch.ComplianceFetcher" title="compliance.fetch.ComplianceFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComplianceFetcher</span></code></a>. Note that this
@@ -243,7 +244,7 @@ the raw data.</p>
 <li><p>Applying <cite>check-like</cite> logic (e.g. your data update if it includes an
 <cite>if</cite>). Checks should test the evidence, not fetchers.</p></li>
 </ul>
-<div class="section" id="evidence-validation">
+<section id="evidence-validation">
 <h3>Evidence Validation<a class="headerlink" href="#evidence-validation" title="Permalink to this headline">¶</a></h3>
 <p>A fetcher should only fetch data and store that data as evidence if the
 current version of that evidence is stale (<code class="docutils literal notranslate"><span class="pre">ttl</span></code> has expired).  To that end
@@ -295,8 +296,8 @@ manager yields the corresponding raw evidence object.</p></li>
                 <span class="n">evidence</span><span class="o">.</span><span class="n">set_content</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">foo_bar_data</span><span class="p">))</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="evidence-dependency-chaining">
+</section>
+<section id="evidence-dependency-chaining">
 <h3>Evidence Dependency Chaining<a class="headerlink" href="#evidence-dependency-chaining" title="Permalink to this headline">¶</a></h3>
 <p>Sometimes a fetcher needs evidence gathered by another fetcher in order to
 perform its fetching operation.  For example, a fetcher may need to collect
@@ -326,8 +327,8 @@ due to an unavailable evidence dependency.</p>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">foo_bar_data</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="fetcher-execution">
+</section>
+<section id="fetcher-execution">
 <h3>Fetcher Execution<a class="headerlink" href="#fetcher-execution" title="Permalink to this headline">¶</a></h3>
 <p>By default the Auditree framework will run all fetchers (tests prefixed by
 <code class="docutils literal notranslate"><span class="pre">fetch_</span></code>) that it can find.  However, it is possible to limit fetcher
@@ -343,9 +344,9 @@ path to the fetcher class.</p>
 <span class="p">]</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="compliance-checks">
+</section>
+</section>
+<section id="compliance-checks">
 <h2>Compliance Checks<a class="headerlink" href="#compliance-checks" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck" title="compliance.check.ComplianceCheck"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComplianceCheck</span></code></a> is the parent class of
 any set of checks that should be executed by the system. The run-time engine
@@ -366,7 +367,7 @@ future.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ERROR</span></code>: the check stopped abruptly and was not able to complete all
 validations.</p></li>
 </ul>
-<div class="section" id="id2">
+<section id="id2">
 <h3>Evidence Validation<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>A check should only perform operations on evidence if the current version of
 that evidence is not stale (<code class="docutils literal notranslate"><span class="pre">ttl</span></code> has not expired).  To that end
@@ -512,8 +513,8 @@ the <code class="docutils literal notranslate"><span class="pre">lazy_load</span
             <span class="bp">self</span><span class="o">.</span><span class="n">add_successes</span><span class="p">(</span><span class="s1">&#39;bar stuff&#39;</span><span class="p">,</span> <span class="n">successes</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="check-execution">
+</section>
+<section id="check-execution">
 <h3>Check Execution<a class="headerlink" href="#check-execution" title="Permalink to this headline">¶</a></h3>
 <p>The Auditree framework executes checks (tests prefixed by <code class="docutils literal notranslate"><span class="pre">test_</span></code>) based
 on accreditation groupings defined in a <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> config file.
@@ -533,9 +534,9 @@ accreditations passed to the framework by the CLI.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="fixers">
+</section>
+</section>
+<section id="fixers">
 <h2>Fixers<a class="headerlink" href="#fixers" title="Permalink to this headline">¶</a></h2>
 <p>After checks have been run, but before notifications or reports are
 generated, the Auditree framework will optionally try to fix the
@@ -549,8 +550,8 @@ listed in dry-run mode. If the fix succeeds, then a counter
 <code class="docutils literal notranslate"><span class="pre">fixed_failure_count</span></code> will be incremented. This counter is displayed
 in the notification message.</p>
 <p>See <a class="reference internal" href="fixers.html#fixers"><span class="std std-ref">Fixers</span></a> section for more information.</p>
-</div>
-<div class="section" id="report-builder">
+</section>
+<section id="report-builder">
 <h2>Report Builder<a class="headerlink" href="#report-builder" title="Permalink to this headline">¶</a></h2>
 <p>Once the execution of all checks and (optionally) fixers have been
 executed, the <a class="reference internal" href="compliance.html#compliance.report.ReportBuilder" title="compliance.report.ReportBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReportBuilder</span></code></a> generates
@@ -558,8 +559,8 @@ reports by inspecting each check and storing the results in the
 locker. These reports are useful for providing detailed information
 regarding what failures were found.</p>
 <p>See <a class="reference internal" href="report-builder.html#report-builder"><span class="std std-ref">Report Builder</span></a> section for more information.</p>
-</div>
-<div class="section" id="notifiers">
+</section>
+<section id="notifiers">
 <h2>Notifiers<a class="headerlink" href="#notifiers" title="Permalink to this headline">¶</a></h2>
 <p>After reports have been generated, the tool will collect notification
 messages from them and will create a
@@ -567,8 +568,8 @@ messages from them and will create a
 specific notification mechanism (e.g. send Slack message, print
 messages to stdout, etc).</p>
 <p>See <a class="reference internal" href="notifiers.html#notifiers-description"><span class="std std-ref">Notifiers</span></a> section for more information.</p>
-</div>
-<div class="section" id="execution-config">
+</section>
+<section id="execution-config">
 <h2>Execution Config<a class="headerlink" href="#execution-config" title="Permalink to this headline">¶</a></h2>
 <p>The Auditree framework is designed to be run locally from your PC or from
 a CI server like Jenkins or Travis. The execution can be tweaked at 2
@@ -584,8 +585,8 @@ to send notifications to different people/channels based on the
 accreditation. See <a class="reference internal" href="notifiers.html#notifiers-description"><span class="std std-ref">Notifiers</span></a> section to see this
 example.</p></li>
 </ul>
-</div>
-<div class="section" id="credentials">
+</section>
+<section id="credentials">
 <span id="id3"></span><h2>Credentials<a class="headerlink" href="#credentials" title="Permalink to this headline">¶</a></h2>
 <p>If you want to configure your credentials locally, the framework
 will look for a credentials file at <code class="docutils literal notranslate"><span class="pre">~/.credentials</span></code> by default. This
@@ -607,8 +608,8 @@ file should be similar to this:</p>
 <span class="n">events_integration_key</span><span class="o">=</span><span class="n">XXX</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -684,13 +685,13 @@ file should be similar to this:</p>
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.18.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.19.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>
