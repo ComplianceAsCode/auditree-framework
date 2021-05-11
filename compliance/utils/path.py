@@ -16,10 +16,9 @@
 
 import importlib
 import sys
-from pathlib import Path
+from pathlib import Path, PurePath
 
 from compliance.config import get_config
-from compliance.utils.data_parse import get_sha256_hash
 
 FETCH_PREFIX = 'fetch_'
 CHECK_PREFIX = 'test_'
@@ -46,6 +45,24 @@ def get_toplevel_dirpath(path):
             return str(path)
 
 
+def get_module_path(path):
+    """
+    Provide the full module dot notation path based on the file path provided.
+
+    :param path: absolute or relative path to a file or directory.
+
+    :returns: the module path in dot notation.
+    """
+    if path is None:
+        return
+    for parent in PurePath(path).parents:
+        if parent.name == 'site-packages':
+            return _path_to_dot(str(PurePath(path).relative_to(parent)))
+    return _path_to_dot(
+        str(PurePath(path).relative_to(get_toplevel_dirpath(path)))
+    )
+
+
 def load_evidences_modules(path):
     """
     Load all evidences modules found within the ``path`` directory structure.
@@ -53,7 +70,7 @@ def load_evidences_modules(path):
     :param path: absolute path to a top level directory.
     """
     for ev_mod in [p for p in Path(path).rglob('evidences') if p.is_dir()]:
-        module_name = f'evidences.{get_sha256_hash(ev_mod.parts, size=10)}'
+        module_name = get_module_path(str(ev_mod))
         spec = None
         try:
             spec = importlib.util.spec_from_file_location(
@@ -75,3 +92,7 @@ def substitute_config(path_tmpl):
     :param path_tmpl: a string template of a path
     """
     return path_tmpl.format(**(get_config().raw_config))
+
+
+def _path_to_dot(path):
+    return path.rstrip('.py').replace('/', '.').replace('\\', '.')
