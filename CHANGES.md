@@ -1,3 +1,7 @@
+# [1.19.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.19.1)
+
+- [FIXED] Evidence cache loading bug resolved.
+
 # [1.19.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.19.0)
 
 - [ADDED] Pre-commit hook for running `bandit` as part of CI/CD was added.
