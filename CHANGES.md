@@ -1,3 +1,7 @@
+# [1.20.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.20.0)
+
+- [ADDED] Repository pull request metadata retrieval added to Github service utility.
+
 # [1.19.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.19.0)
 
 - [ADDED] Pre-commit hook for running `bandit` as part of CI/CD was added.

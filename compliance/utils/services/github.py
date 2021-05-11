@@ -420,8 +420,8 @@ class Github(object):
 
         :param repo: the organization/repository as a string.
         :param since: the starting date/time of a pull request as a datetime.
-
-        :returns: the repo branch's pull request information
+        :param kwargs: key/value pairs of GH pulls API accepted params
+        :returns: Repository pull request metadata
         """
         api_url = f'repos/{repo.strip("/")}/pulls'
         self.session.headers.update(
