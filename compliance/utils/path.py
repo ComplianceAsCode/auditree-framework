@@ -14,11 +14,12 @@
 # limitations under the License.
 """Compliance automation path formatting utilities module."""
 
-import imp
-import os
+import importlib
 import sys
+from pathlib import Path
 
 from compliance.config import get_config
+from compliance.utils.data_parse import get_sha256_hash
 
 FETCH_PREFIX = 'fetch_'
 CHECK_PREFIX = 'test_'
@@ -26,45 +27,50 @@ CHECK_PREFIX = 'test_'
 
 def get_toplevel_dirpath(path):
     """
-    Provide the toplevel directory for the given path.
+    Provide the top level directory for the given path.
 
-    The toplevel directory will be the one containing ``controls.json`` file.
-    This function returns ``None`` if toplevel path could not be calculated.
+    The top level directory contains the ``controls.json`` file.
+    This function returns ``None`` if a top level path can not be found.
 
-    :param path: absolute or relative path to file or dir.
+    :param path: absolute or relative path to a file or directory.
+
+    :returns: the absolute path to the top level directory.
     """
-    if path == '/' or path is None:
-        return None
-    if os.path.exists(os.path.join(path, 'controls.json')):
-        return path
-    return get_toplevel_dirpath(os.path.dirname(path))
+    if path is None:
+        return
+    paths = list(Path(path).resolve().parents)
+    if Path(path).resolve().is_dir():
+        paths = [Path(path).resolve()] + paths
+    for path in paths[:-1]:
+        if Path(path, 'controls.json').is_file():
+            return str(path)
 
 
-def load_evidences_modules(toplevel):
+def load_evidences_modules(path):
     """
-    Load the all evidences modules found at toplevel directory.
+    Load all evidences modules found within the ``path`` directory structure.
 
-    This function prevents double loading.
-
-    :param toplevel: path to the toplevel directory.
+    :param path: absolute path to a top level directory.
     """
-    for root, dirs, _ in os.walk(toplevel):
-        for d in dirs:
-            try:
-                mod_data = imp.find_module(
-                    'evidences', [os.path.join(root, d)]
-                )
-            except ImportError:
-                continue
-            module_name = f'{d}.evidences'
-            if module_name in sys.modules:
-                continue
-            imp.load_module(module_name, *mod_data)
+    for ev_mod in [p for p in Path(path).rglob('evidences') if p.is_dir()]:
+        module_name = f'evidences.{get_sha256_hash(ev_mod.parts, size=10)}'
+        spec = None
+        try:
+            spec = importlib.util.spec_from_file_location(
+                module_name, str(Path(ev_mod, '__init__.py'))
+            )
+        except ImportError:
+            continue
+        if spec is None or module_name in sys.modules:
+            continue
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
 
 
 def substitute_config(path_tmpl):
     """
-    Substitue the config values on the given path template.
+    Substitute the config values on the given path template.
 
     :param path_tmpl: a string template of a path
     """

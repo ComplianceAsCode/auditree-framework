@@ -103,7 +103,7 @@ class _BaseEvidence(object):
 
     @property
     def dir_path(self):
-        return str(PurePath(self.rootdir).joinpath(self.category))
+        return str(PurePath(self.rootdir, self.category))
 
     @property
     def name(self):
@@ -111,7 +111,7 @@ class _BaseEvidence(object):
 
     @property
     def path(self):
-        return str(PurePath(self.dir_path).joinpath(self.name))
+        return str(PurePath(self.dir_path, self.name))
 
     @property
     def extension(self):
@@ -128,6 +128,13 @@ class _BaseEvidence(object):
         if not hasattr(self, '_content_as_json'):
             self._content_as_json = json.loads(self.content)
         return self._content_as_json
+
+    @property
+    def is_empty(self):
+        return not self.content or not self.content.strip() or (
+            self.extension == 'json' and self.content_as_json != 0
+            and not self.content_as_json
+        )
 
     def set_content(self, str_content):
         self._content = str_content

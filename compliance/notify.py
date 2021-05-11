@@ -17,10 +17,10 @@
 import copy
 import json
 import logging
-import os
 import sys
 import time
 from datetime import datetime
+from pathlib import PurePath
 from urllib.parse import urlparse
 
 from compliance.config import get_config
@@ -28,9 +28,10 @@ from compliance.utils.services import pagerduty
 from compliance.utils.services.github import Github
 from compliance.utils.test import parse_test_id
 
+from ibm_cloud_sdk_core.api_exception import ApiException
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
-from ibm_security_advisor_findings_api_sdk import ApiException, FindingsApiV1
+from ibm_cloud_security_advisor import FindingsApiV1
 
 import requests
 
@@ -413,7 +414,7 @@ class LockerNotifier(_BaseMDNotifier):
         )
         self.locker.checkin(
             'Locker notification sent at local time '
-            f'{time.ctime(time.time())}\n\n{os.path.join(folder, filename)}'
+            f'{time.ctime(time.time())}\n\n{PurePath(folder, filename)}'
         )
         self.locker.push()
 

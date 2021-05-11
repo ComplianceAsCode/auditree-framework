@@ -7,7 +7,7 @@ repos:
         files: "^(compliance|test)"
         stages: [commit]
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.0
+    rev: 3.9.1
     hooks:
     -   id: flake8
         args: [
@@ -32,5 +32,12 @@ repos:
           flake8-use-fstring,
           pep8-naming
         ]
+        files: "^(compliance|test)"
+        stages: [commit]
+-   repo: https://github.com/PyCQA/bandit
+    rev: 1.7.0
+    hooks:
+    -   id: bandit
+        args: [--recursive]
         files: "^(compliance|test)"
         stages: [commit]

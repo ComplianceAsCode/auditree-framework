@@ -1,7 +1,7 @@
 [![OS Compatibility][platform-badge]](#prerequisites)
 [![Python Compatibility][python-badge]][python]
 [![pre-commit][pre-commit-badge]][pre-commit]
-[![Code validation](https://github.com/ComplianceAsCode/auditree-framework/workflows/format%20%7C%20lint%20%7C%20test/badge.svg)][lint-test]
+[![Code validation](https://github.com/ComplianceAsCode/auditree-framework/workflows/format%20%7C%20lint%20%7C%20security%20%7C%20test/badge.svg)][lint-test]
 [![Upload Python Package](https://github.com/ComplianceAsCode/auditree-framework/workflows/PyPI%20upload/badge.svg)][pypi-upload]
 
 # auditree-framework

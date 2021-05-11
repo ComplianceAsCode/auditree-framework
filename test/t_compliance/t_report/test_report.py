@@ -38,7 +38,7 @@ class ReportTest(unittest.TestCase):
     ):
         """Test report generation failure affects on general execution."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get_template_dir.return_value = '/tmp/templates'
+        config_mock.get_template_dir.return_value = '/rpt/templates'
         get_cfg_mock.return_value = config_mock
 
         report = ReportEvidence('test', 'test', 12345)
@@ -46,7 +46,7 @@ class ReportTest(unittest.TestCase):
         evidence_path_mock.return_value = report
 
         locker = create_autospec(Locker())
-        locker.local_path = '/tmp/fake_locker'
+        locker.local_path = '/my/fake/locker'
         locker.get_reports_metadata = MagicMock(return_value={'foo': 'bar'})
 
         test_obj = build_test_mock()

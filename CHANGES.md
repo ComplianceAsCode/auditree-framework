@@ -1,6 +1,25 @@
+# [1.19.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.19.0)
+
+- [ADDED] Pre-commit hook for running `bandit` as part of CI/CD was added.
+- [CHANGED] Replaced the deprecated `imp` library with `importlib`.
+- [CHANGED] Replaced the deprecated `ibm_security_advisor_findings_api_sdk` library with `ibm_cloud_security_advisor`.
+- [FIXED] Added clarifying PagerDuty notifier documentation content.
+- [FIXED] Addressed `bandit` (minor) security issue findings.
+
+# [1.18.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.18.0)
+
+- [CHANGED] Now using `pathlib` exclusively for operating system filepath and file functionality.
+- [FIXED] README table of contents generation multi-blank line bug is resolved.
+
+# [1.17.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.17.0)
+
+- [ADDED] Locker get_large_files method added to return large files in the locker.
+- [ADDED] Logging of large files added to remote push operation.
+
 # [1.16.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.16.0)
 
-- [ADDED] Support github pulls API.
+- [ADDED] Locker get_empty_evidences method added to return all empty evidence paths.
+- [ADDED] Evidence base class has override-able is_empty property.
 
 # [1.15.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.15.0)
 

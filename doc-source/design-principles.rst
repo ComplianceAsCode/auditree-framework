@@ -47,11 +47,16 @@ evidence (see :py:mod:`compliance.evidence`):
 See :ref:`fetchers` section for conventions and expectations with
 respect to modifying RawEvidence.
 
-All evidence has a ``ttl`` field (Time To Live) which defines for how
-long an evidence should be considered valid. For instance, healthcheck
-data is only valid during 1 day since new input is generated everyday. For
-this reason, any check trying to use an evidence with an expired ``ttl``
-must error.
+All evidence has a settable ``ttl`` (Time To Live) property that defines how
+long an evidence should be considered valid. For instance, if new data is
+generated on a daily basis then evidence gathered for that data should only be
+valid for 1 day.  For this reason, any check trying to use evidence with an
+expired ``ttl`` will error.
+
+All evidence has an ``is_empty`` property that defines an evidence's empty
+state.  This provides value when monitoring evidence content for completness.
+The property can be overridden to define "empty" for any given evidence.  By default evidence is considered empty if it has no content, is all whitespace,
+or if it is JSON and is an empty dictionary or list (``{}``, ``[]``).
 
 
 Evidence Locker
@@ -89,22 +94,22 @@ for:
 
 * Validating the ``ttl`` for a given evidence.  An optional evidence
   ``ttl`` tolerance value can be configured to be applied during
-  fetcher execution.  Check execution is not affected by this optional
-  tolerance value because checks should only interact with evidence that
-  is fresh (not stale).  This value (in seconds) tells fetchers to
+  fetcher execution.  This value (in seconds) tells fetchers to
   retrieve evidence that is nearly but not yet stale.  If no value is
   supplied then fetchers will only retrieve new evidence after ``ttl``
   has expired.  You can set the optional ``ttl_tolerance`` value in
-  your configuration JSON file like so:
+  your configuration JSON file like so::
 
-.. code-block:: json
+    {
+      "locker": {
+        "repo_url": "https://github.com/my-org/my-evidence-repo",
+        "ttl_tolerance": 3600
+      }
+    }
 
-   {
-     "locker": {
-       "repo_url": "https://github.com/my-org/my-evidence-repo",
-       "ttl_tolerance": 3600
-     }
-   }
+  Check execution is not affected by this optional
+  tolerance value because checks should only interact with evidence that
+  is fresh (not stale).
 
 * It's generally a good idea to regularly "archive" an evidence locker in
   favor of a fresh one.  A yearly locker archive/refresh is a good guideline
@@ -114,38 +119,58 @@ for:
   locker is possible by using the ``prev_repo_url`` option.  With that
   option set, a check that is unable to find historical evidence in the
   current evidence locker will be able to download the previous locker and
-  look for the historical evidence there.  This will continue to do this until
-  the new locker is primed with enough historical evidence to support all
-  checks.  Setting the option in your configuration JSON file would look
-  similar to:
+  look for the historical evidence there.  Setting the option in your configuration JSON file would look
+  similar to::
 
-.. code-block:: json
+    {
+      "locker": {
+        "repo_url": "https://github.com/my-org/my-evidence-repo",
+        "prev_repo_url": "https://github.com/my-org/my-evidence-repo-old"
+      }
+    }
 
-   {
-     "locker": {
-       "repo_url": "https://github.com/my-org/my-evidence-repo",
-       "prev_repo_url": "https://github.com/my-org/my-evidence-repo-old"
-     }
-   }
+  The previous locker will no longer be downloaded once the new locker is
+  primed with enough historical evidence to support all checks.
 
 * A locker can grow large, causing CI/CD jobs to run longer than desired
   due to locker download time.  So in addition to a sound locker archiving
   strategy, it is also possible to configure your locker to only download
-  recent commits by using the ``shallow_days`` option.  When ``shallow_days``
-  is supplied, only commits since the current date minus the number of days set
-  as ``shallow_days`` are included in the locker download.  The option applies
-  to both the locker and the previous locker (if applicable).  Setting the
+  recent commits by using the ``shallow_days`` option.  Setting the
   option in your configuration JSON file would look similar to::
 
-.. code-block:: json
+    {
+      "locker": {
+        "repo_url": "https://github.com/my-org/my-evidence-repo",
+        "prev_repo_url": "https://github.com/my-org/my-evidence-repo-old",
+        "shallow_days": 10
+      }
+    }
 
-   {
-     "locker": {
-       "repo_url": "https://github.com/my-org/my-evidence-repo",
-       "prev_repo_url": "https://github.com/my-org/my-evidence-repo-old",
-       "shallow_days": 10
-     }
-   }
+  When ``shallow_days`` is supplied, only commits since the current date minus
+  the number of days set as ``shallow_days`` are included in the locker
+  download.  The option applies to both the locker and the previous locker (if
+  applicable).
+
+* Remote hosting services (Github, Gitlab, BitBucket) typically have file size
+  limitations that can vary from service instance to service instance.
+  Exceeding a maximum file size will in turn cause the service managing your
+  evidence locker to reject a remote locker Git push request.  Unfortunately
+  rejection notices from a service aren't always the most descriptive so it
+  often isn't clear why your push request was rejected.  To that end, prior to
+  a remote push, the framework will log a list of "largely sized" files.  The
+  large file size threshold is configurable and can be set by using the
+  ``large_file_threshold`` option.  The value is in bytes and defaults to
+  50 MB.  Setting the option in your configuration JSON file would look similar
+  to::
+
+    {
+      "locker": {
+        "repo_url": "https://github.com/my-org/my-evidence-repo",
+        "large_file_threshold": 50000000
+      }
+    }
+
+  This should hopefully add some detail to a remote Git push rejection.
 
 
 .. _fetchers:
