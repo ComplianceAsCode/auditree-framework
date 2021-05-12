@@ -31,8 +31,6 @@ from compliance.utils.exceptions import (
 )
 from compliance.utils.path import FETCH_PREFIX, substitute_config
 
-from deprecated import deprecated
-
 HOUR = 60 * 60
 DAY = HOUR * 24
 YEAR = DAY * 365
@@ -236,7 +234,6 @@ class RawEvidence(_BaseEvidence):
         return data
 
 
-@deprecated(reason='Evidence class to be removed, use RawEvidence instead')
 class DerivedEvidence(_BaseEvidence):
     """The derived evidence class."""
 
@@ -255,7 +252,6 @@ class ReportEvidence(_BaseEvidence):
         return 'reports'
 
 
-@deprecated(reason='Evidence class to be removed')
 class TmpEvidence(_BaseEvidence):
     """The temporary evidence class."""
 
@@ -279,7 +275,7 @@ class ExternalEvidence(_BaseEvidence):
 
 
 class _EvidenceContextManager(object):
-    """Base class for raw evidence context managers."""
+    """Base class for raw and temporary evidence context managers."""
 
     def __init__(self, locker, evidence_path, evidence_type):
         self.locker = locker
@@ -328,7 +324,6 @@ class raw_evidence(_EvidenceContextManager):  # noqa: N801
         super().__init__(locker, evidence_path, 'raw')
 
 
-@deprecated(reason='Context manager to be removed')
 class tmp_evidence(_EvidenceContextManager):  # noqa: N801
     """
     Helper context manager for a typical ``fetch_`` method implementation.
@@ -357,7 +352,6 @@ class tmp_evidence(_EvidenceContextManager):  # noqa: N801
         super().__init__(locker, evidence_path, 'tmp')
 
 
-@deprecated(reason='Context manager to be removed, use raw_evidence instead')
 class derived_evidence(object):  # noqa: N801
     """
     Helper context manager for a typical ``fetch_`` method implementation.
@@ -573,7 +567,7 @@ def get_evidence_class(evidence_type):
     provided.  If no match ``None`` is returned.
 
     :param evidence_type: the type of evidence class desired as a string. Valid
-      values are ``reports``, ``raw``.
+      values are ``tmp``, ``reports``, ``derived``, ``raw``, ``external``.
 
     :returns: the appropriate evidence class.
     """
@@ -711,7 +705,6 @@ def store_raw_evidence(evidence_path):
     return decorator
 
 
-@deprecated(reason='Decorator to be removed')
 def store_tmp_evidence(evidence_path):
     """
     Decorate a typical ``fetcher_`` method fetching temporary evidence.
@@ -735,14 +728,13 @@ def store_tmp_evidence(evidence_path):
     return decorator
 
 
-@deprecated(reason='Decorator to be removed, use store_raw_evidence instead')
 def store_derived_evidence(evidences, target):
     """
     Decorate a typical ``fetcher_`` method fetching derived evidence.
 
     Use when retrieving derived evidence by a fetcher and the name of the
     evidence is static/known.  When the evidence name is dynamic use the
-    tmp_evidence context manager instead.
+    derived_evidence context manager instead.
 
     The decorator expects that the decorated method returns the content to be
     stored in the locker.  The storing of the evidence is also handled by this
@@ -813,7 +805,6 @@ def with_external_evidences(*from_evidences):
     return decorator
 
 
-@deprecated(reason='Decorator to be removed, use with_raw_evidences instead')
 def with_derived_evidences(*from_evidences):
     """
     Decorate a typical ``test_`` check method processing derived evidences.
@@ -833,7 +824,6 @@ def with_derived_evidences(*from_evidences):
     return decorator
 
 
-@deprecated(reason='Decorator to be removed')
 def with_tmp_evidences(*from_evidences):
     """
     Decorate a typical ``test_`` check method processing temporary evidences.

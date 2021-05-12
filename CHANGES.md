@@ -1,3 +1,8 @@
+# [1.20.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.20.0)
+
+- [ADDED] Returned support for `DerivedEvidence`.
+- [ADDED] Returned support for `TmpEvidence`.
+
 # [1.19.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.19.1)
 
 - [FIXED] Evidence cache loading bug resolved.
