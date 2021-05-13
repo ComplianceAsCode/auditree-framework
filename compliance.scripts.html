@@ -4,13 +4,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-    <title>compliance.scripts package &#8212; Auditree Framework 1.19.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>compliance.scripts package &#8212; Auditree Framework 1.20.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -35,7 +34,7 @@
         <li class="right" >
           <a href="compliance.html" title="compliance package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.19.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.20.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" accesskey="U">compliance package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.scripts package</a></li> 
@@ -47,39 +46,39 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="compliance-scripts-package">
+  <div class="section" id="compliance-scripts-package">
 <h1>compliance.scripts package<a class="headerlink" href="#compliance-scripts-package" title="Permalink to this headline">¶</a></h1>
-<section id="submodules">
+<div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</section>
-<section id="module-compliance.scripts.compliance_cli">
+</div>
+<div class="section" id="module-compliance.scripts.compliance_cli">
 <span id="compliance-scripts-compliance-cli-module"></span><h2>compliance.scripts.compliance_cli module<a class="headerlink" href="#module-compliance.scripts.compliance_cli" title="Permalink to this headline">¶</a></h2>
 <p>Compliance automation command line interface.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="compliance.scripts.compliance_cli.ComplianceCLI">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compliance.scripts.compliance_cli.</span></span><span class="sig-name descname"><span class="pre">ComplianceCLI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/scripts/compliance_cli.html#ComplianceCLI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.scripts.compliance_cli.ComplianceCLI" title="Permalink to this definition">¶</a></dt>
+<dt id="compliance.scripts.compliance_cli.ComplianceCLI">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compliance.scripts.compliance_cli.</span></code><code class="sig-name descname"><span class="pre">ComplianceCLI</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/scripts/compliance_cli.html#ComplianceCLI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.scripts.compliance_cli.ComplianceCLI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ilcli.command.Command</span></code></p>
 <p>The Compliance Framework CLI.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="compliance.scripts.compliance_cli.ComplianceCLI.name">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'compliance'</span></em><a class="headerlink" href="#compliance.scripts.compliance_cli.ComplianceCLI.name" title="Permalink to this definition">¶</a></dt>
+<dt id="compliance.scripts.compliance_cli.ComplianceCLI.name">
+<code class="sig-name descname"><span class="pre">name</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'compliance'</span></em><a class="headerlink" href="#compliance.scripts.compliance_cli.ComplianceCLI.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>the name of the command (if None, class name by default)</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="compliance.scripts.compliance_cli.run">
-<span class="sig-prename descclassname"><span class="pre">compliance.scripts.compliance_cli.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/scripts/compliance_cli.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.scripts.compliance_cli.run" title="Permalink to this definition">¶</a></dt>
+<dt id="compliance.scripts.compliance_cli.run">
+<code class="sig-prename descclassname"><span class="pre">compliance.scripts.compliance_cli.</span></code><code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/scripts/compliance_cli.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.scripts.compliance_cli.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute the Compliance CLI.</p>
 </dd></dl>
 
-</section>
-<section id="module-compliance.scripts">
+</div>
+<div class="section" id="module-compliance.scripts">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-compliance.scripts" title="Permalink to this headline">¶</a></h2>
 <p>Compliance automation command line interface package.</p>
-</section>
-</section>
+</div>
+</div>
 
 
             <div class="clearer"></div>
@@ -140,7 +139,7 @@
         <li class="right" >
           <a href="compliance.html" title="compliance package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.19.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.20.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.scripts package</a></li> 
@@ -148,7 +147,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
     </div>
   </body>
 </html>
