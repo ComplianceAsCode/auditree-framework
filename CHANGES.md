@@ -1,3 +1,7 @@
+# [1.21.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.21.0)
+
+- [ADDED] Repository pull request metadata retrieval added to Github service utility.
+
 # [1.20.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.20.0)
 
 - [ADDED] Returned support for `DerivedEvidence`.
