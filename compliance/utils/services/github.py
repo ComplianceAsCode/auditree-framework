@@ -17,6 +17,7 @@
 import json
 import secrets
 from collections import OrderedDict
+from datetime import datetime
 from urllib.parse import parse_qs, urlparse
 
 from compliance.utils.credentials import Config
@@ -412,6 +413,56 @@ class Github(object):
         if path:
             opts['path'] = path
         return self._make_request('get', f'repos/{repo}/commits', params=opts)
+
+    def get_pull_requests(self, repo, since=None, **kwargs):
+        """
+        Retrieve a repository's pull request information.
+
+        :param repo: the organization/repository as a string.
+        :param since: the starting date/time of a pull request as a datetime.
+        :param kwargs: key/value pairs of GH pulls API accepted params
+        :returns: Repository pull request metadata
+        """
+        api_url = f'repos/{repo.strip("/")}/pulls'
+        self.session.headers.update(
+            {'Accept': 'application/vnd.github.v3+json'}
+        )
+        if not since:
+            return self._paginate_api(api_url, **kwargs)
+        pull_requests = []
+        params = {**kwargs}
+        params['page'] = kwargs.get('page', 1)
+        # Sort results by "created" in descending order
+        params['sort'] = 'created'
+        params['direction'] = 'desc'
+        response = self._make_request(
+            'get', api_url, parse=False, params=params
+        )
+        max_page = 1
+        if 'Link' in response.headers:
+            # Link is only present if there are multiple pages
+            link = response.headers['Link']
+            urls = link.replace('>', '').replace('<', '').split()
+            parsed_url = urlparse(urls[2].strip(';'))
+            max_page = int(parse_qs(parsed_url.query)['page'][0])
+        while response:
+            for pull_request in response.json():
+                created_at = datetime.strptime(
+                    pull_request['created_at'], '%Y-%m-%dT%H:%M:%SZ'
+                )
+                # Filter based on provided since datetime
+                if created_at < since:
+                    response = None
+                    break
+                pull_requests.append(pull_request)
+            params['page'] += 1
+            if params['page'] > max_page:
+                response = None
+            else:
+                response = self._make_request(
+                    'get', api_url, parse=False, params=params
+                )
+        return pull_requests
 
     def get_branch_protection_details(self, repo, branch='master'):
         """
