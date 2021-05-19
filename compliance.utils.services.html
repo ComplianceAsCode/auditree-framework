@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compliance.utils.services package &#8212; Auditree Framework 1.20.0 documentation</title>
+    <title>compliance.utils.services package &#8212; Auditree Framework 1.21.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     
@@ -30,7 +30,7 @@
         <li class="right" >
           <a href="compliance.utils.html" title="compliance.utils package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.20.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.21.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="compliance.utils.html" accesskey="U">compliance.utils package</a> &#187;</li>
@@ -229,6 +229,24 @@ be an empty dictionary if there aren’t any.</p>
 <dt>For a repo project the project variable looks like:</dt><dd><p>my-gh-org/my-gh-repo/projects/1</p>
 </dd>
 <dt>For an org project the project variable looks like:</dt><dd><p>my-gh-org/projects/1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compliance.utils.services.github.Github.get_pull_requests">
+<code class="sig-name descname"><span class="pre">get_pull_requests</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">since</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.get_pull_requests"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.services.github.Github.get_pull_requests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a repository’s pull request information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>repo</strong> – the organization/repository as a string.</p></li>
+<li><p><strong>since</strong> – the starting date/time of a pull request as a datetime.</p></li>
+<li><p><strong>kwargs</strong> – key/value pairs of GH pulls API accepted params</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Repository pull request metadata</p>
 </dd>
 </dl>
 </dd></dl>
@@ -488,7 +506,7 @@ This uses the PD API v2.</p>
         <li class="right" >
           <a href="compliance.utils.html" title="compliance.utils package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.20.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.21.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="compliance.utils.html" >compliance.utils package</a> &#187;</li>
