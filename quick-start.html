@@ -4,12 +4,13 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quick Start &#8212; Auditree Framework 1.21.0 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Quick Start &#8212; Auditree Framework 1.21.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -34,7 +35,7 @@
         <li class="right" >
           <a href="index.html" title="Auditree framework documentation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.21.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.21.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Quick Start</a></li> 
       </ul>
     </div>  
@@ -44,7 +45,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="quick-start">
+  <section id="quick-start">
 <span id="id1"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
 <p>If any terminology used in this quick start guide is unclear, have a look at the
 <a class="reference internal" href="design-principles.html#design-principles"><span class="std std-ref">Design Principles</span></a> documentation for clarification.</p>
@@ -78,17 +79,17 @@ report table of contents and generates a file in the evidence locker root called
 <code class="docutils literal notranslate"><span class="pre">check_results.json</span></code> with detailed information about the check execution.</p>
 </li>
 </ul>
-<div class="section" id="advanced-topics">
+<section id="advanced-topics">
 <h2>Advanced Topics<a class="headerlink" href="#advanced-topics" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="configuration">
+<section id="configuration">
 <h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
 <p>There are two configuration files used to configure the execution of the
 <code class="docutils literal notranslate"><span class="pre">auditree-framework</span></code>.  The main configuration file can be named anything you
 like.  In the case of our demo we’ve chosen the name <code class="docutils literal notranslate"><span class="pre">auditree-demo.json</span></code>.  There
 is also a check to accreditation mapping configuration file and this file must be
 named <code class="docutils literal notranslate"><span class="pre">controls.json</span></code>.</p>
-</div>
-<div class="section" id="controls-json">
+</section>
+<section id="controls-json">
 <h3>controls.json<a class="headerlink" href="#controls-json" title="Permalink to this headline">¶</a></h3>
 <p>The mapping between a check (check class path) and accreditations
 (a list of accreditations) happens in the <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> configuration
@@ -102,8 +103,8 @@ As an example, the format for <code class="docutils literal notranslate"><span c
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="remote-evidence-locker">
+</section>
+<section id="remote-evidence-locker">
 <h3>Remote Evidence Locker<a class="headerlink" href="#remote-evidence-locker" title="Permalink to this headline">¶</a></h3>
 <p>Storing and using evidence in a Git remote hosting service repository is achievable
 by using the <code class="docutils literal notranslate"><span class="pre">--evidence</span></code> option with settings of either <code class="docutils literal notranslate"><span class="pre">no-push</span></code> or
@@ -151,8 +152,8 @@ remote locker:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --check demo.arboretum.accred,demo.custom.accred --evidence full-remote -C auditree_demo.json
 </pre></div>
 </div>
-</div>
-<div class="section" id="notifications">
+</section>
+<section id="notifications">
 <h3>Notifications<a class="headerlink" href="#notifications" title="Permalink to this headline">¶</a></h3>
 <p>You can also configure the check run to send notifications to Slack,
 GitHub (as issues), PagerDuty, the evidence locker, Findings, and the terminal
@@ -180,9 +181,9 @@ need this, we recommend to use a Slack app token instead:</p>
 </div>
 <p>Each notifier requires its own configuration and credentials and you can specify
 as many notifiers as you want on any given check execution.</p>
-</div>
-</div>
-<div class="section" id="recommendations">
+</section>
+</section>
+<section id="recommendations">
 <h2>Recommendations<a class="headerlink" href="#recommendations" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Use the example project showcased above as a template for your configuration/execution</p></li>
@@ -211,8 +212,8 @@ tool.</p></li>
 </ul>
 </li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -253,7 +254,7 @@ tool.</p></li>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -278,13 +279,13 @@ tool.</p></li>
         <li class="right" >
           <a href="index.html" title="Auditree framework documentation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.21.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.21.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Quick Start</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
     </div>
   </body>
 </html>
