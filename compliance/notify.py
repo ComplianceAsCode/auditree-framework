@@ -1018,30 +1018,45 @@ class PagerDutyNotifier(_BaseNotifier):
         conf = self._config[accreditation]
         pd_service = conf['service_id'] if isinstance(conf, dict) else conf
 
-        # Get all triggered alerts
-        # NOTE: statuses[]=triggered is supposed to work, but doesn't
-        # so we have to filter the response. leaving it in the query,
-        # as it will be a bit more efficient if they fix the issue.
-        pages = pagerduty.get(
-            'alerts',
+        # Get all current incidents for the service, we need to specify both
+        # acknowledged and triggered so we do not send a second page if there
+        # has already been one acknowledged
+        incidents_data = pagerduty.get(
+            'incidents',
             params={
                 'service_ids[]': pd_service,
-                'statuses[]': 'triggered',
+                'statuses[]': ['acknowledged', 'triggered'],
                 'time_zone': 'UTC'
             },
             creds=self._creds
         )
-        alerts = [
-            {
-                'test': alert['alert_key'],
-                'details': alert.get('body', {}).get('details', ''),
-                'created_at': alert['created_at']
-            }
-            for page in pages
-            for alert in page.json().get('alerts', [])
-            if alert['status'] == 'triggered'
-        ]
+        alerts = []
 
+        # If there are any incidents then loop through them and fetch all the
+        # alerts that are related to the service
+        for inc_data in incidents_data:
+            inc_data.raise_for_status()
+            incidents = inc_data.json()['incidents']
+            for inc in incidents:
+                alerts_data = pagerduty.get(
+                    f'incidents/{inc["id"]}/alerts',
+                    params={
+                        'service_ids[]': pd_service,
+                        'statuses[]': ['acknowledged', 'triggered'],
+                        'time_zone': 'UTC'
+                    },
+                    creds=self._creds
+                )
+                # Fetch all alerts for the incidents
+                for alert_data in alerts_data:
+                    alert_data.raise_for_status()
+                    alerts += [
+                        {
+                            'test': a['alert_key'],
+                            'details': a.get('body', {}).get('details', ''),
+                            'created_at': a['created_at']
+                        } for a in alert_data.json()['alerts']
+                    ]
         # if more than one alert is listed for a check, only return the latest
         latest_alerts = []
         alerts.sort(key=lambda alert: alert['created_at'], reverse=True)

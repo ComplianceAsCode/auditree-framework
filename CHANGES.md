@@ -1,3 +1,7 @@
+# [1.21.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.21.1)
+
+- [FIXED] Addressed PagerDuty notifier hanging and not firing pages.
+
 # [1.21.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.21.0)
 
 - [ADDED] Repository pull request metadata retrieval added to Github service utility.
