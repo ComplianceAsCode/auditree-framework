@@ -118,7 +118,10 @@ class Locker(object):
             self.name = repo_url.rsplit('/', 1)[1]
         elif repo_url is None and name is None:
             self.name = 'example'
-        self.local_path = str(PurePath(tempfile.gettempdir(), self.name))
+        self.local_path = get_config().get(
+            'locker.local_path',
+            str(PurePath(tempfile.gettempdir(), self.name))
+        )
         self._do_push = do_push
         self.ttl_tolerance = ttl_tolerance
         self.gitconfig = gitconfig or {}
