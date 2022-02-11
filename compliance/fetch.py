@@ -1,5 +1,5 @@
 # -*- mode:python; coding:utf-8 -*-
-# Copyright (c) 2020 IBM Corp. All rights reserved.
+# Copyright (c) 2021, 2022 IBM Corp. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,15 +14,20 @@
 # limitations under the License.
 """Compliance fetcher automation module."""
 
+import os
 import shutil
 import tempfile
 import unittest
 from pathlib import Path
+from subprocess import check_output  # nosec
 
 from compliance.config import get_config
 from compliance.utils.http import BaseSession
 
 import requests
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
+FETCH_TERMINAL_SCRIPT = f'{ROOT}/utils/fetch_local_commands'
 
 
 class ComplianceFetcher(unittest.TestCase):
@@ -108,6 +113,48 @@ class ComplianceFetcher(unittest.TestCase):
             params=params,
             creds=(creds['cloudant'].user, creds['cloudant'].password)
         )
+
+    def fetchLocalCommands(  # noqa: N802
+        self,
+        commands,
+        cwd=None,
+        env=None,
+        show_exit_status=False,
+        show_timestamp=False,
+        timeout=20,
+        user=None
+    ):
+        """
+        Retrieve the output from locally executed commands.
+
+        Helper/Convenience method.
+
+        :param commands: A `list` of string commands to be executed.
+        :param cwd: Override the current working directory. Defaults to `None`.
+        :param env: Override environment variables. Defaults to `None`.
+        :param show_exit_status: Show the exit status for each command.
+          Defaults to `False`.
+        :param show_timestamp: Show a timestamp denoting when each command was
+          executed. Defaults to `False`.
+        :param timeout: Terminate after timeout seconds. Defaults to 20.
+        :param user: Execute commands as specified user. Defaults to current
+          user.
+
+        :returns: Command output as a string.
+        """
+        cmd = [FETCH_TERMINAL_SCRIPT]
+        if user:
+            cmd = ['sudo', '-u', user] + cmd
+        if show_exit_status:
+            cmd += ['-s']
+        if show_timestamp:
+            cmd += ['-t']
+        if not cwd:
+            cwd = os.path.expanduser('~')
+        stdin = str.encode('\n'.join(commands) + '\n')
+        return check_output(
+            cmd, cwd=cwd, env=env, input=stdin, timeout=timeout
+        ).decode().rstrip()
 
 
 def fetch(url, name):
