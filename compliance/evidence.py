@@ -1,5 +1,5 @@
 # -*- mode:python; coding:utf-8 -*-
-# Copyright (c) 2020 IBM Corp. All rights reserved.
+# Copyright (c) 2021, 2022 IBM Corp. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ from collections import namedtuple
 from functools import wraps
 from pathlib import PurePath
 
+from compliance.agent import ComplianceAgent
 from compliance.check import ComplianceCheck
 from compliance.config import get_config
 from compliance.utils.data_parse import format_json, parse_dot_key
@@ -27,7 +28,8 @@ from compliance.utils.exceptions import (
     DependencyFetcherNotFoundError,
     DependencyUnavailableError,
     EvidenceNotFoundError,
-    StaleEvidenceError
+    StaleEvidenceError,
+    UnverifiedEvidenceError
 )
 from compliance.utils.path import FETCH_PREFIX, substitute_config
 
@@ -55,14 +57,24 @@ class _BaseEvidence(object):
       considered as stale/invalid.
     :param description: a string containing a longer description about
       the evidence.
+    :param agent: an agent of type :class:`compliance.agent.ComplianceAgent`.
+      Defaults to `None`.
     """
+
+    EVIDENCE_TYPE = 'base'
 
     def __init__(self, name, category, ttl=DAY, description='', **kwargs):
         self._name = name
         self.category = category
         self.ttl = ttl
         self.description = description
+        self._agent = kwargs.get('agent') or ComplianceAgent()
+        self._config = get_config()
         self._content = None
+        self._content_raw = None
+        self._digest = None
+        self._raw_content = None
+        self._signature = None
 
     @classmethod
     def from_evidence(cls, evidence):
@@ -80,10 +92,14 @@ class _BaseEvidence(object):
             evidence.category,
             evidence.ttl,
             evidence.description,
+            agent=evidence.agent,
             **kwargs
         )
-        if evidence.content:
-            new_evidence.set_content(evidence.content)
+        new_evidence.set_digest(evidence.digest)
+        new_evidence.set_signature(evidence.signature)
+        new_evidence.set_content(
+            evidence.content, sign=evidence.signature is None
+        )
         return new_evidence
 
     @classmethod
@@ -97,7 +113,7 @@ class _BaseEvidence(object):
 
     @property
     def rootdir(self):
-        raise NotImplementedError('The root directory is not set.')
+        return self.agent.get_path(self.EVIDENCE_TYPE)
 
     @property
     def dir_path(self):
@@ -116,8 +132,33 @@ class _BaseEvidence(object):
         return PurePath(self.name).suffix.lstrip('.')
 
     @property
+    def agent(self):
+        return self._agent
+
+    @property
     def content(self):
         return self._content
+
+    @property
+    def clear_sign(self):
+        retval = []
+        if self._agent and self._agent.name:
+            retval.append('-----BEGIN AGENT-----')
+            retval.append(self._agent.name)
+            retval.append('-----END AGENT-----')
+        if self._content:
+            retval.append('-----BEGIN CONTENT-----')
+            retval.append(self._content)
+            retval.append('-----END CONTENT-----')
+        if self._digest:
+            retval.append('-----BEGIN DIGEST-----')
+            retval.append(self._digest)
+            retval.append('-----END DIGEST-----')
+        if self._signature:
+            retval.append('-----BEGIN SIGNATURE-----')
+            retval.append(self._signature)
+            retval.append('-----END SIGNATURE-----')
+        return '\n'.join(retval)
 
     @property
     def content_as_json(self):
@@ -134,10 +175,82 @@ class _BaseEvidence(object):
             and not self.content_as_json
         )
 
-    def set_content(self, str_content):
-        self._content = str_content
+    @property
+    def digest(self):
+        return self._digest
+
+    @property
+    def signature(self):
+        return self._signature
+
+    def is_signed(self, locker):
+        """
+        Check if the evidence has been signed.
+
+        :param locker: The evidence locker.
+
+        :returns: `True` if the evidence is signed, else `False`.
+        """
+        metadata = locker.get_evidence_metadata(self.path)
+        self._digest = metadata.get('digest')
+        self._signature = metadata.get('signature')
+        return self._signature is not None
+
+    def set_content(self, content, sign=True):
+        """
+        Set the evidence content.
+
+        :param content: The content as a string or `None`.
+        :param sign: Sign the evidence content (if not already signed).
+        """
+        self._content = content
+        if self._content is None:
+            return  # Don't sign `None` evidence.
         if self.extension == 'json':
-            self._content = format_json(json.loads(str_content))
+            self._content = format_json(json.loads(content))
+        if sign:
+            self._digest, self._signature = self.agent.hash_and_sign(
+                self._content.encode()
+            )
+
+    def set_digest(self, digest):
+        """
+        Set the evidence digest.
+
+        :param digest: The evidence digest as a string or `None`.
+        """
+        self._digest = digest
+
+    def set_signature(self, signature):
+        """
+        Set the evidence signature.
+
+        :param signature: The evidence signature as a string or `None`.
+        """
+        self._signature = signature
+
+    def verify_signature(self, locker):
+        """
+        Verify the evidence content.
+
+        :param locker: The evidence locker.
+
+        :returns: `True` for verified evidence, else `False`.
+        """
+        if self._content is None:
+            return True  # Verify `None` evidence.
+        if self.path == self.agent.PUBLIC_KEYS_EVIDENCE_PATH:
+            # The public keys evidence should be signed with the private key
+            # specified in the configuration.
+            self._agent = ComplianceAgent.from_config()
+        else:
+            self.agent.load_public_key_from_locker(locker)
+        signature = locker.get_evidence_metadata(self.path).get('signature')
+        if not signature:
+            raise UnverifiedEvidenceError(
+                f'Evidence {self.path} is not signed.', self
+            )
+        return self.agent.verify(self.content.encode(), signature)
 
 
 class RawEvidence(_BaseEvidence):
@@ -151,10 +264,12 @@ class RawEvidence(_BaseEvidence):
     configuration settings, if both are provided.
     """
 
+    EVIDENCE_TYPE = 'raw'
+
     def __init__(self, *args, **kwargs):
         """Construct and initialize the raw evidence object."""
         super().__init__(*args, **kwargs)
-        lp_config = get_config().get('locker.partitions', {})
+        lp_config = self._config.get('locker.partitions', {})
         partition = kwargs.get(
             'partition', lp_config.get(f'{self.category}/{self.name}', {})
         )
@@ -162,11 +277,6 @@ class RawEvidence(_BaseEvidence):
         self.part_root = partition.get('root')
         self.binary_content = kwargs.get('binary_content', False)
         self.filtered_content = kwargs.get('filtered_content', False)
-
-    @property
-    def rootdir(self):
-        """Root directory for raw evidence."""
-        return 'raw'
 
     @property
     def is_partitioned(self):
@@ -237,41 +347,29 @@ class RawEvidence(_BaseEvidence):
 class DerivedEvidence(_BaseEvidence):
     """The derived evidence class."""
 
-    @property
-    def rootdir(self):
-        """Root directory for derived evidence."""
-        return 'derived'
+    EVIDENCE_TYPE = 'derived'
 
 
 class ReportEvidence(_BaseEvidence):
     """The report evidence class."""
 
-    @property
-    def rootdir(self):
-        """Root directory for report evidence."""
-        return 'reports'
+    EVIDENCE_TYPE = 'reports'
 
 
 class TmpEvidence(_BaseEvidence):
     """The temporary evidence class."""
 
-    @property
-    def rootdir(self):
-        """Root directory for temporary evidence."""
-        return 'tmp'
+    EVIDENCE_TYPE = 'tmp'
 
 
 class ExternalEvidence(_BaseEvidence):
     """The external evidence class."""
 
+    EVIDENCE_TYPE = 'external'
+
     def __init__(self, name, category, ttl=YEAR, description='', **kwargs):
         """Construct and initialize the external evidence object."""
         super().__init__(name, category, ttl, description, **kwargs)
-
-    @property
-    def rootdir(self):
-        """Root directory for external evidence."""
-        return 'external'
 
 
 class _EvidenceContextManager(object):
@@ -544,18 +642,21 @@ class evidences(object):  # noqa: N801
         if evidence.__class__ not in get_evidence_base_classes():
             # Evidence returned from cache already cast
             ev_class = evidence.__class__
-        base_evidence_class = get_evidence_class(evidence.rootdir)
+        base_evidence_class = get_evidence_class(evidence.EVIDENCE_TYPE)
         if not ev_class or not issubclass(ev_class, base_evidence_class):
             ev_class = base_evidence_class
         return ev_class.from_evidence(evidence)
 
 
 __init_map = {
-    'tmp': TmpEvidence,
-    'reports': ReportEvidence,
-    'derived': DerivedEvidence,
-    'raw': RawEvidence,
-    'external': ExternalEvidence
+    evidence.EVIDENCE_TYPE: evidence
+    for evidence in [
+        DerivedEvidence,
+        ExternalEvidence,
+        RawEvidence,
+        ReportEvidence,
+        TmpEvidence
+    ]
 }
 
 
@@ -608,6 +709,20 @@ def get_evidence_by_path(path, locker=None):
             evidence = locker.load_content(evidence)
         return evidence
 
+    try:
+        split = path.strip('/').split('/')
+        evidence_type, category, name = split[-3:]
+    except ValueError:
+        raise ValueError(f'Invalid evidence path format "{path}"')
+
+    if evidence_type not in __init_map:
+        raise ValueError(f'Unable to create evidence of type {evidence_type}')
+
+    if split[0] == ComplianceAgent.AGENTS_DIR:
+        agent = ComplianceAgent(name=split[1])
+    else:
+        agent = ComplianceAgent.from_config()
+        path = agent.get_path(path)
     if locker:
         try:
             evidence = locker.get_evidence(path)
@@ -615,15 +730,7 @@ def get_evidence_by_path(path, locker=None):
             return evidence
         except ValueError:
             pass
-
-    try:
-        rootdir, category, name = path.strip('/').split('/')
-    except ValueError:
-        raise ValueError(f'Invalid evidence path format "{path}"')
-
-    if rootdir not in __init_map:
-        raise ValueError(f'Unable to create evidence from root dir {rootdir}')
-    return __init_map[rootdir](name, category)
+    return __init_map[evidence_type](name, category, agent=agent)
 
 
 def get_evidence_dependency(path, locker, fetcher=None):
@@ -867,8 +974,9 @@ def _with_evidence_decorator(from_evidences, f, type_str):
             path = from_ev.path
             if issubclass(from_ev.ev_class, ev_class):
                 ev_class = from_ev.ev_class
-        # Ensure path is the full relative path including the type root.
-        if PurePath(path).parts[0] != type_str:
+        # Ensure path is the full relative path.
+        roots = [type_str, ComplianceAgent.AGENTS_DIR]
+        if PurePath(path).parts[0] not in roots:
             path = str(PurePath(type_str, path))
         from_evs.append(LazyLoader(path, ev_class))
 

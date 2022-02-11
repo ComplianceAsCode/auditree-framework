@@ -25,6 +25,7 @@ from pathlib import Path, PurePath
 from threading import Lock
 from urllib.parse import urlparse
 
+from compliance.agent import ComplianceAgent
 from compliance.config import get_config
 from compliance.evidence import CONTENT_FLAGS, TmpEvidence, get_evidence_class
 from compliance.utils.data_parse import (
@@ -34,7 +35,8 @@ from compliance.utils.exceptions import (
     EvidenceNotFoundError,
     HistoricalEvidenceNotFoundError,
     LockerPushError,
-    StaleEvidenceError
+    StaleEvidenceError,
+    UnverifiedEvidenceError
 )
 
 import git
@@ -257,6 +259,14 @@ class Locker(object):
                 'ttl': evidence.ttl,
                 'description': evidence.description
             }
+            if evidence.signature:
+                metadata[evidence.name].update(
+                    {
+                        'agent_name': evidence.agent.name,
+                        'digest': evidence.digest,
+                        'signature': evidence.signature,
+                    }
+                )
             if evidence.is_empty:
                 metadata[evidence.name]['empty'] = True
             tombstones = None
@@ -521,14 +531,21 @@ class Locker(object):
                     root.extend(parse_dot_key(data, evidence.part_root))
                 else:
                     root.extend(data)
-            evidence.set_content(format_json(content))
+            evidence.set_content(format_json(content), sign=False)
         else:
             evidence.set_content(
                 self._get_file_content(
                     evidence.path,
                     evidence_dt,
                     getattr(evidence, 'binary_content', False)
-                )
+                ),
+                sign=False
+            )
+        if evidence.is_signed(self) and not evidence.verify_signature(self):
+            raise UnverifiedEvidenceError(
+                f'Evidence {evidence.path} is signed but the signature could '
+                'not be verified.',
+                evidence
             )
         return evidence
 
@@ -835,10 +852,18 @@ class Locker(object):
             self.repo.git.checkout('-b', self.branch)
 
     def _get_evidence(self, evidence_path, ignore_ttl=False, evidence_dt=None):
+        agent = None
         evidence = None
         try:
             metadata = self.get_evidence_metadata(evidence_path, evidence_dt)
-            class_type, category, evidence_name = evidence_path.split('/')
+            if metadata and metadata.get('agent_name'):
+                agent = ComplianceAgent(
+                    name=metadata.get('agent_name'),
+                    use_agent_dir=evidence_path.startswith(
+                        ComplianceAgent.AGENTS_DIR
+                    )
+                )
+            class_type, category, evidence_name = evidence_path.split('/')[-3:]
             evidence_class_obj = get_evidence_class(class_type)
             evidence = evidence_class_obj(
                 evidence_name,
@@ -850,7 +875,8 @@ class Locker(object):
                     'root': metadata.get('partition_root')
                 },
                 binary_content=metadata.get('binary_content', False),
-                filtered_content=metadata.get('filtered_content', False)
+                filtered_content=metadata.get('filtered_content', False),
+                agent=agent
             )
         except TypeError:
             ev_dt_str = (evidence_dt or dt.utcnow()).strftime('%Y-%m-%d')
