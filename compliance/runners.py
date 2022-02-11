@@ -1,5 +1,5 @@
 # -*- mode:python; coding:utf-8 -*-
-# Copyright (c) 2020 IBM Corp. All rights reserved.
+# Copyright (c) 2021, 2022 IBM Corp. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -115,7 +115,10 @@ class _BaseRunner(object):
         gitconfig = self.config.get('locker.gitconfig')
         if mode == 'local':
             return Locker(
-                name=dirname, ttl_tolerance=ttl_tolerance, gitconfig=gitconfig
+                name=dirname,
+                ttl_tolerance=ttl_tolerance,
+                gitconfig=gitconfig,
+                branch=self.config.get('locker.branch')
             )
         repo_url = self.config.get('locker.repo_url')
         if repo_url is None:
@@ -126,7 +129,8 @@ class _BaseRunner(object):
             creds=self.config.creds,
             do_push=True if mode == 'full-remote' else False,
             ttl_tolerance=ttl_tolerance,
-            gitconfig=gitconfig
+            gitconfig=gitconfig,
+            branch=self.config.get('locker.branch')
         )
 
 

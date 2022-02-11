@@ -1,5 +1,5 @@
 # -*- mode:python; coding:utf-8 -*-
-# Copyright (c) 2020 IBM Corp. All rights reserved.
+# Copyright (c) 2021, 2022 IBM Corp. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ NOT_EVIDENCE = AE_EXEMPT
 KB = 1000
 MB = KB * 1000
 LF_DEFAULT = 50 * MB
+DEFAULT_BRANCH_NAME = 'master'
 
 
 class Locker(object):
@@ -66,7 +67,7 @@ class Locker(object):
         self,
         name=None,
         repo_url=None,
-        branch='master',
+        branch=None,
         creds=None,
         do_push=False,
         ttl_tolerance=0,
@@ -107,7 +108,10 @@ class Locker(object):
                 self.repo_url_with_creds = re.sub(
                     '://', f'://{token}@', self.repo_url_with_creds
                 )
-        self.branch = branch
+        self.branch = DEFAULT_BRANCH_NAME
+        if branch:
+            self.branch = branch
+        self._new_branch = False
         if name is not None:
             self.name = name
         elif repo_url is not None and name is None:
@@ -564,7 +568,7 @@ class Locker(object):
             self.logger.info(
                 f'Cloning {locker} {self.repo_url} to {self.local_path}...'
             )
-            kwargs = {'branch': self.branch}
+            kwargs = {'branch': DEFAULT_BRANCH_NAME}
             shallow_days = get_config().get('locker.shallow_days', -1)
             addl_msg = None
             if shallow_days >= 0:
@@ -580,6 +584,7 @@ class Locker(object):
             self.logger.info(f'{locker.title()} cloned in {duration:.3f}s')
             if addl_msg:
                 self.logger.info(addl_msg)
+        self._checkout_branch()
 
     def init_config(self):
         """Apply the git configuration."""
@@ -619,12 +624,13 @@ class Locker(object):
                 f'Syncing local locker with remote repo {self.repo_url}...'
             )
             remote.fetch()
-            remote.pull(rebase=True)
+            if not self._new_branch:
+                remote.pull(rebase=True)
             self._log_large_files()
             self.logger.info(
                 f'Pushing local locker to remote repo {self.repo_url}...'
             )
-            push_info = remote.push()[0]
+            push_info = remote.push(self.branch, set_upstream=True)[0]
             if push_info.flags >= git.remote.PushInfo.ERROR:
                 raise LockerPushError(push_info)
 
@@ -813,7 +819,17 @@ class Locker(object):
         else:
             self.logger.info(f'Creating locker in {self.local_path}...')
             self.repo = git.Repo.init(self.local_path)
+        self._checkout_branch()
         self.init_config()
+
+    def _checkout_branch(self):
+        if self.repo.active_branch.name == self.branch:
+            return
+        try:
+            self.repo.git.checkout(self.branch)
+        except git.exc.GitCommandError:
+            self._new_branch = True
+            self.repo.git.checkout('-b', self.branch)
 
     def _get_evidence(self, evidence_path, ignore_ttl=False, evidence_dt=None):
         evidence = None
