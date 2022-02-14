@@ -69,7 +69,8 @@ Agents
 
 All fetchers can be executed in "agent" mode. Agents will cryptographically sign
 any evidence they fetch. The agent name, evidence digest and signature can be
-found in the ``index.json`` metadata file.
+found in the ``index.json`` metadata file. See :ref:`verifying-signed-evidence`
+for instructions on how to manually verify signatures.
 
 To configure an agent, add the following to your main configuration::
 
