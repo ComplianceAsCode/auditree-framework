@@ -21,6 +21,7 @@ import sys
 import time
 import unittest
 from collections import defaultdict
+from importlib import import_module
 from pathlib import Path
 
 from compliance.check import ComplianceCheck
@@ -182,6 +183,16 @@ class FetchMode(_BaseRunner):
         include = {f'{f.__module__}.{f.__name__}' for f in fetchers}
         if self.opts.include:
             include = set(json.loads(Path(self.opts.include).read_text()))
+            for test in include:
+                if test in fetchers:
+                    continue
+                test_name, test_class = test.rsplit('.', 1)
+                try:
+                    # Attempt to import missing fetchers.
+                    fetchers.add(getattr(import_module(test_name), test_class))
+                    import_module('.'.join([test.split('.')[0], 'evidences']))
+                except (AttributeError, ModuleNotFoundError):
+                    continue
         exclude = set()
         if self.opts.exclude:
             exclude = set(json.loads(Path(self.opts.exclude).read_text()))
