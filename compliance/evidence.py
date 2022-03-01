@@ -196,6 +196,14 @@ class _BaseEvidence(object):
         self._signature = metadata.get('signature')
         return self._signature is not None
 
+    def set_agent(self, agent):
+        """
+        Set the evidence agent.
+
+        :param agent: Agent of type :class:`compliance.agent.ComplianceAgent`.
+        """
+        self._agent = agent
+
     def set_content(self, content, sign=True):
         """
         Set the evidence content.
@@ -704,10 +712,6 @@ def get_evidence_by_path(path, locker=None):
     """
     path = substitute_config(path)
     evidence = get_config().get_evidence(path)
-    if evidence:
-        if locker and evidence.content is None:
-            evidence = locker.load_content(evidence)
-        return evidence
 
     try:
         split = path.strip('/').split('/')
@@ -715,14 +719,19 @@ def get_evidence_by_path(path, locker=None):
     except ValueError:
         raise ValueError(f'Invalid evidence path format "{path}"')
 
-    if evidence_type not in __init_map:
-        raise ValueError(f'Unable to create evidence of type {evidence_type}')
-
     if split[0] == ComplianceAgent.AGENTS_DIR:
         agent = ComplianceAgent(name=split[1])
     else:
         agent = ComplianceAgent.from_config()
         path = agent.get_path(path)
+    if evidence:
+        evidence.set_agent(agent)
+        if locker and evidence.content is None:
+            evidence = locker.load_content(evidence)
+        return evidence
+
+    if evidence_type not in __init_map:
+        raise ValueError(f'Unable to create evidence of type {evidence_type}')
     if locker:
         try:
             evidence = locker.get_evidence(path)
