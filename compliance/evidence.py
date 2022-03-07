@@ -59,6 +59,8 @@ class _BaseEvidence(object):
       the evidence.
     :param agent: an agent of type :class:`compliance.agent.ComplianceAgent`.
       Defaults to `None`.
+    :param evidence_dt: datetime of the evidence file version to retrieve.
+      Defaults to `None` (which translates to "now").
     """
 
     EVIDENCE_TYPE = 'base'
@@ -69,10 +71,13 @@ class _BaseEvidence(object):
         self.ttl = ttl
         self.description = description
         self._agent = kwargs.get('agent') or ComplianceAgent()
+        if self._agent.name and self.description:
+            self.description = f'{self._agent.name}: {self.description}'
         self._config = get_config()
         self._content = None
         self._content_raw = None
         self._digest = None
+        self._evidence_dt = kwargs.get('evidence_dt')
         self._raw_content = None
         self._signature = None
 
@@ -253,7 +258,9 @@ class _BaseEvidence(object):
             self._agent = ComplianceAgent.from_config()
         else:
             self.agent.load_public_key_from_locker(locker)
-        signature = locker.get_evidence_metadata(self.path).get('signature')
+        signature = locker.get_evidence_metadata(
+            self.path, evidence_dt=self._evidence_dt
+        ).get('signature')
         if not signature:
             raise UnverifiedEvidenceError(
                 f'Evidence {self.path} is not signed.', self
