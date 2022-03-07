@@ -541,12 +541,14 @@ class Locker(object):
                 ),
                 sign=False
             )
-        if evidence.is_signed(self) and not evidence.verify_signature(self):
-            raise UnverifiedEvidenceError(
-                f'Evidence {evidence.path} is signed but the signature could '
-                'not be verified.',
-                evidence
-            )
+        ign_sig = get_config().get('locker.ignore_signatures', default=False)
+        if not ign_sig and evidence.is_signed(self):
+            if not evidence.verify_signature(self):
+                raise UnverifiedEvidenceError(
+                    f'Evidence {evidence.path} is signed but the signature '
+                    'could not be verified.',
+                    evidence
+                )
         return evidence
 
     def validate(self, evidence, ignore_ttl=False):
@@ -876,7 +878,8 @@ class Locker(object):
                 },
                 binary_content=metadata.get('binary_content', False),
                 filtered_content=metadata.get('filtered_content', False),
-                agent=agent
+                agent=agent,
+                evidence_dt=evidence_dt
             )
         except TypeError:
             ev_dt_str = (evidence_dt or dt.utcnow()).strftime('%Y-%m-%d')
