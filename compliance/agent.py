@@ -90,11 +90,11 @@ class ComplianceAgent:
 
     def signable(self):
         """Determine if the agent can sign evidence."""
-        return self.name and self.private_key
+        return all([self.name, self.private_key])
 
     def verifiable(self):
         """Determine if the agent can verify evidence."""
-        return self.name and self.public_key
+        return all([self.name, self.public_key])
 
     def load_public_key_from_locker(self, locker):
         """
