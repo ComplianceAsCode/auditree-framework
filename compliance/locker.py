@@ -656,7 +656,11 @@ class Locker(object):
             self.logger.info(
                 f'Pushing local locker to remote repo {self.repo_url}...'
             )
-            push_info = remote.push(self.branch, set_upstream=True)[0]
+            push_info = remote.push(
+                self.branch,
+                force=get_config().get('locker.force_push', default=False),
+                set_upstream=True
+            )[0]
             if push_info.flags >= git.remote.PushInfo.ERROR:
                 raise LockerPushError(push_info)
 
