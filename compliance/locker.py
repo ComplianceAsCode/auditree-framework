@@ -50,7 +50,6 @@ NOT_EVIDENCE = AE_EXEMPT
 KB = 1000
 MB = KB * 1000
 LF_DEFAULT = 50 * MB
-DEFAULT_BRANCH_NAME = 'master'
 
 
 class Locker(object):
@@ -110,7 +109,9 @@ class Locker(object):
                 self.repo_url_with_creds = re.sub(
                     '://', f'://{token}@', self.repo_url_with_creds
                 )
-        self.branch = DEFAULT_BRANCH_NAME
+        self.default_branch = self.branch = get_config().get(
+            'locker.default_branch', default='master'
+        )
         if branch:
             self.branch = branch
         self._new_branch = False
@@ -590,7 +591,7 @@ class Locker(object):
             self.logger.info(
                 f'Cloning {locker} {self.repo_url} to {self.local_path}...'
             )
-            kwargs = {'branch': DEFAULT_BRANCH_NAME}
+            kwargs = {'branch': self.default_branch}
             shallow_days = get_config().get('locker.shallow_days', -1)
             addl_msg = None
             if shallow_days >= 0:
@@ -600,7 +601,10 @@ class Locker(object):
                 addl_msg = f'{locker.title()} contains commits since {since}'
             start = time.perf_counter()
             self.repo = git.Repo.clone_from(
-                self.repo_url_with_creds, self.local_path, **kwargs
+                self.repo_url_with_creds,
+                self.local_path,
+                single_branch=True,
+                **kwargs
             )
             duration = time.perf_counter() - start
             self.logger.info(f'{locker.title()} cloned in {duration:.3f}s')

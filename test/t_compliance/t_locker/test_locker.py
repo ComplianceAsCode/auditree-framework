@@ -80,6 +80,7 @@ class LockerTest(unittest.TestCase):
         git_mock.clone_from.assert_called_with(
             url,
             str(PurePath(tempfile.gettempdir(), 'locker-demo.git')),
+            single_branch=True,
             branch='master'
         )
 
