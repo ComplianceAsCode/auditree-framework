@@ -167,12 +167,16 @@ class ComplianceAgent:
             name=config.get('agent_name'),
             use_agent_dir=config.get('use_agent_dir', True)
         )
-        key_path = config.get('agent_private_key')
-        if key_path:
-            with open(key_path, 'rb') as key_file:
+        private_key_path = config.get('agent_private_key')
+        public_key_path = config.get('agent_public_key')
+        if private_key_path:
+            with open(private_key_path, 'rb') as key_file:
                 agent.private_key = key_file.read()
             agent.public_key = agent.private_key.public_key().public_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
             )
+        elif public_key_path:
+            with open(public_key_path, 'rb') as key_file:
+                agent.public_key = key_file.read()
         return agent
