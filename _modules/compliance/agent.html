@@ -1,0 +1,264 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>compliance.agent &#8212; Auditree Framework 1.22.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.22.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.agent</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for compliance.agent</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- mode:python; coding:utf-8 -*-</span>
+<span class="c1"># Copyright (c) 2022 IBM Corp. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;Compliance check automation module.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">PurePath</span>
+
+<span class="kn">from</span> <span class="nn">compliance.config</span> <span class="kn">import</span> <span class="n">get_config</span>
+
+<span class="kn">from</span> <span class="nn">cryptography.exceptions</span> <span class="kn">import</span> <span class="n">InvalidSignature</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.backends</span> <span class="kn">import</span> <span class="n">default_backend</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives</span> <span class="kn">import</span> <span class="n">hashes</span><span class="p">,</span> <span class="n">serialization</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives.asymmetric</span> <span class="kn">import</span> <span class="n">padding</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives.asymmetric.utils</span> <span class="kn">import</span> <span class="n">Prehashed</span>
+
+
+<div class="viewcode-block" id="ComplianceAgent"><a class="viewcode-back" href="../../compliance.html#compliance.agent.ComplianceAgent">[docs]</a><span class="k">class</span> <span class="nc">ComplianceAgent</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compliance agent class.&quot;&quot;&quot;</span>
+
+    <span class="n">AGENTS_DIR</span> <span class="o">=</span> <span class="s1">&#39;agents&#39;</span>
+    <span class="n">PUBLIC_KEYS_EVIDENCE_PATH</span> <span class="o">=</span> <span class="s1">&#39;raw/auditree/agent_public_keys.json&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_agent_dir</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct and initialize the agent object.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_private_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_public_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_use_agent_dir</span> <span class="o">=</span> <span class="n">use_agent_dir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get agent name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">private_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get agent private key.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_private_key</span>
+
+    <span class="nd">@private_key</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">private_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_bytes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set agent private key.</span>
+
+<span class="sd">        :param data_bytes: The PEM encoded key data as `bytes`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_private_key</span> <span class="o">=</span> <span class="n">serialization</span><span class="o">.</span><span class="n">load_pem_private_key</span><span class="p">(</span>
+            <span class="n">data_bytes</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">default_backend</span><span class="p">()</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">public_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get agent public key.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_public_key</span>
+
+    <span class="nd">@public_key</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">public_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_bytes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set agent public key.</span>
+
+<span class="sd">        :param data_bytes: The PEM encoded key data as `bytes`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_public_key</span> <span class="o">=</span> <span class="n">serialization</span><span class="o">.</span><span class="n">load_pem_public_key</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ComplianceAgent.get_path"><a class="viewcode-back" href="../../compliance.html#compliance.agent.ComplianceAgent.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the full evidence path.</span>
+
+<span class="sd">        :param path: The relative evidence path as a string.</span>
+
+<span class="sd">        :returns: The full evidence path as a string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_agent_dir</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">PurePath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">AGENTS_DIR</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">PurePath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AGENTS_DIR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">path</span></div>
+
+<div class="viewcode-block" id="ComplianceAgent.signable"><a class="viewcode-back" href="../../compliance.html#compliance.agent.ComplianceAgent.signable">[docs]</a>    <span class="k">def</span> <span class="nf">signable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine if the agent can sign evidence.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">private_key</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ComplianceAgent.verifiable"><a class="viewcode-back" href="../../compliance.html#compliance.agent.ComplianceAgent.verifiable">[docs]</a>    <span class="k">def</span> <span class="nf">verifiable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine if the agent can verify evidence.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_key</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ComplianceAgent.load_public_key_from_locker"><a class="viewcode-back" href="../../compliance.html#compliance.agent.ComplianceAgent.load_public_key_from_locker">[docs]</a>    <span class="k">def</span> <span class="nf">load_public_key_from_locker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locker</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load agent public key from locker.</span>
+
+<span class="sd">        :param locker: A locker of type :class:`compliance.locker.Locker`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">public_keys</span> <span class="o">=</span> <span class="n">locker</span><span class="o">.</span><span class="n">get_evidence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PUBLIC_KEYS_EVIDENCE_PATH</span><span class="p">)</span>
+            <span class="n">public_key_str</span> <span class="o">=</span> <span class="n">public_keys</span><span class="o">.</span><span class="n">content_as_json</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">public_key</span> <span class="o">=</span> <span class="n">public_key_str</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_public_key</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Missing public key evidence.</span></div>
+
+<div class="viewcode-block" id="ComplianceAgent.hash_and_sign"><a class="viewcode-back" href="../../compliance.html#compliance.agent.ComplianceAgent.hash_and_sign">[docs]</a>    <span class="k">def</span> <span class="nf">hash_and_sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_bytes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Hash and sign evidence using the agent private key.</span>
+
+<span class="sd">        :param data_bytes: The data to sign as `bytes`.</span>
+
+<span class="sd">        :returns: A `tuple` containing the hexadecimal digest string and the</span>
+<span class="sd">          base64 encoded signature string. Returns tuple `(None, None)` if the</span>
+<span class="sd">          agent is not configured to sign evidence.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">signable</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">hashed</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span>
+        <span class="n">signature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">private_key</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span>
+            <span class="n">hashed</span><span class="o">.</span><span class="n">digest</span><span class="p">(),</span>
+            <span class="n">padding</span><span class="o">.</span><span class="n">PSS</span><span class="p">(</span>
+                <span class="n">mgf</span><span class="o">=</span><span class="n">padding</span><span class="o">.</span><span class="n">MGF1</span><span class="p">(</span><span class="n">hashes</span><span class="o">.</span><span class="n">SHA256</span><span class="p">()),</span>
+                <span class="n">salt_length</span><span class="o">=</span><span class="n">padding</span><span class="o">.</span><span class="n">PSS</span><span class="o">.</span><span class="n">MAX_LENGTH</span>
+            <span class="p">),</span>
+            <span class="n">Prehashed</span><span class="p">(</span><span class="n">hashes</span><span class="o">.</span><span class="n">SHA256</span><span class="p">())</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">hashed</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(),</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">signature</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ComplianceAgent.verify"><a class="viewcode-back" href="../../compliance.html#compliance.agent.ComplianceAgent.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_bytes</span><span class="p">,</span> <span class="n">signature_b64</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verify evidence using the agent public key.</span>
+
+<span class="sd">        :param data_bytes: The data to verify as `bytes`.</span>
+<span class="sd">        :param signature_b64: The base64 encoded signature string.</span>
+
+<span class="sd">        :returns: `True` if data can be verified, else `False`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">verifiable</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">public_key</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span>
+                <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">signature_b64</span><span class="p">),</span>
+                <span class="n">data_bytes</span><span class="p">,</span>
+                <span class="n">padding</span><span class="o">.</span><span class="n">PSS</span><span class="p">(</span>
+                    <span class="n">mgf</span><span class="o">=</span><span class="n">padding</span><span class="o">.</span><span class="n">MGF1</span><span class="p">(</span><span class="n">hashes</span><span class="o">.</span><span class="n">SHA256</span><span class="p">()),</span>
+                    <span class="n">salt_length</span><span class="o">=</span><span class="n">padding</span><span class="o">.</span><span class="n">PSS</span><span class="o">.</span><span class="n">MAX_LENGTH</span>
+                <span class="p">),</span>
+                <span class="n">hashes</span><span class="o">.</span><span class="n">SHA256</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="n">InvalidSignature</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ComplianceAgent.from_config"><a class="viewcode-back" href="../../compliance.html#compliance.agent.ComplianceAgent.from_config">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load agent from configuration.&quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
+        <span class="n">agent</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;agent_name&#39;</span><span class="p">),</span>
+            <span class="n">use_agent_dir</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_agent_dir&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">private_key_path</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;agent_private_key&#39;</span><span class="p">)</span>
+        <span class="n">public_key_path</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;agent_public_key&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">private_key_path</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">private_key_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">key_file</span><span class="p">:</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">private_key</span> <span class="o">=</span> <span class="n">key_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">agent</span><span class="o">.</span><span class="n">public_key</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">private_key</span><span class="o">.</span><span class="n">public_key</span><span class="p">()</span><span class="o">.</span><span class="n">public_bytes</span><span class="p">(</span>
+                <span class="n">encoding</span><span class="o">=</span><span class="n">serialization</span><span class="o">.</span><span class="n">Encoding</span><span class="o">.</span><span class="n">PEM</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="n">serialization</span><span class="o">.</span><span class="n">PublicFormat</span><span class="o">.</span><span class="n">SubjectPublicKeyInfo</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">public_key_path</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">public_key_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">key_file</span><span class="p">:</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">public_key</span> <span class="o">=</span> <span class="n">key_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">agent</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Auditree Framework 1.22.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">compliance.agent</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

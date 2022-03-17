@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; Auditree Framework 1.21.1 documentation</title>
+    <title>Index &#8212; Auditree Framework 1.22.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.21.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Index</a></li> 
       </ul>
     </div>  
@@ -98,6 +98,8 @@
 </li>
       <li><a href="compliance.html#compliance.runners.ComplianceCheckResult.addSuccess">addSuccess() (compliance.runners.ComplianceCheckResult method)</a>
 </li>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent.AGENTS_DIR">AGENTS_DIR (compliance.agent.ComplianceAgent attribute)</a>
+</li>
       <li><a href="compliance.utils.services.html#compliance.utils.services.github.Github.apply_labels">apply_labels() (compliance.utils.services.github.Github method)</a>
 </li>
       <li><a href="compliance.html#compliance.controls.ControlDescriptor.as_dict">as_dict (compliance.controls.ControlDescriptor property)</a>
@@ -133,6 +135,13 @@
 
       <ul>
         <li><a href="compliance.html#module-compliance">module</a>
+</li>
+      </ul></li>
+      <li>
+    compliance.agent
+
+      <ul>
+        <li><a href="compliance.html#module-compliance.agent">module</a>
 </li>
       </ul></li>
       <li>
@@ -226,6 +235,8 @@
         <li><a href="compliance.utils.html#module-compliance.utils">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     compliance.utils.credentials
 
@@ -233,8 +244,6 @@
         <li><a href="compliance.utils.html#module-compliance.utils.credentials">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     compliance.utils.data_parse
 
@@ -291,6 +300,8 @@
         <li><a href="compliance.utils.html#module-compliance.utils.test">module</a>
 </li>
       </ul></li>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent">ComplianceAgent (class in compliance.agent)</a>
+</li>
       <li><a href="compliance.html#compliance.runners.ComplianceBaseResult">ComplianceBaseResult (class in compliance.runners)</a>
 </li>
       <li><a href="compliance.html#compliance.check.ComplianceCheck">ComplianceCheck (class in compliance.check)</a>
@@ -355,8 +366,22 @@
 </li>
       <li><a href="compliance.html#compliance.check.ComplianceCheck.evidence_metadata">evidence_metadata (compliance.check.ComplianceCheck property)</a>
 </li>
+      <li><a href="compliance.html#compliance.evidence.DerivedEvidence.EVIDENCE_TYPE">EVIDENCE_TYPE (compliance.evidence.DerivedEvidence attribute)</a>
+
+      <ul>
+        <li><a href="compliance.html#compliance.evidence.ExternalEvidence.EVIDENCE_TYPE">(compliance.evidence.ExternalEvidence attribute)</a>
+</li>
+        <li><a href="compliance.html#compliance.evidence.RawEvidence.EVIDENCE_TYPE">(compliance.evidence.RawEvidence attribute)</a>
+</li>
+        <li><a href="compliance.html#compliance.evidence.ReportEvidence.EVIDENCE_TYPE">(compliance.evidence.ReportEvidence attribute)</a>
+</li>
+        <li><a href="compliance.html#compliance.evidence.TmpEvidence.EVIDENCE_TYPE">(compliance.evidence.TmpEvidence attribute)</a>
+</li>
+      </ul></li>
       <li><a href="compliance.utils.html#compliance.utils.exceptions.EvidenceNotFoundError">EvidenceNotFoundError</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.html#compliance.evidence.evidences">evidences (class in compliance.evidence)</a>
 
       <ul>
@@ -365,8 +390,6 @@
       </ul></li>
       <li><a href="compliance.html#compliance.check.ComplianceCheck.evidences_for_check">evidences_for_check() (compliance.check.ComplianceCheck method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.html#compliance.fix.Fixer.execute_fix">execute_fix() (compliance.fix.Fixer method)</a>
 </li>
       <li><a href="compliance.html#compliance.evidence.ExternalEvidence">ExternalEvidence (class in compliance.evidence)</a>
@@ -399,6 +422,8 @@
 </li>
       <li><a href="compliance.html#compliance.fetch.ComplianceFetcher.fetchCloudantDoc">fetchCloudantDoc() (compliance.fetch.ComplianceFetcher method)</a>
 </li>
+      <li><a href="compliance.html#compliance.fetch.ComplianceFetcher.fetchLocalCommands">fetchLocalCommands() (compliance.fetch.ComplianceFetcher method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.html#compliance.runners.FetchMode">FetchMode (class in compliance.runners)</a>
@@ -416,6 +441,8 @@
       <li><a href="compliance.html#compliance.fix.Fixer">Fixer (class in compliance.fix)</a>
 </li>
       <li><a href="compliance.utils.html#compliance.utils.data_parse.format_json">format_json() (in module compliance.utils.data_parse)</a>
+</li>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent.from_config">from_config() (compliance.agent.ComplianceAgent class method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -479,10 +506,10 @@
 </li>
       <li><a href="compliance.html#compliance.locker.Locker.get_evidence_metadata">get_evidence_metadata() (compliance.locker.Locker method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.html#compliance.evidence.get_evidence_types">get_evidence_types() (in module compliance.evidence)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.html#compliance.runners.FetchMode.get_fetchers">get_fetchers() (compliance.runners.FetchMode method)</a>
 </li>
       <li><a href="compliance.html#compliance.locker.Locker.get_file">get_file() (compliance.locker.Locker method)</a>
@@ -513,6 +540,8 @@
 </li>
       <li><a href="compliance.html#compliance.evidence.RawEvidence.get_partition">get_partition() (compliance.evidence.RawEvidence method)</a>
 </li>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent.get_path">get_path() (compliance.agent.ComplianceAgent method)</a>
+</li>
       <li><a href="compliance.utils.services.html#compliance.utils.services.github.Github.get_project">get_project() (compliance.utils.services.github.Github method)</a>
 </li>
       <li><a href="compliance.utils.services.html#compliance.utils.services.github.Github.get_pull_requests">get_pull_requests() (compliance.utils.services.github.Github method)</a>
@@ -540,6 +569,10 @@
 
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent.hash_and_sign">hash_and_sign() (compliance.agent.ComplianceAgent method)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.utils.html#compliance.utils.exceptions.HistoricalEvidenceNotFoundError">HistoricalEvidenceNotFoundError</a>
 </li>
@@ -589,6 +622,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent.load_public_key_from_locker">load_public_key_from_locker() (compliance.agent.ComplianceAgent method)</a>
+</li>
       <li><a href="compliance.html#compliance.locker.Locker.lock">lock (compliance.locker.Locker attribute)</a>
 </li>
       <li><a href="compliance.html#compliance.locker.Locker">Locker (class in compliance.locker)</a>
@@ -614,6 +649,8 @@
 
       <ul>
         <li><a href="compliance.html#module-compliance">compliance</a>
+</li>
+        <li><a href="compliance.html#module-compliance.agent">compliance.agent</a>
 </li>
         <li><a href="compliance.html#module-compliance.check">compliance.check</a>
 </li>
@@ -670,8 +707,12 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compliance.scripts.html#compliance.scripts.compliance_cli.ComplianceCLI.name">name (compliance.scripts.compliance_cli.ComplianceCLI attribute)</a>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent.name">name (compliance.agent.ComplianceAgent property)</a>
+
+      <ul>
+        <li><a href="compliance.scripts.html#compliance.scripts.compliance_cli.ComplianceCLI.name">(compliance.scripts.compliance_cli.ComplianceCLI attribute)</a>
 </li>
+      </ul></li>
       <li><a href="compliance.html#compliance.notify.FDNotifier.notify">notify() (compliance.notify.FDNotifier method)</a>
 
       <ul>
@@ -704,15 +745,21 @@
 </li>
       <li><a href="compliance.utils.services.html#compliance.utils.services.github.Github.patch_issue">patch_issue() (compliance.utils.services.github.Github method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.html#compliance.evidence.LazyLoader.path">path (compliance.evidence.LazyLoader property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.html#compliance.controls.ControlDescriptor.paths">paths (compliance.controls.ControlDescriptor property)</a>
 </li>
       <li><a href="compliance.utils.services.html#compliance.utils.services.pagerduty.post">post() (in module compliance.utils.services.pagerduty)</a>
 </li>
       <li><a href="compliance.utils.html#compliance.utils.http.BaseSession.prepare_request">prepare_request() (compliance.utils.http.BaseSession method)</a>
+</li>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent.private_key">private_key (compliance.agent.ComplianceAgent property)</a>
+</li>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent.public_key">public_key (compliance.agent.ComplianceAgent property)</a>
+</li>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent.PUBLIC_KEYS_EVIDENCE_PATH">PUBLIC_KEYS_EVIDENCE_PATH (compliance.agent.ComplianceAgent attribute)</a>
 </li>
       <li><a href="compliance.html#compliance.locker.Locker.push">push() (compliance.locker.Locker method)</a>
 </li>
@@ -742,26 +789,14 @@
 </li>
       <li><a href="compliance.html#compliance.report.ReportBuilder">ReportBuilder (class in compliance.report)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.html#compliance.evidence.ReportEvidence">ReportEvidence (class in compliance.evidence)</a>
 </li>
       <li><a href="compliance.html#compliance.check.ComplianceCheck.reports">reports (compliance.check.ComplianceCheck property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.html#compliance.locker.Locker.reset_depenency_rerun">reset_depenency_rerun() (compliance.locker.Locker method)</a>
 </li>
-      <li><a href="compliance.html#compliance.evidence.DerivedEvidence.rootdir">rootdir (compliance.evidence.DerivedEvidence property)</a>
-
-      <ul>
-        <li><a href="compliance.html#compliance.evidence.ExternalEvidence.rootdir">(compliance.evidence.ExternalEvidence property)</a>
-</li>
-        <li><a href="compliance.html#compliance.evidence.RawEvidence.rootdir">(compliance.evidence.RawEvidence property)</a>
-</li>
-        <li><a href="compliance.html#compliance.evidence.ReportEvidence.rootdir">(compliance.evidence.ReportEvidence property)</a>
-</li>
-        <li><a href="compliance.html#compliance.evidence.TmpEvidence.rootdir">(compliance.evidence.TmpEvidence property)</a>
-</li>
-      </ul></li>
       <li><a href="compliance.html#compliance.check.ComplianceCheck.run">run() (compliance.check.ComplianceCheck method)</a>
 
       <ul>
@@ -787,6 +822,8 @@
       <li><a href="compliance.utils.services.html#compliance.utils.services.pagerduty.send_event">send_event() (in module compliance.utils.services.pagerduty)</a>
 </li>
       <li><a href="compliance.html#compliance.fetch.ComplianceFetcher.session">session() (compliance.fetch.ComplianceFetcher class method)</a>
+</li>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent.signable">signable() (compliance.agent.ComplianceAgent method)</a>
 </li>
       <li><a href="compliance.html#compliance.notify.SlackNotifier">SlackNotifier (class in compliance.notify)</a>
 </li>
@@ -840,6 +877,10 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compliance.utils.html#compliance.utils.exceptions.UnverifiedEvidenceError">UnverifiedEvidenceError</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.utils.services.html#compliance.utils.services.github.Github.update_annotations">update_annotations() (compliance.utils.services.github.Github method)</a>
 </li>
   </ul></td>
@@ -849,6 +890,12 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.html#compliance.locker.Locker.validate">validate() (compliance.locker.Locker method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent.verifiable">verifiable() (compliance.agent.ComplianceAgent method)</a>
+</li>
+      <li><a href="compliance.html#compliance.agent.ComplianceAgent.verify">verify() (compliance.agent.ComplianceAgent method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -910,13 +957,13 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.21.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Index</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+        &#169; Copyright 2022, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

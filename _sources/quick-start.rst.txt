@@ -64,6 +64,44 @@ As an example, the format for ``controls.json`` is as follows::
     "chk_pkg.chk_cat_bar.checks.chk_module_bar.BarCheckClass": ["accred.one", "accred.two"]
   }
 
+Agents
+~~~~~~
+
+All fetchers can be executed in "agent" mode. Agents will cryptographically sign
+any evidence they fetch. The agent name, evidence digest and signature can be
+found in the ``index.json`` metadata file. See :ref:`verifying-signed-evidence`
+for instructions on how to manually verify signatures.
+
+To configure an agent, add the following to your main configuration::
+
+  {
+    "agent_name": "my-agent-name",
+    "agent_private_key": "/path/to/key.pem",
+    ...
+  }
+
+Each agent must have a unique name. By default, any evidence created by an agent
+will be stored under the corresponding agent directory (e.g.
+``agents/my-agent-name/raw/system/uptime.txt``). You can set
+``"use_agent_dir": false`` to suppress this behavior.
+
+Signed evidence can be used in checks. It is automatically verified when it's
+loaded from the locker. The public key used to verify the evidence must be made
+available in the locker under ``raw/auditree/agent_public_keys.json``. This is a
+special evidence and must take the following form::
+
+  {
+    "my-agent-name": "-----BEGIN PUBLIC KEY-----\n...",
+    "my-other-agent-name": "-----BEGIN PUBLIC KEY-----\n...",
+    ...
+  }
+
+We recommend you implement an additional fetcher to pull this public keys
+evidence into the locker and ensure it's kept up-to-date. You can sign this
+evidence too using an agent configured with ``"use_agent_dir": false``. However,
+it means only that agent can then be used to execute checks against any signed
+evidence.
+
 Remote Evidence Locker
 ~~~~~~~~~~~~~~~~~~~~~~
 

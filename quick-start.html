@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Quick Start &#8212; Auditree Framework 1.21.1 documentation</title>
+    <title>Quick Start &#8212; Auditree Framework 1.22.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="index.html" title="Auditree framework documentation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.21.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Quick Start</a></li> 
       </ul>
     </div>  
@@ -103,6 +103,41 @@ As an example, the format for <code class="docutils literal notranslate"><span c
 <span class="p">}</span>
 </pre></div>
 </div>
+</section>
+<section id="agents">
+<h3>Agents<a class="headerlink" href="#agents" title="Permalink to this headline">¶</a></h3>
+<p>All fetchers can be executed in “agent” mode. Agents will cryptographically sign
+any evidence they fetch. The agent name, evidence digest and signature can be
+found in the <code class="docutils literal notranslate"><span class="pre">index.json</span></code> metadata file. See <a class="reference internal" href="verifying-signed-evidence.html#verifying-signed-evidence"><span class="std std-ref">Verifying Signed Evidence</span></a>
+for instructions on how to manually verify signatures.</p>
+<p>To configure an agent, add the following to your main configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;agent_name&quot;</span><span class="p">:</span> <span class="s2">&quot;my-agent-name&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;agent_private_key&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/key.pem&quot;</span><span class="p">,</span>
+  <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Each agent must have a unique name. By default, any evidence created by an agent
+will be stored under the corresponding agent directory (e.g.
+<code class="docutils literal notranslate"><span class="pre">agents/my-agent-name/raw/system/uptime.txt</span></code>). You can set
+<code class="docutils literal notranslate"><span class="pre">&quot;use_agent_dir&quot;:</span> <span class="pre">false</span></code> to suppress this behavior.</p>
+<p>Signed evidence can be used in checks. It is automatically verified when it’s
+loaded from the locker. The public key used to verify the evidence must be made
+available in the locker under <code class="docutils literal notranslate"><span class="pre">raw/auditree/agent_public_keys.json</span></code>. This is a
+special evidence and must take the following form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;my-agent-name&quot;</span><span class="p">:</span> <span class="s2">&quot;-----BEGIN PUBLIC KEY-----</span><span class="se">\n</span><span class="s2">...&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;my-other-agent-name&quot;</span><span class="p">:</span> <span class="s2">&quot;-----BEGIN PUBLIC KEY-----</span><span class="se">\n</span><span class="s2">...&quot;</span><span class="p">,</span>
+  <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We recommend you implement an additional fetcher to pull this public keys
+evidence into the locker and ensure it’s kept up-to-date. You can sign this
+evidence too using an agent configured with <code class="docutils literal notranslate"><span class="pre">&quot;use_agent_dir&quot;:</span> <span class="pre">false</span></code>. However,
+it means only that agent can then be used to execute checks against any signed
+evidence.</p>
 </section>
 <section id="remote-evidence-locker">
 <h3>Remote Evidence Locker<a class="headerlink" href="#remote-evidence-locker" title="Permalink to this headline">¶</a></h3>
@@ -222,12 +257,14 @@ tool.</p></li>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Quick Start</a><ul>
 <li><a class="reference internal" href="#advanced-topics">Advanced Topics</a><ul>
 <li><a class="reference internal" href="#configuration">Configuration</a></li>
 <li><a class="reference internal" href="#controls-json">controls.json</a></li>
+<li><a class="reference internal" href="#agents">Agents</a></li>
 <li><a class="reference internal" href="#remote-evidence-locker">Remote Evidence Locker</a></li>
 <li><a class="reference internal" href="#notifications">Notifications</a></li>
 </ul>
@@ -237,12 +274,17 @@ tool.</p></li>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Auditree framework documentation</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="design-principles.html"
-                        title="next chapter">Design Principles</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">Auditree framework documentation</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="design-principles.html"
+                          title="next chapter">Design Principles</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -279,13 +321,13 @@ tool.</p></li>
         <li class="right" >
           <a href="index.html" title="Auditree framework documentation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.21.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Quick Start</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+        &#169; Copyright 2022, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

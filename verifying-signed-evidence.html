@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Verifying Signed Evidence &#8212; Auditree Framework 1.22.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="compliance" href="modules.html" />
+    <link rel="prev" title="Running on Tekton" href="running-on-tekton.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="compliance"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="running-on-tekton.html" title="Running on Tekton"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Verifying Signed Evidence</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="verifying-signed-evidence">
+<span id="id1"></span><h1>Verifying Signed Evidence<a class="headerlink" href="#verifying-signed-evidence" title="Permalink to this headline">¶</a></h1>
+<p>Follow the instructions to manually verify the sample evidence below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-----</span><span class="n">BEGIN</span> <span class="n">AGENT</span><span class="o">-----</span>
+<span class="n">auditree</span><span class="o">.</span><span class="n">local</span>
+<span class="o">-----</span><span class="n">END</span> <span class="n">AGENT</span><span class="o">-----</span>
+<span class="o">-----</span><span class="n">BEGIN</span> <span class="n">CONTENT</span><span class="o">-----</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">my</span> <span class="n">evidence</span><span class="o">.</span>
+<span class="o">-----</span><span class="n">END</span> <span class="n">CONTENT</span><span class="o">-----</span>
+<span class="o">-----</span><span class="n">BEGIN</span> <span class="n">DIGEST</span><span class="o">-----</span>
+<span class="mi">81</span><span class="n">ddd37cb8aba90077a717b7d6c067815add58e658bb2be0dea4d4d9301c762d</span>
+<span class="o">-----</span><span class="n">END</span> <span class="n">DIGEST</span><span class="o">-----</span>
+<span class="o">-----</span><span class="n">BEGIN</span> <span class="n">SIGNATURE</span><span class="o">-----</span>
+<span class="n">xRIu2dey1WSCSRpBWHlar5XUv13vZtm1n</span><span class="o">/</span><span class="n">KEDckA85UoQjEqEo7xlmnpzBtkNcieME6frhBMmBOYPW4uFYS1EUtLxkixYkYjt3wKlHl8CkvKDFoqAMqG8AC</span><span class="o">/</span><span class="n">cCdqwP7D7SlO5RH1pJ1kp2yX2XB2MTMHkd</span><span class="o">/</span><span class="mi">9</span><span class="n">tguNZBpaCnscYCmpBvng6okB7HbToOlVUfKY1tWDDIm3JefFMEoJqXgIEZMmVnF</span><span class="o">+</span><span class="n">nLniF</span><span class="o">/</span><span class="n">PvPTL</span><span class="o">+</span><span class="n">q38e6Wd1xeJpZYiLk12imarzkf9MweA5D22xkv51pI2ils3jovxymzio26cSkL7iHBsbiNOWWXoETo0aYm2g9CzhxnRGku9OEkW97JGNASkjSw</span><span class="o">==</span>
+<span class="o">-----</span><span class="n">END</span> <span class="n">SIGNATURE</span><span class="o">-----</span>
+</pre></div>
+</div>
+<ol class="arabic">
+<li><p>Fetch the public key for the <code class="docutils literal notranslate"><span class="pre">auditree.local</span></code> agent. This can be collected
+directly from the agent or the public keys evidence (available in the locker
+under <code class="docutils literal notranslate"><span class="pre">raw/auditree/agent_public_keys.json</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat &gt; key.pub
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxYosRYnahnSuH3SmNupn
+zQhxJsDEhqChKjrcyN19L8+vcjUUiMSaKRoAHuUKp5Pfwkoylryd4AyXIU9UnXZg
+dIOl2+r5xzXqfdLwi+PAU/eEWPLAQfCpIodqKqBLCyzpMoJHv9GDqg8XJkY/2i8j
+7oiqLR7vibIgRAJXqF95KdNvbW7Gvu8JHigN4aoGdbQSPp/jJ30wBvy7hHOSrMWF
+iQUt7H25YbvOZGWQeC8HZ2EXruzG+FV2rkW52FaTn31lX1EEc2Yz8AI7/yF/8C5j
+SSL/pmzxBzh/P4zGDNlm2habpwAIQpHnJJ8XeXYS//RXuOYNObeRwfhm82TB9+nS
+lQIDAQAB
+-----END PUBLIC KEY-----
+</pre></div>
+</div>
+</li>
+<li><p>Save the evidence content to your local filesystem and verify the digest:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat &gt; evidence.txt
+This is my evidence.
+
+$ openssl dgst -sha256 evidence.txt
+SHA256(evidence.txt)= 81ddd37cb8aba90077a717b7d6c067815add58e658bb2be0dea4d4d9301c762d
+</pre></div>
+</div>
+<p><em>Be sure not to add any additional whitespace when saving evidence locally.</em></p>
+</li>
+<li><p>Save the signature to your local filesystem:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat &gt; signature.txt
+xRIu2dey1WSCSRpBWHlar5XUv13vZtm1n/KEDckA85UoQjEqEo7xlmnpzBtkNcieME6frhBMmBOYPW4uFYS1EUtLxkixYkYjt3wKlHl8CkvKDFoqAMqG8AC/cCdqwP7D7SlO5RH1pJ1kp2yX2XB2MTMHkd/9tguNZBpaCnscYCmpBvng6okB7HbToOlVUfKY1tWDDIm3JefFMEoJqXgIEZMmVnF+nLniF/PvPTL+q38e6Wd1xeJpZYiLk12imarzkf9MweA5D22xkv51pI2ils3jovxymzio26cSkL7iHBsbiNOWWXoETo0aYm2g9CzhxnRGku9OEkW97JGNASkjSw==
+</pre></div>
+</div>
+</li>
+<li><p>Convert the Base64 signature to binary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openssl base64 -d -in signature.txt -out evidence.sig
+</pre></div>
+</div>
+</li>
+<li><p>Verify the signature:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openssl dgst -sha256 -verify key.pub -signature evidence.sig -sigopt rsa_padding_mode:pss evidence.txt
+Verified OK
+</pre></div>
+</div>
+<p>If the verification is successful, the OpenSSL command will print the
+<code class="docutils literal notranslate"><span class="pre">Verified</span> <span class="pre">OK</span></code> message, otherwise it will print <code class="docutils literal notranslate"><span class="pre">Verification</span> <span class="pre">Failure</span></code>.</p>
+</li>
+</ol>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="running-on-tekton.html"
+                          title="previous chapter">Running on Tekton</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="modules.html"
+                          title="next chapter">compliance</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/verifying-signed-evidence.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="compliance"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="running-on-tekton.html" title="Running on Tekton"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Verifying Signed Evidence</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

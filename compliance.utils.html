@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>compliance.utils package &#8212; Auditree Framework 1.21.1 documentation</title>
+    <title>compliance.utils package &#8212; Auditree Framework 1.22.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="compliance.scripts.html" title="compliance.scripts package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.21.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" accesskey="U">compliance package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils package</a></li> 
@@ -71,12 +71,12 @@
 <p>Compliance credentials configuration.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.utils.credentials.Config">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compliance.utils.credentials.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'~/.credentials'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/credentials.html#Config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.credentials.Config" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.utils.credentials.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'~/.credentials'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/credentials.html#Config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.credentials.Config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Handle credentials configuration.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compliance.utils.credentials.Config.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">section</span></em>, <em class="sig-param"><span class="pre">key=None</span></em>, <em class="sig-param"><span class="pre">account=None</span></em>, <em class="sig-param"><span class="pre">default=&lt;object</span> <span class="pre">object&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/credentials.html#Config.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.credentials.Config.get" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">account=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default=&lt;object</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/credentials.html#Config.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.credentials.Config.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve sections and keys by account.</p>
 <p><code class="docutils literal notranslate"><span class="pre">section</span></code>: the section from which to retrieve keys.
 <code class="docutils literal notranslate"><span class="pre">key</span></code>: the key in the section whose value you want to retrieve. if</p>
@@ -168,44 +168,51 @@ notation.  For example “foo.bar”.</p></li>
 <p>Compliance automation custom exceptions module.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="compliance.utils.exceptions.DependencyFetcherNotFoundError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">DependencyFetcherNotFoundError</span></span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#DependencyFetcherNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.DependencyFetcherNotFoundError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">DependencyFetcherNotFoundError</span></span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#DependencyFetcherNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.DependencyFetcherNotFoundError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
 <p>Dependency fetcher not found exception class.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="compliance.utils.exceptions.DependencyUnavailableError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">DependencyUnavailableError</span></span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#DependencyUnavailableError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.DependencyUnavailableError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">DependencyUnavailableError</span></span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#DependencyUnavailableError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.DependencyUnavailableError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
 <p>Missing dependent evidence exception class.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="compliance.utils.exceptions.EvidenceNotFoundError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">EvidenceNotFoundError</span></span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#EvidenceNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.EvidenceNotFoundError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">EvidenceNotFoundError</span></span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#EvidenceNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.EvidenceNotFoundError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
 <p>Missing evidence exception class.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="compliance.utils.exceptions.HistoricalEvidenceNotFoundError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">HistoricalEvidenceNotFoundError</span></span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#HistoricalEvidenceNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.HistoricalEvidenceNotFoundError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">HistoricalEvidenceNotFoundError</span></span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#HistoricalEvidenceNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.HistoricalEvidenceNotFoundError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
 <p>Missing historical evidence exception class.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="compliance.utils.exceptions.LockerPushError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">LockerPushError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">push_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#LockerPushError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.LockerPushError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">LockerPushError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">push_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#LockerPushError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.LockerPushError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Locker push exception class.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="compliance.utils.exceptions.StaleEvidenceError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">StaleEvidenceError</span></span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#StaleEvidenceError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.StaleEvidenceError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">StaleEvidenceError</span></span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#StaleEvidenceError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.StaleEvidenceError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Stale evidence exception class.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="compliance.utils.exceptions.UnverifiedEvidenceError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.utils.exceptions.</span></span><span class="sig-name descname"><span class="pre">UnverifiedEvidenceError</span></span><a class="reference internal" href="_modules/compliance/utils/exceptions.html#UnverifiedEvidenceError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.exceptions.UnverifiedEvidenceError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Unverified evidence exception class.</p>
 </dd></dl>
 
 </section>
@@ -214,7 +221,7 @@ notation.  For example “foo.bar”.</p></li>
 <p>Compliance HTTP helpers.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.utils.http.BaseSession">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compliance.utils.http.</span></span><span class="sig-name descname"><span class="pre">BaseSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">baseurl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/http.html#BaseSession"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.http.BaseSession" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.utils.http.</span></span><span class="sig-name descname"><span class="pre">BaseSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">baseurl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/http.html#BaseSession"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.http.BaseSession" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">requests.sessions.Session</span></code></p>
 <p>Subclass of requests.Session to support a base URL.</p>
 <dl class="py method">
@@ -320,8 +327,9 @@ path structure is different from the suggested one.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">compliance.utils package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
@@ -336,12 +344,17 @@ path structure is different from the suggested one.</p>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="compliance.scripts.html"
-                        title="previous chapter">compliance.scripts package</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="compliance.utils.services.html"
-                        title="next chapter">compliance.utils.services package</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="compliance.scripts.html"
+                          title="previous chapter">compliance.scripts package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="compliance.utils.services.html"
+                          title="next chapter">compliance.utils.services package</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -378,15 +391,15 @@ path structure is different from the suggested one.</p>
         <li class="right" >
           <a href="compliance.scripts.html" title="compliance.scripts package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.21.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+        &#169; Copyright 2022, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

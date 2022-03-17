@@ -13,6 +13,14 @@ Subpackages
 Submodules
 ----------
 
+compliance.agent module
+-----------------------
+
+.. automodule:: compliance.agent
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 compliance.check module
 -----------------------
 
