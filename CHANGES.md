@@ -1,3 +1,11 @@
+# [1.22.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.22.0)
+
+- [ADDED] Agent mode for storing cryptographically signed evidence.
+- [ADDED] Configurable branch name for evidence repository.
+- [ADDED] Configurable force push to remote for evidence repository.
+- [ADDED] Fetcher helper for running local commands.
+- [FIXED] Attempt to import missing fetchers from the include JSON configuration.
+
 # [1.21.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.21.1)
 
 - [FIXED] Addressed PagerDuty notifier hanging and not firing pages.
