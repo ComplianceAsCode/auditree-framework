@@ -1,3 +1,7 @@
+# [1.22.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.22.1)
+
+- [FIXED] Set Python version to 3.7 in publish/deploy GH action to match other actions.
+
 # [1.22.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.22.0)
 
 - [ADDED] Agent mode for storing cryptographically signed evidence.
