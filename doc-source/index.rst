@@ -49,6 +49,7 @@ Guides
    coding-standards
    running-on-travis
    running-on-tekton
+   verifying-signed-evidence
 
 Source code
 -----------

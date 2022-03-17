@@ -1,5 +1,5 @@
 # -*- mode:python; coding:utf-8 -*-
-# Copyright (c) 2020 IBM Corp. All rights reserved.
+# Copyright (c) 2021, 2022 IBM Corp. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ from pathlib import Path, PurePath
 from threading import Lock
 from urllib.parse import urlparse
 
+from compliance.agent import ComplianceAgent
 from compliance.config import get_config
 from compliance.evidence import CONTENT_FLAGS, TmpEvidence, get_evidence_class
 from compliance.utils.data_parse import (
@@ -34,7 +35,8 @@ from compliance.utils.exceptions import (
     EvidenceNotFoundError,
     HistoricalEvidenceNotFoundError,
     LockerPushError,
-    StaleEvidenceError
+    StaleEvidenceError,
+    UnverifiedEvidenceError
 )
 
 import git
@@ -66,7 +68,7 @@ class Locker(object):
         self,
         name=None,
         repo_url=None,
-        branch='master',
+        branch=None,
         creds=None,
         do_push=False,
         ttl_tolerance=0,
@@ -107,14 +109,22 @@ class Locker(object):
                 self.repo_url_with_creds = re.sub(
                     '://', f'://{token}@', self.repo_url_with_creds
                 )
-        self.branch = branch
+        self.default_branch = self.branch = get_config().get(
+            'locker.default_branch', default='master'
+        )
+        if branch:
+            self.branch = branch
+        self._new_branch = False
         if name is not None:
             self.name = name
         elif repo_url is not None and name is None:
             self.name = repo_url.rsplit('/', 1)[1]
         elif repo_url is None and name is None:
             self.name = 'example'
-        self.local_path = str(PurePath(tempfile.gettempdir(), self.name))
+        self.local_path = get_config().get(
+            'locker.local_path',
+            str(PurePath(tempfile.gettempdir(), self.name))
+        )
         self._do_push = do_push
         self.ttl_tolerance = ttl_tolerance
         self.gitconfig = gitconfig or {}
@@ -250,6 +260,14 @@ class Locker(object):
                 'ttl': evidence.ttl,
                 'description': evidence.description
             }
+            if evidence.signature:
+                metadata[evidence.name].update(
+                    {
+                        'agent_name': evidence.agent.name,
+                        'digest': evidence.digest,
+                        'signature': evidence.signature,
+                    }
+                )
             if evidence.is_empty:
                 metadata[evidence.name]['empty'] = True
             tombstones = None
@@ -514,15 +532,24 @@ class Locker(object):
                     root.extend(parse_dot_key(data, evidence.part_root))
                 else:
                     root.extend(data)
-            evidence.set_content(format_json(content))
+            evidence.set_content(format_json(content), sign=False)
         else:
             evidence.set_content(
                 self._get_file_content(
                     evidence.path,
                     evidence_dt,
                     getattr(evidence, 'binary_content', False)
-                )
+                ),
+                sign=False
             )
+        ign_sig = get_config().get('locker.ignore_signatures', default=False)
+        if not ign_sig and evidence.is_signed(self):
+            if not evidence.verify_signature(self):
+                raise UnverifiedEvidenceError(
+                    f'Evidence {evidence.path} is signed but the signature '
+                    'could not be verified.',
+                    evidence
+                )
         return evidence
 
     def validate(self, evidence, ignore_ttl=False):
@@ -564,7 +591,7 @@ class Locker(object):
             self.logger.info(
                 f'Cloning {locker} {self.repo_url} to {self.local_path}...'
             )
-            kwargs = {'branch': self.branch}
+            kwargs = {'branch': self.default_branch}
             shallow_days = get_config().get('locker.shallow_days', -1)
             addl_msg = None
             if shallow_days >= 0:
@@ -574,12 +601,16 @@ class Locker(object):
                 addl_msg = f'{locker.title()} contains commits since {since}'
             start = time.perf_counter()
             self.repo = git.Repo.clone_from(
-                self.repo_url_with_creds, self.local_path, **kwargs
+                self.repo_url_with_creds,
+                self.local_path,
+                single_branch=True,
+                **kwargs
             )
             duration = time.perf_counter() - start
             self.logger.info(f'{locker.title()} cloned in {duration:.3f}s')
             if addl_msg:
                 self.logger.info(addl_msg)
+        self._checkout_branch()
 
     def init_config(self):
         """Apply the git configuration."""
@@ -619,12 +650,17 @@ class Locker(object):
                 f'Syncing local locker with remote repo {self.repo_url}...'
             )
             remote.fetch()
-            remote.pull(rebase=True)
+            if not self._new_branch:
+                remote.pull(rebase=True)
             self._log_large_files()
             self.logger.info(
                 f'Pushing local locker to remote repo {self.repo_url}...'
             )
-            push_info = remote.push()[0]
+            push_info = remote.push(
+                self.branch,
+                force=get_config().get('locker.force_push', default=False),
+                set_upstream=True
+            )[0]
             if push_info.flags >= git.remote.PushInfo.ERROR:
                 raise LockerPushError(push_info)
 
@@ -813,13 +849,31 @@ class Locker(object):
         else:
             self.logger.info(f'Creating locker in {self.local_path}...')
             self.repo = git.Repo.init(self.local_path)
+        self._checkout_branch()
         self.init_config()
 
+    def _checkout_branch(self):
+        if self.repo.active_branch.name == self.branch:
+            return
+        try:
+            self.repo.git.checkout(self.branch)
+        except git.exc.GitCommandError:
+            self._new_branch = True
+            self.repo.git.checkout('-b', self.branch)
+
     def _get_evidence(self, evidence_path, ignore_ttl=False, evidence_dt=None):
+        agent = None
         evidence = None
         try:
             metadata = self.get_evidence_metadata(evidence_path, evidence_dt)
-            class_type, category, evidence_name = evidence_path.split('/')
+            if metadata and metadata.get('agent_name'):
+                agent = ComplianceAgent(
+                    name=metadata.get('agent_name'),
+                    use_agent_dir=evidence_path.startswith(
+                        ComplianceAgent.AGENTS_DIR
+                    )
+                )
+            class_type, category, evidence_name = evidence_path.split('/')[-3:]
             evidence_class_obj = get_evidence_class(class_type)
             evidence = evidence_class_obj(
                 evidence_name,
@@ -831,7 +885,9 @@ class Locker(object):
                     'root': metadata.get('partition_root')
                 },
                 binary_content=metadata.get('binary_content', False),
-                filtered_content=metadata.get('filtered_content', False)
+                filtered_content=metadata.get('filtered_content', False),
+                agent=agent,
+                evidence_dt=evidence_dt
             )
         except TypeError:
             ev_dt_str = (evidence_dt or dt.utcnow()).strftime('%Y-%m-%d')

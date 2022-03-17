@@ -1,1 +1,2 @@
 graft compliance/templates
+include compliance/utils/fetch_local_commands

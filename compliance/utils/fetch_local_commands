@@ -1,0 +1,66 @@
+#!/bin/bash
+# Copyright (c) 2022 IBM Corp. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+usage() {
+  echo "Usage: $0 [-h] [-u <user>]"
+  echo "       -h    Print usage."
+  echo "       -s    Show exit status."
+  echo "       -t    Show timestamp."
+  return 1
+} 1>&2
+
+show_exit_status=0
+show_timestamp=0
+while getopts :hst option
+do
+  case $option in
+    h)
+      usage
+      exit 0
+      ;;
+    s)
+      show_exit_status=1
+      ;;
+    t)
+      show_timestamp=1
+      ;;
+    *)
+      echo "Error: Illegal option -$OPTARG specified." 1>&2
+      exit "$(usage)"
+      ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+ps1() {
+  if [[ "$show_timestamp" -eq 1 ]]; then
+    printf '[%s] %s@%s:%s$' "$(date -u +%FT%TZ)" "$(whoami)" "$(hostname -f)" "${PWD/#$HOME/~}"
+  else
+    printf '%s@%s:%s$' "$(whoami)" "$(hostname -f)" "${PWD/#$HOME/~}"
+  fi
+}
+
+run() {
+  printf '%s ' "$(ps1)" "$@"
+  printf '\n'
+  eval "$@"; rc="$?"
+  if [[ "$show_exit_status" -eq 1 ]]; then
+    printf '%s %s\n%s\n' "$(ps1)" 'echo $?' "$rc"
+  fi
+}
+
+while IFS=$'\n' read -r cmd; do
+  run "$cmd" 2>&1
+done

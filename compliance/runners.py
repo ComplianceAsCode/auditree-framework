@@ -1,5 +1,5 @@
 # -*- mode:python; coding:utf-8 -*-
-# Copyright (c) 2020 IBM Corp. All rights reserved.
+# Copyright (c) 2021, 2022 IBM Corp. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import sys
 import time
 import unittest
 from collections import defaultdict
+from importlib import import_module
 from pathlib import Path
 
 from compliance.check import ComplianceCheck
@@ -115,7 +116,10 @@ class _BaseRunner(object):
         gitconfig = self.config.get('locker.gitconfig')
         if mode == 'local':
             return Locker(
-                name=dirname, ttl_tolerance=ttl_tolerance, gitconfig=gitconfig
+                name=dirname,
+                ttl_tolerance=ttl_tolerance,
+                gitconfig=gitconfig,
+                branch=self.config.get('locker.branch')
             )
         repo_url = self.config.get('locker.repo_url')
         if repo_url is None:
@@ -126,7 +130,8 @@ class _BaseRunner(object):
             creds=self.config.creds,
             do_push=True if mode == 'full-remote' else False,
             ttl_tolerance=ttl_tolerance,
-            gitconfig=gitconfig
+            gitconfig=gitconfig,
+            branch=self.config.get('locker.branch')
         )
 
 
@@ -178,6 +183,16 @@ class FetchMode(_BaseRunner):
         include = {f'{f.__module__}.{f.__name__}' for f in fetchers}
         if self.opts.include:
             include = set(json.loads(Path(self.opts.include).read_text()))
+            for test in include:
+                if test in fetchers:
+                    continue
+                test_name, test_class = test.rsplit('.', 1)
+                try:
+                    # Attempt to import missing fetchers.
+                    fetchers.add(getattr(import_module(test_name), test_class))
+                    import_module('.'.join([test.split('.')[0], 'evidences']))
+                except (AttributeError, ModuleNotFoundError):
+                    continue
         exclude = set()
         if self.opts.exclude:
             exclude = set(json.loads(Path(self.opts.exclude).read_text()))
