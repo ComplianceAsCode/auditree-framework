@@ -295,7 +295,9 @@ class ComplianceCheck(unittest.TestCase):
         """
         evidence = self.locker.get_evidence(evidence_path, True, evidence_dt)
         self.add_evidence_metadata(
-            evidence_path, evidence_dt, getattr(evidence, 'locker', None)
+            evidence_path,
+            evidence_dt=evidence_dt,
+            evidence_locker=evidence.locker
         )
         return evidence
 

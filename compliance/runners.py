@@ -119,7 +119,8 @@ class _BaseRunner(object):
                 name=dirname,
                 ttl_tolerance=ttl_tolerance,
                 gitconfig=gitconfig,
-                branch=self.config.get('locker.branch')
+                branch=self.config.get('locker.branch'),
+                local_path=self.config.get('locker.local_path')
             )
         repo_url = self.config.get('locker.repo_url')
         if repo_url is None:
@@ -131,7 +132,8 @@ class _BaseRunner(object):
             do_push=True if mode == 'full-remote' else False,
             ttl_tolerance=ttl_tolerance,
             gitconfig=gitconfig,
-            branch=self.config.get('locker.branch')
+            branch=self.config.get('locker.branch'),
+            local_path=self.config.get('locker.local_path')
         )
 
 
