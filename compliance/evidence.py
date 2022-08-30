@@ -352,12 +352,8 @@ class RawEvidence(_BaseEvidence):
         return format_json(data)
 
     def _partition(self, data, key):
-        idx = 0
-        for field in self.part_fields:
-            data = list(
-                filter(lambda e: parse_dot_key(e, field) == key[idx], data)
-            )
-            idx += 1
+        for idx, field in enumerate(self.part_fields):
+            data = [d for d in data if parse_dot_key(d, field) == key[idx]]
         return data
 
 
