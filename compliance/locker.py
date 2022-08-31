@@ -147,6 +147,27 @@ class Locker(object):
             self._extra_lockers = self._get_extra_lockers()
         else:
             self._extra_lockers = []
+        self._clone_depth = get_config().get('locker.depth')
+        days = get_config().get('locker.shallow_days')
+        self._clone_shallow_since_days = days
+
+    @property
+    def clone_depth(self):
+        """
+        Provide the commit depth used when cloning the repository.
+
+        :returns: the clone depth.
+        """
+        return self._clone_depth
+
+    @property
+    def clone_shallow_since_days(self):
+        """
+        Provide the maximum commit age to fetch when cloning the repository.
+
+        :returns: the shallow since days.
+        """
+        return self._clone_shallow_since_days
 
     @property
     def touched_files(self):
@@ -175,6 +196,14 @@ class Locker(object):
                     touched_files.append(str(PurePath(f).with_name(t)))
         return touched_files
 
+    @clone_depth.setter
+    def clone_depth(self, depth):
+        self._clone_depth = depth
+
+    @clone_shallow_since_days.setter
+    def clone_shallow_since_days(self, days):
+        self._clone_shallow_since_days = days
+
     def _get_extra_lockers(self):
         """Get extra locker configurations."""
         extra_lockers_cfg = get_config().get('locker.extra', [])
@@ -190,6 +219,9 @@ class Locker(object):
                 repo_url=extra_locker_cfg['repo_url'],
                 use_extra_lockers=False
             )
+            extra_locker.clone_depth = extra_locker_cfg.get('depth')
+            days = extra_locker_cfg.get('shallow_days')
+            extra_locker.clone_shallow_since_days = days
             extra_locker.get_locker_repo(locker=extra_locker.name)
             extra_lockers.append(extra_locker)
         return extra_lockers
@@ -607,10 +639,12 @@ class Locker(object):
                 f'Cloning {locker} {self.repo_url} to {self.local_path}...'
             )
             kwargs = {'branch': self.default_branch}
-            shallow_days = get_config().get('locker.shallow_days', -1)
             addl_msg = None
-            if shallow_days >= 0:
-                since_dt = dt.utcnow() - timedelta(days=shallow_days + 1)
+            if self.clone_depth:
+                kwargs['depth'] = self.clone_depth
+            if self.clone_shallow_since_days:
+                days = self.clone_shallow_since_days + 1
+                since_dt = dt.utcnow() - timedelta(days=days)
                 since = since_dt.strftime('%Y/%m/%d')
                 kwargs['shallow_since'] = since
                 addl_msg = f'{locker.title()} contains commits since {since}'

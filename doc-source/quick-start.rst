@@ -163,6 +163,7 @@ centrally, for example::
     "repo_url": "https://github.com/foo/evidence-locker",
     "extra": [
       {
+        "depth": 10,
         "repo_url": "https://github.com/foo/evidence-locker-bar"
       },
       {
@@ -175,6 +176,12 @@ The ``extra`` lockers are only used when **checking** evidence. If evidence is
 not found in the primary locker then Auditree will look in any ``extra`` lockers
 that have been configured. Only the primary locker can be used to store new
 evidence.
+
+Auditree clones the evidence locker at the start of every run. This can take a
+long time if the repository is large. If you don't need the full repository
+history then consider using the ``depth`` configuration. This creates a shallow
+clone with a history truncated to the specified number of commits. See the
+configuration example above where ``depth`` has been set to 10.
 
 Notifications
 ~~~~~~~~~~~~~
