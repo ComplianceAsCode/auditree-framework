@@ -154,6 +154,28 @@ remote locker::
 
   $ compliance --check demo.arboretum.accred,demo.custom.accred --evidence full-remote -C auditree_demo.json
 
+You can configure multiple remote lockers using the ``extra``
+configuration. This is useful if you're running lots of Auditree agents and
+storing evidence in multiple lockers. It allows you to check all evidence
+centrally, for example::
+
+  "locker": {
+    "repo_url": "https://github.com/foo/evidence-locker",
+    "extra": [
+      {
+        "repo_url": "https://github.com/foo/evidence-locker-bar"
+      },
+      {
+        "repo_url": "https://github.com/foo/evidence-locker-baz"
+      }
+    ]
+  }
+
+The ``extra`` lockers are only used when **checking** evidence. If evidence is
+not found in the primary locker then Auditree will look in any ``extra`` lockers
+that have been configured. Only the primary locker can be used to store new
+evidence.
+
 Notifications
 ~~~~~~~~~~~~~
 

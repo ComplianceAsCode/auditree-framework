@@ -70,6 +70,7 @@ class _BaseEvidence(object):
         self.category = category
         self.ttl = ttl
         self.description = description
+        self.locker = None
         self._agent = kwargs.get('agent') or ComplianceAgent()
         if self._agent.name and self.description:
             self.description = f'{self._agent.name}: {self.description}'
@@ -100,6 +101,7 @@ class _BaseEvidence(object):
             agent=evidence.agent,
             **kwargs
         )
+        new_evidence.locker = evidence.locker
         new_evidence.set_digest(evidence.digest)
         new_evidence.set_signature(evidence.signature)
         new_evidence.set_content(
@@ -350,12 +352,8 @@ class RawEvidence(_BaseEvidence):
         return format_json(data)
 
     def _partition(self, data, key):
-        idx = 0
-        for field in self.part_fields:
-            data = list(
-                filter(lambda e: parse_dot_key(e, field) == key[idx], data)
-            )
-            idx += 1
+        for idx, field in enumerate(self.part_fields):
+            data = [d for d in data if parse_dot_key(d, field) == key[idx]]
         return data
 
 
@@ -605,29 +603,30 @@ class evidences(object):  # noqa: N801
     def __enter__(self):
         """Perform check evidences pre-processing."""
         evidence = {}
-        evidence_list = []
+        rtval_dict = True
         if isinstance(self.from_evidences, list):
             for from_evidence in self.from_evidences:
                 path = from_evidence
                 if isinstance(from_evidence, LazyLoader):
                     # preserve original path to be used as key of evidence dict
                     path = from_evidence.path
-                ev = self._get_evidence(from_evidence)
-                evidence[path] = ev
-                evidence_list.append(ev.path)
+                evidence[path] = self._get_evidence(from_evidence)
         elif isinstance(self.from_evidences, dict):
             for evidence_name, from_evidence in self.from_evidences.items():
                 evidence[evidence_name] = self._get_evidence(from_evidence)
-                evidence_list.append(evidence[evidence_name].path)
         else:
-            evidence = self._get_evidence(self.from_evidences)
-            evidence_list.append(evidence.path)
-        if hasattr(self, 'check'):
-            for ev_path in evidence_list:
-                self.check.add_evidence_metadata(ev_path)
+            rtval_dict = False
+            evidence['evidence'] = self._get_evidence(self.from_evidences)
         if not evidence:
             raise EvidenceNotFoundError('No evidence found!')
-        return evidence
+        if hasattr(self, 'check'):
+            for ev in evidence.values():
+                self.check.add_evidence_metadata(
+                    ev.path, evidence_locker=ev.locker
+                )
+        if rtval_dict:
+            return evidence
+        return next(iter(evidence.values()))
 
     def __exit__(self, typ, val, traceback):
         """Perform check evidences post-processing."""
@@ -1017,5 +1016,7 @@ def _evidence_wrapper(self, from_evidences, func):
             ev = fe.ev_class.from_evidence(ev)
         evidences.append(ev)
     for evidence in evidences:
-        self.add_evidence_metadata(evidence.path)
+        self.add_evidence_metadata(
+            evidence.path, evidence_locker=evidence.locker
+        )
     return func(self, *evidences)

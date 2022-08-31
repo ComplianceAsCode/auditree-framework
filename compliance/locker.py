@@ -72,7 +72,9 @@ class Locker(object):
         creds=None,
         do_push=False,
         ttl_tolerance=0,
-        gitconfig=None
+        gitconfig=None,
+        local_path=None,
+        use_extra_lockers=True
     ):
         """
         Construct and initialize the locker object.
@@ -90,6 +92,8 @@ class Locker(object):
         :param ttl_tolerance: the applied to evidence time to live.  If within
           that tolerance the evidence will be treated as stale.
         :param gitconfig: the git configuration to be applied to the locker.
+        :param local_path: a path to a local git repository.
+        :param use_extra_lockers: get evidence from configured 'extra' lockers.
         """
         self.repo_url = repo_url
         self.repo_url_with_creds = self.repo_url
@@ -121,10 +125,10 @@ class Locker(object):
             self.name = repo_url.rsplit('/', 1)[1]
         elif repo_url is None and name is None:
             self.name = 'example'
-        self.local_path = get_config().get(
-            'locker.local_path',
-            str(PurePath(tempfile.gettempdir(), self.name))
-        )
+        if local_path:
+            self.local_path = local_path
+        else:
+            self.local_path = str(PurePath(tempfile.gettempdir(), self.name))
         self._do_push = do_push
         self.ttl_tolerance = ttl_tolerance
         self.gitconfig = gitconfig or {}
@@ -139,6 +143,10 @@ class Locker(object):
         self.commit_date = dt.utcnow().isoformat()
         self.forced_evidence = []
         self.dependency_rerun = []
+        if use_extra_lockers:
+            self._extra_lockers = self._get_extra_lockers()
+        else:
+            self._extra_lockers = []
 
     @property
     def touched_files(self):
@@ -166,6 +174,25 @@ class Locker(object):
                 if ts == self.commit_date:
                     touched_files.append(str(PurePath(f).with_name(t)))
         return touched_files
+
+    def _get_extra_lockers(self):
+        """Get extra locker configurations."""
+        extra_lockers_cfg = get_config().get('locker.extra', [])
+        prev_repo_url = get_config().get('locker.prev_repo_url')
+        if prev_repo_url:
+            extra_lockers_cfg.append({'repo_url': prev_repo_url})
+        extra_lockers = []
+        for extra_locker_cfg in extra_lockers_cfg:
+            extra_locker = Locker(
+                branch=extra_locker_cfg.get('branch'),
+                creds=self.creds,
+                local_path=extra_locker_cfg.get('local_path'),
+                repo_url=extra_locker_cfg['repo_url'],
+                use_extra_lockers=False
+            )
+            extra_locker.get_locker_repo(locker=extra_locker.name)
+            extra_lockers.append(extra_locker)
+        return extra_lockers
 
     def reset_depenency_rerun(self):
         """Reset the dependency_rerun attribute to an empty list."""
@@ -470,36 +497,24 @@ class Locker(object):
 
         :returns: the populated evidence object.
         """
-        evidence = None
+        missing_errs = (EvidenceNotFoundError, HistoricalEvidenceNotFoundError)
         try:
             evidence = self._get_evidence(
                 evidence_path, ignore_ttl, evidence_dt
             )
-        except (EvidenceNotFoundError, HistoricalEvidenceNotFoundError):
-            prev_repo_url = get_config().get('locker.prev_repo_url')
-            if not (prev_repo_url and
-                    evidence_dt) or dt.utcnow().date() <= evidence_dt.date():
-                raise
-            # Try the previous locker
-            if not hasattr(self, '_prev_locker'):
-                self._prev_locker = Locker(
-                    f'{self.name}_prev',
-                    prev_repo_url,
-                    self.branch,
-                    self.creds
-                )
-            self.logger.info(
-                f'{evidence_dt.strftime("%Y-%m-%d")} historical evidence '
-                f'{evidence_path} not found in locker.  '
-                'Looking in previous locker...'
-            )
-            self._prev_locker.get_locker_repo('previous locker')
-            evidence = self._prev_locker._get_evidence(
-                evidence_path, ignore_ttl, evidence_dt
-            )
-            # Preserve previous locker for report metadata and TOC.
-            evidence.locker = self._prev_locker
-        return evidence
+            evidence.locker = self
+            return evidence
+        except missing_errs as missing_err:
+            for extra_locker in self._extra_lockers:
+                try:
+                    evidence = extra_locker._get_evidence(
+                        evidence_path, ignore_ttl, evidence_dt
+                    )
+                    evidence.locker = extra_locker
+                    return evidence
+                except missing_errs:
+                    continue
+            raise missing_err
 
     def load_content(self, evidence, ignore_ttl=False, evidence_dt=None):
         """
