@@ -953,7 +953,7 @@ class Locker(object):
             ev_dt_str = (evidence_dt or dt.utcnow()).strftime('%Y-%m-%d')
             raise EvidenceNotFoundError(
                 f'Evidence {evidence_path} is not found in the locker '
-                f'for {ev_dt_str}.  It may not be a valid evidence path.'
+                f'for {ev_dt_str}. It may not be a valid evidence path.'
             )
         return self.load_content(evidence, ignore_ttl, evidence_dt)
 
