@@ -170,6 +170,16 @@ class Locker(object):
         return self._clone_shallow_since_days
 
     @property
+    def head_commit_hexsha(self):
+        """
+        Get SHA of repository head commit.
+
+        :returns: 40 byte hexadecimal version of 20 byte binary SHA.
+        """
+        with self.lock:
+            return self.repo.head.commit.hexsha
+
+    @property
     def touched_files(self):
         """
         Provide paths to files that have been touched in the local locker.
@@ -835,7 +845,8 @@ class Locker(object):
         if dt:
             options['until'] = dt.strftime('%Y-%m-%d')
         try:
-            commit = next(self.repo.iter_commits(paths=path, **options))
+            with self.lock:
+                commit = next(self.repo.iter_commits(paths=path, **options))
         except StopIteration:
             pass
         return commit
