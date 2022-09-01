@@ -1,18 +1,19 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>compliance package &#8212; Auditree Framework 1.22.1 documentation</title>
+    <title>compliance package &#8212; Auditree Framework 1.23.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
@@ -35,7 +36,7 @@
         <li class="right" >
           <a href="modules.html" title="compliance"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
@@ -47,9 +48,9 @@
           <div class="body" role="main">
             
   <section id="compliance-package">
-<h1>compliance package<a class="headerlink" href="#compliance-package" title="Permalink to this headline">¶</a></h1>
+<h1>compliance package<a class="headerlink" href="#compliance-package" title="Permalink to this heading">¶</a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compliance.scripts.html">compliance.scripts package</a><ul>
@@ -83,10 +84,10 @@
 </div>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-compliance.agent">
-<span id="compliance-agent-module"></span><h2>compliance.agent module<a class="headerlink" href="#module-compliance.agent" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-agent-module"></span><h2>compliance.agent module<a class="headerlink" href="#module-compliance.agent" title="Permalink to this heading">¶</a></h2>
 <p>Compliance check automation module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.agent.ComplianceAgent">
@@ -114,10 +115,10 @@
 <span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/agent.html#ComplianceAgent.get_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.agent.ComplianceAgent.get_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the full evidence path.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> – The relative evidence path as a string.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The full evidence path as a string.</p>
 </dd>
 </dl>
@@ -128,10 +129,10 @@
 <span class="sig-name descname"><span class="pre">hash_and_sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/agent.html#ComplianceAgent.hash_and_sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.agent.ComplianceAgent.hash_and_sign" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hash and sign evidence using the agent private key.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>data_bytes</strong> – The data to sign as <cite>bytes</cite>.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A <cite>tuple</cite> containing the hexadecimal digest string and the
 base64 encoded signature string. Returns tuple <cite>(None, None)</cite> if the
 agent is not configured to sign evidence.</p>
@@ -144,7 +145,7 @@ agent is not configured to sign evidence.</p>
 <span class="sig-name descname"><span class="pre">load_public_key_from_locker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locker</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/agent.html#ComplianceAgent.load_public_key_from_locker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.agent.ComplianceAgent.load_public_key_from_locker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load agent public key from locker.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>locker</strong> – A locker of type <a class="reference internal" href="#compliance.locker.Locker" title="compliance.locker.Locker"><code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.locker.Locker</span></code></a>.</p>
 </dd>
 </dl>
@@ -185,13 +186,13 @@ agent is not configured to sign evidence.</p>
 <span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signature_b64</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/agent.html#ComplianceAgent.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.agent.ComplianceAgent.verify" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verify evidence using the agent public key.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data_bytes</strong> – The data to verify as <cite>bytes</cite>.</p></li>
 <li><p><strong>signature_b64</strong> – The base64 encoded signature string.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><cite>True</cite> if data can be verified, else <cite>False</cite>.</p>
 </dd>
 </dl>
@@ -201,19 +202,19 @@ agent is not configured to sign evidence.</p>
 
 </section>
 <section id="module-compliance.check">
-<span id="compliance-check-module"></span><h2>compliance.check module<a class="headerlink" href="#module-compliance.check" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-check-module"></span><h2>compliance.check module<a class="headerlink" href="#module-compliance.check" title="Permalink to this heading">¶</a></h2>
 <p>Compliance check automation module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.check.ComplianceCheck">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.check.</span></span><span class="sig-name descname"><span class="pre">ComplianceCheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
 <p>Compliance check automation TestCase class.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compliance.check.ComplianceCheck.add_evidence_metadata">
 <span class="sig-name descname"><span class="pre">add_evidence_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evidence_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence_locker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.add_evidence_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.add_evidence_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add evidence metadata to the evidence_metadata property of each check.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>evidence_path</strong> – the evidence path.</p></li>
 <li><p><strong>evidence_dt</strong> – the evidence date.</p></li>
@@ -229,10 +230,10 @@ Use when historical evidence is found in a secondary locker.</p></li>
 <span class="sig-name descname"><span class="pre">add_failures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.add_failures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.add_failures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add failures for each check.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Param</dt>
+<dt class="field-odd">Param<span class="colon">:</span></dt>
 <dd class="field-odd"><p>section_key: key for the failures.</p>
 </dd>
-<dt class="field-even">Param</dt>
+<dt class="field-even">Param<span class="colon">:</span></dt>
 <dd class="field-even"><p>section_value: all the failures for that key.</p>
 </dd>
 </dl>
@@ -243,7 +244,7 @@ Use when historical evidence is found in a secondary locker.</p></li>
 <span class="sig-name descname"><span class="pre">add_issue_if_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actual</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_warning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.add_issue_if_diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.add_issue_if_diff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add failures/warnings if differences exist between actual and expected.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>actual</strong> – the “actual” set items.</p></li>
 <li><p><strong>expected</strong> – the “expected” set items.</p></li>
@@ -259,10 +260,10 @@ Use when historical evidence is found in a secondary locker.</p></li>
 <span class="sig-name descname"><span class="pre">add_successes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.add_successes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.add_successes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add successes for each check.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Param</dt>
+<dt class="field-odd">Param<span class="colon">:</span></dt>
 <dd class="field-odd"><p>section_key: key for the successes.</p>
 </dd>
-<dt class="field-even">Param</dt>
+<dt class="field-even">Param<span class="colon">:</span></dt>
 <dd class="field-even"><p>section_value: all the successes for that key.</p>
 </dd>
 </dl>
@@ -273,10 +274,10 @@ Use when historical evidence is found in a secondary locker.</p></li>
 <span class="sig-name descname"><span class="pre">add_warnings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.add_warnings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.add_warnings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add warnings for each check.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Param</dt>
+<dt class="field-odd">Param<span class="colon">:</span></dt>
 <dd class="field-odd"><p>section_key: key for the warnings.</p>
 </dd>
-<dt class="field-even">Param</dt>
+<dt class="field-even">Param<span class="colon">:</span></dt>
 <dd class="field-even"><p>section_value: all the warnings for that key.</p>
 </dd>
 </dl>
@@ -293,7 +294,7 @@ Use when historical evidence is found in a secondary locker.</p></li>
 <span class="sig-name descname"><span class="pre">evidences_for_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.evidences_for_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.evidences_for_check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide evidences used by all tests in the check.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>results</strong> – contains all the test results.</p>
 </dd>
 </dl>
@@ -316,7 +317,7 @@ Use when historical evidence is found in a secondary locker.</p></li>
 <span class="sig-name descname"><span class="pre">failures_for_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.failures_for_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.failures_for_check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide failures associated with all tests in the check.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>results</strong> – contains all the test results.</p>
 </dd>
 </dl>
@@ -327,7 +328,7 @@ Use when historical evidence is found in a secondary locker.</p></li>
 <span class="sig-name descname"><span class="pre">failures_for_check_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.failures_for_check_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.failures_for_check_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count failures for all tests in check.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>results</strong> – contains all the test results.</p>
 </dd>
 </dl>
@@ -344,7 +345,7 @@ Use when historical evidence is found in a secondary locker.</p></li>
 <span class="sig-name descname"><span class="pre">get_historical_evidence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evidence_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence_dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.get_historical_evidence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.get_historical_evidence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve historical evidence from the locker and track as metadata.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>evidence_path</strong> – the evidence path.</p></li>
 <li><p><strong>evidence_dt</strong> – the evidence date.</p></li>
@@ -399,7 +400,7 @@ assumed that the runbook exists and is in HTML format.</p>
 <span class="sig-name descname"><span class="pre">successes_for_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.successes_for_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.successes_for_check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide successes associated with all tests in the check.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>results</strong> – contains all the test results.</p>
 </dd>
 </dl>
@@ -410,7 +411,7 @@ assumed that the runbook exists and is in HTML format.</p>
 <span class="sig-name descname"><span class="pre">successes_for_check_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.successes_for_check_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.successes_for_check_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count successes for all tests in check.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>results</strong> – contains all the test results.</p>
 </dd>
 </dl>
@@ -427,7 +428,7 @@ assumed that the runbook exists and is in HTML format.</p>
 <span class="sig-name descname"><span class="pre">total_issues_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.total_issues_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.total_issues_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total number of issues as property for the check.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>results</strong> – contains all the test results.</p>
 </dd>
 </dl>
@@ -450,7 +451,7 @@ assumed that the runbook exists and is in HTML format.</p>
 <span class="sig-name descname"><span class="pre">warnings_for_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.warnings_for_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.warnings_for_check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide warnings associated with all tests in the check.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>results</strong> – contains all the test results.</p>
 </dd>
 </dl>
@@ -461,7 +462,7 @@ assumed that the runbook exists and is in HTML format.</p>
 <span class="sig-name descname"><span class="pre">warnings_for_check_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/check.html#ComplianceCheck.warnings_for_check_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.check.ComplianceCheck.warnings_for_check_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count failures for all tests in the check.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>results</strong> – contains all the test results.</p>
 </dd>
 </dl>
@@ -471,7 +472,7 @@ assumed that the runbook exists and is in HTML format.</p>
 
 </section>
 <section id="module-compliance.config">
-<span id="compliance-config-module"></span><h2>compliance.config module<a class="headerlink" href="#module-compliance.config" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-config-module"></span><h2>compliance.config module<a class="headerlink" href="#module-compliance.config" title="Permalink to this heading">¶</a></h2>
 <p>Compliance configuration automation module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.config.ComplianceConfig">
@@ -489,7 +490,7 @@ assumed that the runbook exists and is in HTML format.</p>
 <span class="sig-name descname"><span class="pre">add_evidences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evidence_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/config.html#ComplianceConfig.add_evidences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.config.ComplianceConfig.add_evidences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a list of evidence objects to the evidence cache.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>evidence_list</strong> – a list of evidence objects.</p>
 </dd>
 </dl>
@@ -513,7 +514,7 @@ assumed that the runbook exists and is in HTML format.</p>
 <dd><p>Provide the configuration value for the supplied <code class="docutils literal notranslate"><span class="pre">config_path</span></code>.</p>
 <p>Returns the default if <code class="docutils literal notranslate"><span class="pre">config_path</span></code> cannot be retrieved.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>config_path</strong> – dot notation path with the following format
 <code class="docutils literal notranslate"><span class="pre">'key[.subkey]</span></code>. For instance, <code class="docutils literal notranslate"><span class="pre">locker.dirname</span></code>.</p>
 </dd>
@@ -525,7 +526,7 @@ assumed that the runbook exists and is in HTML format.</p>
 <span class="sig-name descname"><span class="pre">get_evidence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evidence_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/config.html#ComplianceConfig.get_evidence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.config.ComplianceConfig.get_evidence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide an evidence object from the evidence cache.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> – the path to the evidence within the Locker.
 For example, <code class="docutils literal notranslate"><span class="pre">raw/source1/evidence.json</span></code></p>
 </dd>
@@ -541,7 +542,7 @@ For example, <code class="docutils literal notranslate"><span class="pre">raw/so
 If <code class="docutils literal notranslate"><span class="pre">test_obj</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, then current directory <code class="docutils literal notranslate"><span class="pre">'.'</span></code> is
 assumed as initial path.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>test_obj</strong> – a <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.ComplianceTest</span></code> object from
 where the template directory search will start from.</p>
 </dd>
@@ -553,7 +554,7 @@ where the template directory search will start from.</p>
 <span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/config.html#ComplianceConfig.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.config.ComplianceConfig.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load configuration from a JSON file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>config_file</strong> – the path to the JSON config file.
 If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">DEFAULT</span></code> configuration is used.</p>
 </dd>
@@ -576,7 +577,7 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 
 </section>
 <section id="module-compliance.controls">
-<span id="compliance-controls-module"></span><h2>compliance.controls module<a class="headerlink" href="#module-compliance.controls" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-controls-module"></span><h2>compliance.controls module<a class="headerlink" href="#module-compliance.controls" title="Permalink to this heading">¶</a></h2>
 <p>Compliance check controls automation module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.controls.ControlDescriptor">
@@ -604,7 +605,7 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 <p>Original: {‘test_path’: {‘key’: {‘sub-key: [‘accred1’, ‘accred2’]}}}
 Simplified: {‘test_path’: [‘accred1’, ‘accred2’]}</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>test_path</strong> – the Python path to the test.
 For example: <code class="docutils literal notranslate"><span class="pre">package.category.checks.module.TestClass</span></code></p>
 </dd>
@@ -616,7 +617,7 @@ For example: <code class="docutils literal notranslate"><span class="pre">packag
 <span class="sig-name descname"><span class="pre">is_test_included</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accreditations</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/controls.html#ControlDescriptor.is_test_included"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.controls.ControlDescriptor.is_test_included" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide boolean result of whether a check is part of accreditations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>test_path</strong> – the Python path to the test. For instance:
 <code class="docutils literal notranslate"><span class="pre">package.accr1.TestClass</span></code> or <code class="docutils literal notranslate"><span class="pre">package.accr2.test_function</span></code></p></li>
@@ -637,12 +638,12 @@ may be included.</p></li>
 
 </section>
 <section id="module-compliance.evidence">
-<span id="compliance-evidence-module"></span><h2>compliance.evidence module<a class="headerlink" href="#module-compliance.evidence" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-evidence-module"></span><h2>compliance.evidence module<a class="headerlink" href="#module-compliance.evidence" title="Permalink to this heading">¶</a></h2>
 <p>Compliance evidence management automation module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.evidence.DerivedEvidence">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.evidence.</span></span><span class="sig-name descname"><span class="pre">DerivedEvidence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">86400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#DerivedEvidence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.evidence.DerivedEvidence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.evidence._BaseEvidence</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseEvidence</span></code></p>
 <p>The derived evidence class.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="compliance.evidence.DerivedEvidence.EVIDENCE_TYPE">
@@ -654,7 +655,7 @@ may be included.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.evidence.ExternalEvidence">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.evidence.</span></span><span class="sig-name descname"><span class="pre">ExternalEvidence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">31536000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#ExternalEvidence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.evidence.ExternalEvidence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.evidence._BaseEvidence</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseEvidence</span></code></p>
 <p>The external evidence class.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="compliance.evidence.ExternalEvidence.EVIDENCE_TYPE">
@@ -684,7 +685,7 @@ may be included.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.evidence.RawEvidence">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.evidence.</span></span><span class="sig-name descname"><span class="pre">RawEvidence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#RawEvidence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.evidence.RawEvidence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.evidence._BaseEvidence</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseEvidence</span></code></p>
 <p>The raw evidence class.</p>
 <p>Raw evidence is partition-able if the content is JSON and by providing a
 list of partition fields along with an optional partition root.  The
@@ -706,10 +707,10 @@ expected to match the key fields provided during evidence
 instantiation and are relative to the root partition provided during
 evidence instantiation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>key</strong> – A list of key values to partition by</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A JSON document filtered by the key values provided</p>
 </dd>
 </dl>
@@ -729,7 +730,7 @@ evidence instantiation.</p>
 key fields provided during evidence instantiation.  Key values are
 relative to the root partition provided during evidence instantiation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A list of key values where the key values are lists as well.</p>
 </dd>
 </dl>
@@ -740,7 +741,7 @@ relative to the root partition provided during evidence instantiation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.evidence.ReportEvidence">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.evidence.</span></span><span class="sig-name descname"><span class="pre">ReportEvidence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">86400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#ReportEvidence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.evidence.ReportEvidence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.evidence._BaseEvidence</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseEvidence</span></code></p>
 <p>The report evidence class.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="compliance.evidence.ReportEvidence.EVIDENCE_TYPE">
@@ -752,7 +753,7 @@ relative to the root partition provided during evidence instantiation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.evidence.TmpEvidence">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.evidence.</span></span><span class="sig-name descname"><span class="pre">TmpEvidence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">86400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#TmpEvidence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.evidence.TmpEvidence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.evidence._BaseEvidence</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseEvidence</span></code></p>
 <p>The temporary evidence class.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="compliance.evidence.TmpEvidence.EVIDENCE_TYPE">
@@ -833,11 +834,11 @@ the evidence will be retrieved from the locker.</p></li>
 </ul>
 </div></blockquote>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> – relative path to the evidence within the Locker. For example,
 <code class="docutils literal notranslate"><span class="pre">raw/source1/evidence.json</span></code>.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the evidence object.</p>
 </dd>
 </dl>
@@ -850,11 +851,11 @@ the evidence will be retrieved from the locker.</p></li>
 <p>Returns the corresponding evidence class object based on the category
 provided.  If no match <code class="docutils literal notranslate"><span class="pre">None</span></code> is returned.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>evidence_type</strong> – the type of evidence class desired as a string. Valid
 values are <code class="docutils literal notranslate"><span class="pre">tmp</span></code>, <code class="docutils literal notranslate"><span class="pre">reports</span></code>, <code class="docutils literal notranslate"><span class="pre">derived</span></code>, <code class="docutils literal notranslate"><span class="pre">raw</span></code>, <code class="docutils literal notranslate"><span class="pre">external</span></code>.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the appropriate evidence class.</p>
 </dd>
 </dl>
@@ -872,7 +873,7 @@ putting that evidence into the evidence cache.  When an evidence dependency
 is not found the fetcher is queued up as a dependency rerun for subsequent
 processing.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> – relative path to the evidence within the Locker. For example,
 <code class="docutils literal notranslate"><span class="pre">raw/source1/evidence.json</span></code>.</p></li>
@@ -882,7 +883,7 @@ provided, this defines the fetcher that is added to the re-run list.
 Otherwise the execution stack is traversed to find the fetcher caller.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the evidence object.</p>
 </dd>
 </dl>
@@ -897,7 +898,7 @@ Otherwise the execution stack is traversed to find the fetcher caller.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.evidence.raw_evidence">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.evidence.</span></span><span class="sig-name descname"><span class="pre">raw_evidence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#raw_evidence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.evidence.raw_evidence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.evidence._EvidenceContextManager</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_EvidenceContextManager</span></code></p>
 <p>Helper context manager for a typical <code class="docutils literal notranslate"><span class="pre">fetch_</span></code> method implementation.</p>
 <p>Use when retrieving raw evidence by a fetcher and the name of the evidence
 is dynamic.  When the evidence name is static/known use the
@@ -921,7 +922,7 @@ derived_evidence context manager instead.</p>
 stored in the locker.  The storing of the evidence is also handled by this
 decorator.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>evidences</strong> – a list of relative paths to the evidences needed by
 the fetcher. They will be passed to the method call.
@@ -944,7 +945,7 @@ raw_evidence context manager instead.</p>
 stored in the locker.  The storing of the evidence is also handled by this
 decorator.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> – relative path to the evidence within the Locker. For example,
 <code class="docutils literal notranslate"><span class="pre">source1/evidence.json</span></code>.</p>
 </dd>
@@ -959,7 +960,7 @@ decorator.</p>
 evidence is static/known.  When the evidence name is dynamic use the
 tmp_evidence context manager instead.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> – relative path to the evidence within the Locker. For example,
 <code class="docutils literal notranslate"><span class="pre">source1/evidence.json</span></code>.</p>
 </dd>
@@ -969,7 +970,7 @@ tmp_evidence context manager instead.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.evidence.tmp_evidence">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.evidence.</span></span><span class="sig-name descname"><span class="pre">tmp_evidence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/evidence.html#tmp_evidence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.evidence.tmp_evidence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.evidence._EvidenceContextManager</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_EvidenceContextManager</span></code></p>
 <p>Helper context manager for a typical <code class="docutils literal notranslate"><span class="pre">fetch_</span></code> method implementation.</p>
 <p>Use when retrieving temporary evidence by a fetcher and the name of the
 evidence is dynamic.  When the evidence name is static/known use the
@@ -990,7 +991,7 @@ the calling <code class="docutils literal notranslate"><span class="pre">with</s
 evidence is/are static/known.  When the evidence names are dynamic use the
 <code class="docutils literal notranslate"><span class="pre">evidences</span></code> context manager instead.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>from_evidences</strong> – relative paths to evidences as strings or
 LazyLoader namedtuples that contain relative paths to evidences and
 evidence classes required by the check.</p>
@@ -1006,7 +1007,7 @@ evidence classes required by the check.</p>
 evidence is/are static/known.  When the evidence names are dynamic use the
 <code class="docutils literal notranslate"><span class="pre">evidences</span></code> context manager instead.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>from_evidences</strong> – relative paths to evidences as strings or
 LazyLoader namedtuples that contain relative paths to evidences and
 evidence classes required by the check.</p>
@@ -1022,7 +1023,7 @@ evidence classes required by the check.</p>
 evidence is/are static/known.  When the evidence names are dynamic use the
 <code class="docutils literal notranslate"><span class="pre">evidences</span></code> context manager instead.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>from_evidences</strong> – relative paths to evidences as strings or
 LazyLoader namedtuples that contain relative paths to evidences and
 evidence classes required by the check.</p>
@@ -1038,7 +1039,7 @@ evidence classes required by the check.</p>
 evidence is/are static/known.  When the evidence names are dynamic use the
 <code class="docutils literal notranslate"><span class="pre">evidences</span></code> context manager instead.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>from_evidences</strong> – relative paths to evidences as strings or
 LazyLoader namedtuples that contain relative paths to evidences and
 evidence classes required by the check.</p>
@@ -1048,12 +1049,12 @@ evidence classes required by the check.</p>
 
 </section>
 <section id="module-compliance.fetch">
-<span id="compliance-fetch-module"></span><h2>compliance.fetch module<a class="headerlink" href="#module-compliance.fetch" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-fetch-module"></span><h2>compliance.fetch module<a class="headerlink" href="#module-compliance.fetch" title="Permalink to this heading">¶</a></h2>
 <p>Compliance fetcher automation module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.fetch.ComplianceFetcher">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.fetch.</span></span><span class="sig-name descname"><span class="pre">ComplianceFetcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/fetch.html#ComplianceFetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.fetch.ComplianceFetcher" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
 <p>Compliance fetcher automation TestCase class.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compliance.fetch.ComplianceFetcher.fetchCloudantDoc">
@@ -1061,13 +1062,13 @@ evidence classes required by the check.</p>
 <dd><p>Retrieve a Cloudant document.</p>
 <p>Helper/Convenience method.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>db_url</strong> – the URL to the Cloudant doc to retrieve.</p></li>
 <li><p><strong>params</strong> – optional parameters to include in the GET request.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the Cloudant document content.</p>
 </dd>
 </dl>
@@ -1079,7 +1080,7 @@ evidence classes required by the check.</p>
 <dd><p>Retrieve the output from locally executed commands.</p>
 <p>Helper/Convenience method.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>commands</strong> – A <cite>list</cite> of string commands to be executed.</p></li>
 <li><p><strong>cwd</strong> – Override the current working directory. Defaults to <cite>None</cite>.</p></li>
@@ -1093,7 +1094,7 @@ executed. Defaults to <cite>False</cite>.</p></li>
 user.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Command output as a string.</p>
 </dd>
 </dl>
@@ -1105,14 +1106,14 @@ user.</p></li>
 <dd><p>Retrieve remote content through an HTTP GET request.</p>
 <p>Helper/Convenience method.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>url</strong> – the URL of the file.</p></li>
 <li><p><strong>params</strong> – optional parameters to include in the GET request.</p></li>
 <li><p><strong>creds</strong> – optional tuple with (user, password) to be used.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the remote content.</p>
 </dd>
 </dl>
@@ -1123,7 +1124,7 @@ user.</p></li>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">headers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/fetch.html#ComplianceFetcher.session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.fetch.ComplianceFetcher.session" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a requests session object with User-Agent header.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>url</strong> – optional base URL for the session requests to use.  A url
 argument triggers a new session object to be created whereas no url
@@ -1132,7 +1133,7 @@ argument will return the current session object if one exists.</p></li>
 <li><p><strong>headers</strong> – optional kwargs to add to session headers.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a requests Session object.</p>
 </dd>
 </dl>
@@ -1151,13 +1152,13 @@ argument will return the current session object if one exists.</p></li>
 <span class="sig-prename descclassname"><span class="pre">compliance.fetch.</span></span><span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/fetch.html#fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.fetch.fetch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write content retrieved from provided url to a file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>url</strong> – the URL to GET content from.</p></li>
 <li><p><strong>name</strong> – the name of the file to write to in the TMPDIR.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the path to the file.</p>
 </dd>
 </dl>
@@ -1165,7 +1166,7 @@ argument will return the current session object if one exists.</p></li>
 
 </section>
 <section id="module-compliance.fix">
-<span id="compliance-fix-module"></span><h2>compliance.fix module<a class="headerlink" href="#module-compliance.fix" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-fix-module"></span><h2>compliance.fix module<a class="headerlink" href="#module-compliance.fix" title="Permalink to this heading">¶</a></h2>
 <p>Compliance fixer automation module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.fix.Fixer">
@@ -1183,7 +1184,7 @@ executed, or if in dry-run mode, will print out the method’s
 docstring, injecting any arguments if needed.  The check’s
 fixed_failure_count is incremented if the fix was successful.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>test_obj</strong> – instance of subclass of
 <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.utils.check.ComplianceCheck</span></code> on which
@@ -1218,11 +1219,11 @@ a single <cite>fix_failures</cite> method which handles all fixes for the class.
 
 </section>
 <section id="module-compliance.locker">
-<span id="compliance-locker-module"></span><h2>compliance.locker module<a class="headerlink" href="#module-compliance.locker" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-locker-module"></span><h2>compliance.locker module<a class="headerlink" href="#module-compliance.locker" title="Permalink to this heading">¶</a></h2>
 <p>Compliance locker management automation module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.locker.Locker">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.locker.</span></span><span class="sig-name descname"><span class="pre">Locker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_push</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gitconfig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.locker.</span></span><span class="sig-name descname"><span class="pre">Locker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_push</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gitconfig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_extra_lockers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The locker (context manager) class.</p>
 <p>The evidence locker maintains a git repository of evidence and places new
@@ -1234,7 +1235,7 @@ the configured git repository.</p>
 <span class="sig-name descname"><span class="pre">add_content_to_locker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.add_content_to_locker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.add_content_to_locker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add non-evidence text content to the local locker.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>content</strong> – the content to add to the local locker.</p></li>
 <li><p><strong>folder</strong> – the folder in the local locker to add the content to.</p></li>
@@ -1251,7 +1252,7 @@ the configured git repository.</p>
 <p>The locker will generate the file internally and add it to the
 local git repository.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>evidence</strong> – the evidence to add. Note that evidence content
 attribute must be populated.</p></li>
@@ -1269,7 +1270,7 @@ applicable for check generated ReportEvidence.</p></li>
 <span class="sig-name descname"><span class="pre">checkin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.checkin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.checkin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Commit changed files to the local git repository.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>message</strong> – the message to apply on the commit.</p>
 </dd>
 </dl>
@@ -1281,12 +1282,34 @@ applicable for check generated ReportEvidence.</p></li>
 <dd><p>Pull (clone) the remote repository to the local git repository.</p>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="compliance.locker.Locker.clone_depth">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clone_depth</span></span><a class="headerlink" href="#compliance.locker.Locker.clone_depth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide the commit depth used when cloning the repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the clone depth.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compliance.locker.Locker.clone_shallow_since_days">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clone_shallow_since_days</span></span><a class="headerlink" href="#compliance.locker.Locker.clone_shallow_since_days" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide the maximum commit age to fetch when cloning the repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the shallow since days.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="compliance.locker.Locker.create_tombstone_metadata">
 <span class="sig-name descname"><span class="pre">create_tombstone_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.create_tombstone_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.create_tombstone_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create tombstones for evidence being removed from the locker.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>candidate</strong> – either the name of the evidence file or an iterable
 of partition hashes.</p></li>
@@ -1294,7 +1317,7 @@ of partition hashes.</p></li>
 <li><p><strong>reason</strong> – the reason evidence is being removed.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a list of tombstones.</p>
 </dd>
 </dl>
@@ -1311,13 +1334,13 @@ of partition hashes.</p></li>
 <span class="sig-name descname"><span class="pre">get_abandoned_evidences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_abandoned_evidences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.get_abandoned_evidences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a set of evidence where the update <code class="docutils literal notranslate"><span class="pre">threshold</span></code> has passed.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>threshold</strong> (<em>int</em>) – the time in seconds after TTL expires that
 evidence can remain un-updated before it is considered abandoned.
 The abandoned evidence threshold defaults to 30 days if none is
 provided.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a set of abandoned evidence file relative paths.</p>
 </dd>
 </dl>
@@ -1328,7 +1351,7 @@ provided.</p>
 <span class="sig-name descname"><span class="pre">get_content_from_locker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_content_from_locker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.get_content_from_locker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read non-evidence text content from the local locker.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>folder</strong> – the folder in the local locker to get the content from.</p></li>
 <li><p><strong>filename</strong> – the name of the file in the local locker.</p></li>
@@ -1344,7 +1367,7 @@ provided.</p>
 <p>Fetchers will only be considered for re-execution if they initially
 failed to execute due to a dependency error.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a list of fetcher methods to re-execute.</p>
 </dd>
 </dl>
@@ -1357,7 +1380,7 @@ failed to execute due to a dependency error.</p>
 <p>Evidence content is considered empty based on an evidence object’s
 is_empty property.  This information is stored in evidence metadata.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a list of empty evidence file relative paths.</p>
 </dd>
 </dl>
@@ -1373,7 +1396,7 @@ URL is provided in the configuration then an attempt to get the
 historical version of the evidence will be made from the previous
 locker.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>evidence_path</strong> – string path of the evidence within the locker.
 For example, <cite>raw/service1/output.json</cite>.</p></li>
@@ -1383,7 +1406,7 @@ Defaults to False.</p></li>
 Defaults to None which translates to “now”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the populated evidence object.</p>
 </dd>
 </dl>
@@ -1394,13 +1417,13 @@ Defaults to None which translates to “now”.</p></li>
 <span class="sig-name descname"><span class="pre">get_evidence_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evidence_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_evidence_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.get_evidence_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide evidence metadata from package index file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>evidence_path</strong> – the evidence relative path.</p></li>
 <li><p><strong>evidence_dt</strong> – the upper bound evidence commit date.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the metadata for the evidence specified.</p>
 </dd>
 </dl>
@@ -1412,10 +1435,10 @@ Defaults to None which translates to “now”.</p></li>
 <dd><p>Provide the path for a file in the locker.</p>
 <p>The file may or may not exist in the locker.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>filename</strong> – the name of a file in the locker.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the path to the filename provided.</p>
 </dd>
 </dl>
@@ -1426,7 +1449,7 @@ Defaults to None which translates to “now”.</p></li>
 <span class="sig-name descname"><span class="pre">get_hash</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.get_hash" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide the current master revision.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the commit SHA or None.</p>
 </dd>
 </dl>
@@ -1437,7 +1460,7 @@ Defaults to None which translates to “now”.</p></li>
 <span class="sig-name descname"><span class="pre">get_index_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evidence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_index_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.get_index_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide the full path to the index file of the given evidence.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>evidence</strong> – the evidence object to be used.</p>
 </dd>
 </dl>
@@ -1448,11 +1471,11 @@ Defaults to None which translates to “now”.</p></li>
 <span class="sig-name descname"><span class="pre">get_index_file_by_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evidence_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_index_file_by_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.get_index_file_by_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide the full path to the supplied evidence’s index file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>evidence_path</strong> – the path to the evidence within the evidence
 locker.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the full path to the evidence’s index file.</p>
 </dd>
 </dl>
@@ -1464,10 +1487,10 @@ locker.</p>
 <dd><p>Provide a dictionary of “large” evidence locker files.</p>
 <p>A “large” file is one whose size is &gt; the <code class="docutils literal notranslate"><span class="pre">size</span></code> argument provided.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>size</strong> (<em>int</em>) – file size threshold.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a dictionary of file paths and sizes of “large” files.</p>
 </dd>
 </dl>
@@ -1478,13 +1501,13 @@ locker.</p>
 <span class="sig-name descname"><span class="pre">get_latest_commit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_latest_commit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.get_latest_commit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide the most recent commit for the file and date specified.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> – the relative path to the file.</p></li>
 <li><p><strong>dt</strong> – the upper bound commit date.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the latest commit containing the file specified.</p>
 </dd>
 </dl>
@@ -1495,7 +1518,7 @@ locker.</p>
 <span class="sig-name descname"><span class="pre">get_locker_repo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'evidence</span> <span class="pre">locker'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_locker_repo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.get_locker_repo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pull (clone) the remote repository to the local git repository.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>locker</strong> – the locker “name” used in logging</p>
 </dd>
 </dl>
@@ -1507,7 +1530,7 @@ locker.</p>
 <dd><p>Provide the path for a file/commit SHA in the locker.</p>
 <p>The file may or may not exist in the locker.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename</strong> – the name of a file in the locker.</p></li>
 <li><p><strong>include_commit</strong> – if the latest commit SHA should be included.</p></li>
@@ -1515,7 +1538,7 @@ locker.</p>
 <li><p><strong>locker_url</strong> – use this locker_url instead of self.repo_url.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the remote repository path to the filename provided.</p>
 </dd>
 </dl>
@@ -1526,8 +1549,19 @@ locker.</p>
 <span class="sig-name descname"><span class="pre">get_reports_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.get_reports_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.get_reports_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide all metadata related to reports as a dictionary.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>reports metadata.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compliance.locker.Locker.head_commit_hexsha">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">head_commit_hexsha</span></span><a class="headerlink" href="#compliance.locker.Locker.head_commit_hexsha" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get SHA of repository head commit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>40 byte hexadecimal version of 20 byte binary SHA.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1537,7 +1571,7 @@ locker.</p>
 <span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evidence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence_used</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an evidence to the git index.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>evidence</strong> – the evidence object.</p></li>
 <li><p><strong>checks</strong> – A list of checks used to generate report content.  Only
@@ -1568,14 +1602,14 @@ be cloned. If not, a fresh new git repository will be created locally.</p>
 <span class="sig-name descname"><span class="pre">load_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evidence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_ttl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.load_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.load_content" title="Permalink to this definition">¶</a></dt>
 <dd><p>Populate the content of the evidence from the locker.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>evidence</strong> – an evidence object.</p></li>
 <li><p><strong>ignore_ttl</strong> – Boolean for TTL validation.  Defaults to False.</p></li>
 <li><p><strong>evidence_dt</strong> – The date of the evidence content to load.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The evidence object with content.</p>
 </dd>
 </dl>
@@ -1606,7 +1640,7 @@ be cloned. If not, a fresh new git repository will be created locally.</p>
 and when partitioned file content is no longer part of the overall
 evidence content.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>evidence</strong> – the evidence object.</p></li>
 <li><p><strong>hashes</strong> – an iterable with evidence partition hashes.</p></li>
@@ -1628,7 +1662,7 @@ evidence content.</p>
 <p>Files are considered “touched” if they have been added/updated in
 the locker.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a list of touched files.</p>
 </dd>
 </dl>
@@ -1639,13 +1673,13 @@ the locker.</p>
 <span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evidence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_ttl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#Locker.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.Locker.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate the evidence against the time to live.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>evidence</strong> – an Evidence object.</p></li>
 <li><p><strong>ignore_ttl</strong> – ignore time to live if set to True.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True/False time to live validation.</p>
 </dd>
 </dl>
@@ -1666,10 +1700,10 @@ updated evidence.</p>
 <span class="sig-prename descclassname"><span class="pre">compliance.locker.</span></span><span class="sig-name descname"><span class="pre">is_evidence_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">git_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#is_evidence_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.is_evidence_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confirm whether the supplied git object is an evidence file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>git_obj</strong> – A GitPython object</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True or False (Object is or isn’t an evidence file)</p>
 </dd>
 </dl>
@@ -1680,10 +1714,10 @@ updated evidence.</p>
 <span class="sig-prename descclassname"><span class="pre">compliance.locker.</span></span><span class="sig-name descname"><span class="pre">is_index_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/locker.html#is_index_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.locker.is_index_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confirm whether the supplied object is, or points to, an index file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>obj</strong> – Either a GitPython object or a relative file path as a string</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True or False (Object is or isn’t an index file)</p>
 </dd>
 </dl>
@@ -1691,12 +1725,12 @@ updated evidence.</p>
 
 </section>
 <section id="module-compliance.notify">
-<span id="compliance-notify-module"></span><h2>compliance.notify module<a class="headerlink" href="#module-compliance.notify" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-notify-module"></span><h2>compliance.notify module<a class="headerlink" href="#module-compliance.notify" title="Permalink to this heading">¶</a></h2>
 <p>Compliance notification management automation module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.notify.FDNotifier">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.notify.</span></span><span class="sig-name descname"><span class="pre">FDNotifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fd=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='UTF-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">push_error=False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#FDNotifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.notify.FDNotifier" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.notify._BaseNotifier</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseNotifier</span></code></p>
 <p>File descriptor notifier class.</p>
 <p>Notifications are written to the file descriptor specified.
 Defaults to STDOUT.</p>
@@ -1711,7 +1745,7 @@ Defaults to STDOUT.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.notify.FindingsNotifier">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.notify.</span></span><span class="sig-name descname"><span class="pre">FindingsNotifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">push_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#FindingsNotifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.notify.FindingsNotifier" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.notify._BaseNotifier</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseNotifier</span></code></p>
 <p>Findings notifier class.</p>
 <p>Notifications are sent using the Findings API.  This notifier is
 configurable via <a class="reference internal" href="#compliance.config.ComplianceConfig" title="compliance.config.ComplianceConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.config.ComplianceConfig</span></code></a>.</p>
@@ -1726,7 +1760,7 @@ configurable via <a class="reference internal" href="#compliance.config.Complian
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.notify.GHIssuesNotifier">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.notify.</span></span><span class="sig-name descname"><span class="pre">GHIssuesNotifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">push_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#GHIssuesNotifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.notify.GHIssuesNotifier" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.notify._BaseMDNotifier</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseMDNotifier</span></code></p>
 <p>Github notifier class.</p>
 <p>Notifications are sent to Github as repository issues.  This
 notifier is configurable via <a class="reference internal" href="#compliance.config.ComplianceConfig" title="compliance.config.ComplianceConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.config.ComplianceConfig</span></code></a>.</p>
@@ -1741,11 +1775,11 @@ notifier is configurable via <a class="reference internal" href="#compliance.con
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.notify.LockerNotifier">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.notify.</span></span><span class="sig-name descname"><span class="pre">LockerNotifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">push_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#LockerNotifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.notify.LockerNotifier" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.notify._BaseMDNotifier</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseMDNotifier</span></code></p>
 <p>Evidence Locker notifier class.</p>
 <p>Notifications are written to the evidence locker.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>results</strong> – dictionary generated by
 <a class="reference internal" href="#compliance.runners.CheckMode" title="compliance.runners.CheckMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.runners.CheckMode</span></code></a> at the end of the execution.</p></li>
@@ -1765,7 +1799,7 @@ that they belong to.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.notify.PagerDutyNotifier">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.notify.</span></span><span class="sig-name descname"><span class="pre">PagerDutyNotifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">push_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#PagerDutyNotifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.notify.PagerDutyNotifier" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.notify._BaseNotifier</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseNotifier</span></code></p>
 <p>PagerDuty notifier class.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compliance.notify.PagerDutyNotifier.notify">
@@ -1778,7 +1812,7 @@ that they belong to.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.notify.SlackNotifier">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.notify.</span></span><span class="sig-name descname"><span class="pre">SlackNotifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">push_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#SlackNotifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.notify.SlackNotifier" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.notify._BaseNotifier</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseNotifier</span></code></p>
 <p>Slack notifier class.</p>
 <p>Notifications are sent to Slack channel(s).  This notifier is
 configurable via <a class="reference internal" href="#compliance.config.ComplianceConfig" title="compliance.config.ComplianceConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.config.ComplianceConfig</span></code></a>.</p>
@@ -1807,7 +1841,7 @@ values.</p>
 
 </section>
 <section id="module-compliance.report">
-<span id="compliance-report-module"></span><h2>compliance.report module<a class="headerlink" href="#module-compliance.report" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-report-module"></span><h2>compliance.report module<a class="headerlink" href="#module-compliance.report" title="Permalink to this heading">¶</a></h2>
 <p>Compliance report build automation module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.report.ReportBuilder">
@@ -1828,7 +1862,7 @@ values.</p>
 reports and evidences used, found in the report metadata.  It
 returns a dictionary keyed by check class dot path.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rpt_metadata</strong> – Metadata from all report evidence index.json files</p>
 </dd>
 </dl>
@@ -1841,7 +1875,7 @@ returns a dictionary keyed by check class dot path.</p>
 <p>This method generates a TOC based on all report evidence metadata and
 appends that TOC to the bottom of an evidence locker’s README.md file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rpt_metadata</strong> – Metadata from all report evidence index.json files</p>
 </dd>
 </dl>
@@ -1852,7 +1886,7 @@ appends that TOC to the bottom of an evidence locker’s README.md file.</p>
 <span class="sig-name descname"><span class="pre">get_template_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/report.html#ReportBuilder.get_template_for"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.report.ReportBuilder.get_template_for" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide the file path of the template associated to the given evidence.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>test_report_obj</strong> – the test object that needs to create report.</p></li>
 <li><p><strong>evidence</strong> – the ReportEvidence object expected.</p></li>
@@ -1868,7 +1902,7 @@ appends that TOC to the bottom of an evidence locker’s README.md file.</p>
 <p>If template system was selected, this method renders the content
 using the template for the given evidence.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>evidence</strong> – the evidence object to be rendered using its template.</p></li>
 <li><p><strong>test_obj</strong> – test object which has all the tests for check.</p></li>
@@ -1881,12 +1915,12 @@ using the template for the given evidence.</p>
 
 </section>
 <section id="module-compliance.runners">
-<span id="compliance-runners-module"></span><h2>compliance.runners module<a class="headerlink" href="#module-compliance.runners" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-runners-module"></span><h2>compliance.runners module<a class="headerlink" href="#module-compliance.runners" title="Permalink to this heading">¶</a></h2>
 <p>Compliance automation flow management module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.runners.CheckMode">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.runners.</span></span><span class="sig-name descname"><span class="pre">CheckMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_opts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/runners.html#CheckMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.runners.CheckMode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.runners._BaseRunner</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseRunner</span></code></p>
 <p>The check process flow.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compliance.runners.CheckMode.build_reports">
@@ -1917,7 +1951,7 @@ using the template for the given evidence.</p>
 <span class="sig-name descname"><span class="pre">run_checks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/runners.html#CheckMode.run_checks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.runners.CheckMode.run_checks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute checks.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Success (True) if no errors encountered</p>
 </dd>
 </dl>
@@ -1934,7 +1968,7 @@ using the template for the given evidence.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.runners.ComplianceBaseResult">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.runners.</span></span><span class="sig-name descname"><span class="pre">ComplianceBaseResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/runners.html#ComplianceBaseResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.runners.ComplianceBaseResult" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.runner.TextTestResult</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TextTestResult</span></code></p>
 <p>Base Compliance result class.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compliance.runners.ComplianceBaseResult.startTest">
@@ -1953,14 +1987,14 @@ using the template for the given evidence.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.runners.ComplianceCheckResult">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.runners.</span></span><span class="sig-name descname"><span class="pre">ComplianceCheckResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/runners.html#ComplianceCheckResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.runners.ComplianceCheckResult" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#compliance.runners.ComplianceBaseResult" title="compliance.runners.ComplianceBaseResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.runners.ComplianceBaseResult</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#compliance.runners.ComplianceBaseResult" title="compliance.runners.ComplianceBaseResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComplianceBaseResult</span></code></a></p>
 <p>Compliance check result class.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compliance.runners.ComplianceCheckResult.addError">
 <span class="sig-name descname"><span class="pre">addError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/runners.html#ComplianceCheckResult.addError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.runners.ComplianceCheckResult.addError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add test errors to check results.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>test</strong> – a <code class="docutils literal notranslate"><span class="pre">unittest.TestCase</span></code> object.</p></li>
 <li><p><strong>err</strong> – a tuple of the form returned by sys.exc_info()</p></li>
@@ -1974,7 +2008,7 @@ using the template for the given evidence.</p>
 <span class="sig-name descname"><span class="pre">addFailure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/runners.html#ComplianceCheckResult.addFailure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.runners.ComplianceCheckResult.addFailure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add test failures to check results.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>test</strong> – a <code class="docutils literal notranslate"><span class="pre">unittest.TestCase</span></code> object.</p></li>
 <li><p><strong>err</strong> – a tuple of the form returned by sys.exc_info()</p></li>
@@ -1988,7 +2022,7 @@ using the template for the given evidence.</p>
 <span class="sig-name descname"><span class="pre">addSuccess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/runners.html#ComplianceCheckResult.addSuccess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.runners.ComplianceCheckResult.addSuccess" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add test successes and warnings to check results.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>test</strong> – a <code class="docutils literal notranslate"><span class="pre">unittest.TestCase</span></code> object.</p>
 </dd>
 </dl>
@@ -1999,7 +2033,7 @@ using the template for the given evidence.</p>
 <span class="sig-name descname"><span class="pre">record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/runners.html#ComplianceCheckResult.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.runners.ComplianceCheckResult.record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Populate the results as expected by downstream reports and notifiers.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>test</strong> – a <code class="docutils literal notranslate"><span class="pre">unittest.TestCase</span></code> object.</p></li>
 <li><p><strong>status</strong> – a string status (<cite>pass</cite>, <cite>warn</cite>, <cite>fail</cite>, or <cite>error</cite>)</p></li>
@@ -2022,7 +2056,7 @@ compatibility with checks, reporting, and notifiers.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.runners.FetchMode">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.runners.</span></span><span class="sig-name descname"><span class="pre">FetchMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_opts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/runners.html#FetchMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.runners.FetchMode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.runners._BaseRunner</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseRunner</span></code></p>
 <p>The fetcher process flow.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compliance.runners.FetchMode.get_fetchers">
@@ -2035,10 +2069,10 @@ compatibility with checks, reporting, and notifiers.</p>
 <span class="sig-name descname"><span class="pre">run_fetchers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reruns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/runners.html#FetchMode.run_fetchers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.runners.FetchMode.run_fetchers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute fetchers.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>reruns</strong> – A list of fetchers in dot notation to rerun</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Success (True) if no errors other than dependency unavailable</p>
 </dd>
 </dl>
@@ -2048,7 +2082,7 @@ compatibility with checks, reporting, and notifiers.</p>
 
 </section>
 <section id="module-compliance">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-compliance" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-compliance" title="Permalink to this heading">¶</a></h2>
 <p>Compliance automation package.</p>
 </section>
 </section>
@@ -2109,7 +2143,7 @@ compatibility with checks, reporting, and notifiers.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -2129,14 +2163,14 @@ compatibility with checks, reporting, and notifiers.</p>
         <li class="right" >
           <a href="modules.html" title="compliance"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>

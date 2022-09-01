@@ -1,18 +1,19 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>compliance.utils.services package &#8212; Auditree Framework 1.22.1 documentation</title>
+    <title>compliance.utils.services package &#8212; Auditree Framework 1.23.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
@@ -31,7 +32,7 @@
         <li class="right" >
           <a href="compliance.utils.html" title="compliance.utils package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="compliance.utils.html" accesskey="U">compliance.utils package</a> &#187;</li>
@@ -45,12 +46,12 @@
           <div class="body" role="main">
             
   <section id="compliance-utils-services-package">
-<h1>compliance.utils.services package<a class="headerlink" href="#compliance-utils-services-package" title="Permalink to this headline">¶</a></h1>
+<h1>compliance.utils.services package<a class="headerlink" href="#compliance-utils-services-package" title="Permalink to this heading">¶</a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-compliance.utils.services.github">
-<span id="compliance-utils-services-github-module"></span><h2>compliance.utils.services.github module<a class="headerlink" href="#module-compliance.utils.services.github" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-utils-services-github-module"></span><h2>compliance.utils.services.github module<a class="headerlink" href="#module-compliance.utils.services.github" title="Permalink to this heading">¶</a></h2>
 <p>Compliance Github service helper.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.utils.services.github.Github">
@@ -157,13 +158,13 @@ POST /repos/:owner/:repo/issues/:number/labels</p>
 <span class="sig-name descname"><span class="pre">get_branch_protection_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'master'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.get_branch_protection_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.services.github.Github.get_branch_protection_details" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a repository branch’s branch protection details.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>repo</strong> – the organization/repository as a string.</p></li>
 <li><p><strong>branch</strong> – the branch as a string.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the repository branch’s branch protection details.</p>
 </dd>
 </dl>
@@ -186,7 +187,7 @@ POST /repos/:owner/:repo/issues/:number/labels</p>
 <span class="sig-name descname"><span class="pre">get_commit_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">since</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'master'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.get_commit_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.services.github.Github.get_commit_details" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a repository branch’s commit details since a given date/time.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>repo</strong> – the organization/repository as a string.</p></li>
 <li><p><strong>since</strong> – the starting date/time as a datetime.</p></li>
@@ -194,7 +195,7 @@ POST /repos/:owner/:repo/issues/:number/labels</p>
 <li><p><strong>path</strong> – if provided, only commits for the path will be returned.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the repo branch’s commit details since a given date/time.</p>
 </dd>
 </dl>
@@ -239,14 +240,14 @@ be an empty dictionary if there aren’t any.</p>
 <span class="sig-name descname"><span class="pre">get_pull_requests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">since</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.get_pull_requests"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.services.github.Github.get_pull_requests" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a repository’s pull request information.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>repo</strong> – the organization/repository as a string.</p></li>
 <li><p><strong>since</strong> – the starting date/time of a pull request as a datetime.</p></li>
 <li><p><strong>kwargs</strong> – key/value pairs of GH pulls API accepted params</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Repository pull request metadata</p>
 </dd>
 </dl>
@@ -257,10 +258,10 @@ be an empty dictionary if there aren’t any.</p>
 <span class="sig-name descname"><span class="pre">get_repo_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.get_repo_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.services.github.Github.get_repo_details" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a repository’s metadata.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>repo</strong> – the organization/repository as a string.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the repository’s metadata details.</p>
 </dd>
 </dl>
@@ -277,7 +278,7 @@ be an empty dictionary if there aren’t any.</p>
 <span class="sig-name descname"><span class="pre">make_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.make_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.services.github.Github.make_request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform a REST call to the Github API.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>method</strong> – HTTP request method</p></li>
 <li><p><strong>url</strong> – The URL to make the request to</p></li>
@@ -286,7 +287,7 @@ False then the entire response is returned</p></li>
 <li><p><strong>kwargs</strong> – Additional arguments added directly to the request call</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>response content from the request made</p>
 </dd>
 </dl>
@@ -303,13 +304,13 @@ False then the entire response is returned</p></li>
 <span class="sig-name descname"><span class="pre">paginate_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/services/github.html#Github.paginate_api"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.services.github.Github.paginate_api" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform GET calls handling pagination.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>api_url</strong> – The URL to make the GET request to</p></li>
 <li><p><strong>kwargs</strong> – Additional arguments added directly to the request call</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Combined paginated JSON content</p>
 </dd>
 </dl>
@@ -366,7 +367,7 @@ and then the annotations themselves as a dictionary.</p>
 
 </section>
 <section id="module-compliance.utils.services.pagerduty">
-<span id="compliance-utils-services-pagerduty-module"></span><h2>compliance.utils.services.pagerduty module<a class="headerlink" href="#module-compliance.utils.services.pagerduty" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-utils-services-pagerduty-module"></span><h2>compliance.utils.services.pagerduty module<a class="headerlink" href="#module-compliance.utils.services.pagerduty" title="Permalink to this heading">¶</a></h2>
 <p>Compliance Pagerduty service helper.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compliance.utils.services.pagerduty.delete">
@@ -375,7 +376,7 @@ and then the annotations themselves as a dictionary.</p>
 <p>Returns the result as <code class="xref py py-class docutils literal notranslate"><span class="pre">requests.Response</span></code> object.
 This uses the PD API v2.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> – API endpoint to call (e.g. ‘users’)</p></li>
 <li><p><strong>params</strong> – a dictionary with parameters</p></li>
@@ -393,7 +394,7 @@ This uses the PD API v2.</p>
 <p>Returns the pages wrapped as <code class="xref py py-class docutils literal notranslate"><span class="pre">requests.Response</span></code> object.
 This uses the PD API v2.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> – API endpoint to call (e.g. ‘users’)</p></li>
 <li><p><strong>params</strong> – a dictionary with parameters</p></li>
@@ -411,7 +412,7 @@ This uses the PD API v2.</p>
 <p>Returns the result as <code class="xref py py-class docutils literal notranslate"><span class="pre">requests.Response</span></code> objects.
 This uses the PD API v2.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> – API endpoint to call (e.g. ‘users’)</p></li>
 <li><p><strong>params</strong> – a dictionary with parameters</p></li>
@@ -429,7 +430,7 @@ This uses the PD API v2.</p>
 <p>Return the result as <code class="xref py py-class docutils literal notranslate"><span class="pre">requests.Response</span></code> object.
 This uses the PD API v2.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> – API endpoint to call (e.g. ‘users’)</p></li>
 <li><p><strong>params</strong> – a dictionary with parameters</p></li>
@@ -448,7 +449,7 @@ This uses the PD API v2.</p>
 
 </section>
 <section id="module-compliance.utils.services">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-compliance.utils.services" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-compliance.utils.services" title="Permalink to this heading">¶</a></h2>
 <p>Compliance automation utilities services package.</p>
 </section>
 </section>
@@ -494,7 +495,7 @@ This uses the PD API v2.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -511,7 +512,7 @@ This uses the PD API v2.</p>
         <li class="right" >
           <a href="compliance.utils.html" title="compliance.utils package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="compliance.utils.html" >compliance.utils package</a> &#187;</li>
@@ -520,7 +521,7 @@ This uses the PD API v2.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>

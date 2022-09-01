@@ -1,18 +1,19 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Notifiers &#8212; Auditree Framework 1.22.1 documentation</title>
+    <title>Notifiers &#8212; Auditree Framework 1.23.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
@@ -35,7 +36,7 @@
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>  
@@ -46,7 +47,7 @@
           <div class="body" role="main">
             
   <section id="notifiers">
-<span id="notifiers-description"></span><h1>Notifiers<a class="headerlink" href="#notifiers" title="Permalink to this headline">¶</a></h1>
+<span id="notifiers-description"></span><h1>Notifiers<a class="headerlink" href="#notifiers" title="Permalink to this heading">¶</a></h1>
 <p>The last phase in a typical framework check run is the notification
 system.  Multiple notifiers can be targeted as part of this phase by using
 the <code class="docutils literal notranslate"><span class="pre">--notify</span></code> option on the <code class="docutils literal notranslate"><span class="pre">compliance</span> <span class="pre">--check</span></code> command.  Valid
@@ -105,7 +106,7 @@ evidences generated (if applicable) and a link to the check runbook that
 contains remediation instructions (if applicable).</p>
 <p>The following sections describe the notifiers supported by the framework.</p>
 <section id="file-descriptor">
-<h2>File descriptor<a class="headerlink" href="#file-descriptor" title="Permalink to this headline">¶</a></h2>
+<h2>File descriptor<a class="headerlink" href="#file-descriptor" title="Permalink to this heading">¶</a></h2>
 <p>File descriptor notifications are written directly to standard output.  Among
 other things, this is useful for testing purposes.  The file descriptor
 notifier is also the default notifier and does not need to be specifically
@@ -114,7 +115,7 @@ set using the <code class="docutils literal notranslate"><span class="pre">--not
 failure, error).</p>
 </section>
 <section id="slack">
-<h2>Slack<a class="headerlink" href="#slack" title="Permalink to this headline">¶</a></h2>
+<h2>Slack<a class="headerlink" href="#slack" title="Permalink to this heading">¶</a></h2>
 <p>This configurable notifier will notify Slack channels (including user personal
 channels if desired) per accreditation.  If configured, it will also manage
 a channel monitoring rotation that will select the appropriate user for the
@@ -186,7 +187,7 @@ message of the target private channel. Of course, the Slack App needs
 to be part of the private channel.</p>
 </section>
 <section id="pagerduty">
-<h2>PagerDuty<a class="headerlink" href="#pagerduty" title="Permalink to this headline">¶</a></h2>
+<h2>PagerDuty<a class="headerlink" href="#pagerduty" title="Permalink to this heading">¶</a></h2>
 <p>This configurable notifier will send alerts to PagerDuty.
 The following is an example configuration for this notifier
 to be added to a configuration file and used with the <code class="docutils literal notranslate"><span class="pre">pagerduty</span></code>
@@ -234,7 +235,7 @@ Include the following in your credentials file:</p>
 </div>
 </section>
 <section id="github-issue">
-<h2>GitHub Issue<a class="headerlink" href="#github-issue" title="Permalink to this headline">¶</a></h2>
+<h2>GitHub Issue<a class="headerlink" href="#github-issue" title="Permalink to this heading">¶</a></h2>
 <p>Depending on the configuration this notifier will create or update a GitHub
 issue per check or as a summary issue per accreditation. If an open issue
 already exists then the notification will be added to the existing issue as
@@ -250,7 +251,7 @@ credentials file as shown below:</p>
 </pre></div>
 </div>
 <section id="gh-summary-issue-by-accreditation">
-<h3>GH Summary Issue by Accreditation<a class="headerlink" href="#gh-summary-issue-by-accreditation" title="Permalink to this headline">¶</a></h3>
+<h3>GH Summary Issue by Accreditation<a class="headerlink" href="#gh-summary-issue-by-accreditation" title="Permalink to this heading">¶</a></h3>
 <p>A configuration element for each accreditation is necessary to send summary
 issue notifications using this notifier. Summary notifications send all
 result statuses for checks within the accreditation.  Each accreditation
@@ -385,7 +386,7 @@ compliance checks:</p>
 </div>
 </section>
 <section id="gh-issue-per-check">
-<h3>GH Issue Per Check<a class="headerlink" href="#gh-issue-per-check" title="Permalink to this headline">¶</a></h3>
+<h3>GH Issue Per Check<a class="headerlink" href="#gh-issue-per-check" title="Permalink to this heading">¶</a></h3>
 <p>A configuration element for each accreditation is necessary to send
 notifications per check using this notifier.  Each accreditation configuration
 should consist of a list of repositories to send the notifications to, a
@@ -426,7 +427,7 @@ used with the <code class="docutils literal notranslate"><span class="pre">-C</s
 </section>
 </section>
 <section id="evidence-locker">
-<h2>Evidence Locker<a class="headerlink" href="#evidence-locker" title="Permalink to this headline">¶</a></h2>
+<h2>Evidence Locker<a class="headerlink" href="#evidence-locker" title="Permalink to this heading">¶</a></h2>
 <p>This notifier will take your check execution for all accreditations and put
 a summary markdown file <code class="docutils literal notranslate"><span class="pre">notifications/alerts_summary.md</span></code> into your evidence
 locker.  The summary markdown file will <strong>only</strong> be pushed to the remote
@@ -435,7 +436,7 @@ option when executing your checks otherwise the file will remain in the local
 evidence locker.  No additional configuration is required for this notifier.</p>
 </section>
 <section id="security-advisor-findings">
-<h2>Security Advisor Findings<a class="headerlink" href="#security-advisor-findings" title="Permalink to this headline">¶</a></h2>
+<h2>Security Advisor Findings<a class="headerlink" href="#security-advisor-findings" title="Permalink to this heading">¶</a></h2>
 <p>This configurable notifier will post findings to Security Advisor Findings API
 per accreditation. The following is an example configuration for this notifier
 to be added to a configuration file and used with the <code class="docutils literal notranslate"><span class="pre">-C</span></code> option when
@@ -520,7 +521,7 @@ file:</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -540,13 +541,13 @@ file:</p>
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>

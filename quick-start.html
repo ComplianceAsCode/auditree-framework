@@ -1,18 +1,19 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Quick Start &#8212; Auditree Framework 1.22.1 documentation</title>
+    <title>Quick Start &#8212; Auditree Framework 1.23.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
@@ -35,7 +36,7 @@
         <li class="right" >
           <a href="index.html" title="Auditree framework documentation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Quick Start</a></li> 
       </ul>
     </div>  
@@ -46,7 +47,7 @@
           <div class="body" role="main">
             
   <section id="quick-start">
-<span id="id1"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading">¶</a></h1>
 <p>If any terminology used in this quick start guide is unclear, have a look at the
 <a class="reference internal" href="design-principles.html#design-principles"><span class="std std-ref">Design Principles</span></a> documentation for clarification.</p>
 <p>The Auditree framework requires at least one directory containing fetchers and
@@ -80,9 +81,9 @@ report table of contents and generates a file in the evidence locker root called
 </li>
 </ul>
 <section id="advanced-topics">
-<h2>Advanced Topics<a class="headerlink" href="#advanced-topics" title="Permalink to this headline">¶</a></h2>
+<h2>Advanced Topics<a class="headerlink" href="#advanced-topics" title="Permalink to this heading">¶</a></h2>
 <section id="configuration">
-<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">¶</a></h3>
 <p>There are two configuration files used to configure the execution of the
 <code class="docutils literal notranslate"><span class="pre">auditree-framework</span></code>.  The main configuration file can be named anything you
 like.  In the case of our demo we’ve chosen the name <code class="docutils literal notranslate"><span class="pre">auditree-demo.json</span></code>.  There
@@ -90,7 +91,7 @@ is also a check to accreditation mapping configuration file and this file must b
 named <code class="docutils literal notranslate"><span class="pre">controls.json</span></code>.</p>
 </section>
 <section id="controls-json">
-<h3>controls.json<a class="headerlink" href="#controls-json" title="Permalink to this headline">¶</a></h3>
+<h3>controls.json<a class="headerlink" href="#controls-json" title="Permalink to this heading">¶</a></h3>
 <p>The mapping between a check (check class path) and accreditations
 (a list of accreditations) happens in the <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> configuration
 file.  Each new check must be included in <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> in
@@ -105,7 +106,7 @@ As an example, the format for <code class="docutils literal notranslate"><span c
 </div>
 </section>
 <section id="agents">
-<h3>Agents<a class="headerlink" href="#agents" title="Permalink to this headline">¶</a></h3>
+<h3>Agents<a class="headerlink" href="#agents" title="Permalink to this heading">¶</a></h3>
 <p>All fetchers can be executed in “agent” mode. Agents will cryptographically sign
 any evidence they fetch. The agent name, evidence digest and signature can be
 found in the <code class="docutils literal notranslate"><span class="pre">index.json</span></code> metadata file. See <a class="reference internal" href="verifying-signed-evidence.html#verifying-signed-evidence"><span class="std std-ref">Verifying Signed Evidence</span></a>
@@ -140,7 +141,7 @@ it means only that agent can then be used to execute checks against any signed
 evidence.</p>
 </section>
 <section id="remote-evidence-locker">
-<h3>Remote Evidence Locker<a class="headerlink" href="#remote-evidence-locker" title="Permalink to this headline">¶</a></h3>
+<h3>Remote Evidence Locker<a class="headerlink" href="#remote-evidence-locker" title="Permalink to this heading">¶</a></h3>
 <p>Storing and using evidence in a Git remote hosting service repository is achievable
 by using the <code class="docutils literal notranslate"><span class="pre">--evidence</span></code> option with settings of either <code class="docutils literal notranslate"><span class="pre">no-push</span></code> or
 <code class="docutils literal notranslate"><span class="pre">full-remote</span></code> along with the locker configuration URL similar to the one found
@@ -187,9 +188,36 @@ remote locker:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ compliance --check demo.arboretum.accred,demo.custom.accred --evidence full-remote -C auditree_demo.json
 </pre></div>
 </div>
+<p>You can configure multiple remote lockers using the <code class="docutils literal notranslate"><span class="pre">extra</span></code>
+configuration. This is useful if you’re running lots of Auditree agents and
+storing evidence in multiple lockers. It allows you to check all evidence
+centrally, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;locker&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/foo/evidence-locker&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;extra&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&quot;depth&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+      <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/foo/evidence-locker-bar&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/foo/evidence-locker-baz&quot;</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">extra</span></code> lockers are only used when <strong>checking</strong> evidence. If evidence is
+not found in the primary locker then Auditree will look in any <code class="docutils literal notranslate"><span class="pre">extra</span></code> lockers
+that have been configured. Only the primary locker can be used to store new
+evidence.</p>
+<p>Auditree clones the evidence locker at the start of every run. This can take a
+long time if the repository is large. If you don’t need the full repository
+history then consider using the <code class="docutils literal notranslate"><span class="pre">depth</span></code> configuration. This creates a shallow
+clone with a history truncated to the specified number of commits. See the
+configuration example above where <code class="docutils literal notranslate"><span class="pre">depth</span></code> has been set to 10.</p>
 </section>
 <section id="notifications">
-<h3>Notifications<a class="headerlink" href="#notifications" title="Permalink to this headline">¶</a></h3>
+<h3>Notifications<a class="headerlink" href="#notifications" title="Permalink to this heading">¶</a></h3>
 <p>You can also configure the check run to send notifications to Slack,
 GitHub (as issues), PagerDuty, the evidence locker, Findings, and the terminal
 console which is the default.  To do this add the desired notifier(s) to your
@@ -219,7 +247,7 @@ as many notifiers as you want on any given check execution.</p>
 </section>
 </section>
 <section id="recommendations">
-<h2>Recommendations<a class="headerlink" href="#recommendations" title="Permalink to this headline">¶</a></h2>
+<h2>Recommendations<a class="headerlink" href="#recommendations" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Use the example project showcased above as a template for your configuration/execution</p></li>
 </ul>
@@ -301,7 +329,7 @@ tool.</p></li>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -321,13 +349,13 @@ tool.</p></li>
         <li class="right" >
           <a href="index.html" title="Auditree framework documentation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Quick Start</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>

@@ -1,18 +1,19 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Partitioned Evidence &#8212; Auditree Framework 1.22.1 documentation</title>
+    <title>Partitioned Evidence &#8212; Auditree Framework 1.23.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
@@ -35,7 +36,7 @@
         <li class="right" >
           <a href="oscal.html" title="OSCAL Support"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Partitioned Evidence</a></li> 
       </ul>
     </div>  
@@ -46,7 +47,7 @@
           <div class="body" role="main">
             
   <section id="partitioned-evidence">
-<span id="evidence-partitioning"></span><h1>Partitioned Evidence<a class="headerlink" href="#partitioned-evidence" title="Permalink to this headline">¶</a></h1>
+<span id="evidence-partitioning"></span><h1>Partitioned Evidence<a class="headerlink" href="#partitioned-evidence" title="Permalink to this heading">¶</a></h1>
 <p>Depending on the repository hosting service being used, it may be necessary to
 manage evidence more effectively.  For example Github has limits on individual
 file sizes.  In cases like this it is possible to partition evidence into
@@ -75,7 +76,7 @@ field with the evidence JSON document.</p></li>
 </li>
 </ul>
 <section id="partition-by-configuration">
-<h2>Partition By Configuration<a class="headerlink" href="#partition-by-configuration" title="Permalink to this headline">¶</a></h2>
+<h2>Partition By Configuration<a class="headerlink" href="#partition-by-configuration" title="Permalink to this heading">¶</a></h2>
 <p>Turning partitioning on for a given evidence can be accomplished by setting the
 appropriate <code class="docutils literal notranslate"><span class="pre">locker.partitions</span></code> parameters in your configuration file.
 Parameters include the relative repository path to the raw evidence (sans the
@@ -109,7 +110,7 @@ where the evidence will be partitioned.  For example:</p>
 </div>
 </section>
 <section id="partition-by-evidence">
-<h2>Partition By Evidence<a class="headerlink" href="#partition-by-evidence" title="Permalink to this headline">¶</a></h2>
+<h2>Partition By Evidence<a class="headerlink" href="#partition-by-evidence" title="Permalink to this heading">¶</a></h2>
 <p>Turning partitioning on for a given evidence can also be accomplished by
 directly constructing your raw evidence object in your fetcher with the
 appropriate partitioning parameters.  Parameters include the partition key(s)
@@ -141,9 +142,9 @@ partitioned.  For example:</p>
 object overrides partitioning by configuration.</p>
 </section>
 <section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h2>
 <section id="default-partition-root">
-<h3>Default Partition Root<a class="headerlink" href="#default-partition-root" title="Permalink to this headline">¶</a></h3>
+<h3>Default Partition Root<a class="headerlink" href="#default-partition-root" title="Permalink to this heading">¶</a></h3>
 <ul>
 <li><p>Unpartitioned evidence content:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
@@ -200,7 +201,7 @@ object overrides partitioning by configuration.</p>
 </ul>
 </section>
 <section id="explicit-partition-root">
-<h3>Explicit Partition Root<a class="headerlink" href="#explicit-partition-root" title="Permalink to this headline">¶</a></h3>
+<h3>Explicit Partition Root<a class="headerlink" href="#explicit-partition-root" title="Permalink to this heading">¶</a></h3>
 <ul>
 <li><p>Unpartitioned evidence content:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -333,7 +334,7 @@ object overrides partitioning by configuration.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -353,13 +354,13 @@ object overrides partitioning by configuration.</p>
         <li class="right" >
           <a href="oscal.html" title="OSCAL Support"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Partitioned Evidence</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>

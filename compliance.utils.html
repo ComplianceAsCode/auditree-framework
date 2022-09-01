@@ -1,18 +1,19 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>compliance.utils package &#8212; Auditree Framework 1.22.1 documentation</title>
+    <title>compliance.utils package &#8212; Auditree Framework 1.23.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
@@ -35,7 +36,7 @@
         <li class="right" >
           <a href="compliance.scripts.html" title="compliance.scripts package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" accesskey="U">compliance package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils package</a></li> 
@@ -48,9 +49,9 @@
           <div class="body" role="main">
             
   <section id="compliance-utils-package">
-<h1>compliance.utils package<a class="headerlink" href="#compliance-utils-package" title="Permalink to this headline">¶</a></h1>
+<h1>compliance.utils package<a class="headerlink" href="#compliance-utils-package" title="Permalink to this heading">¶</a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compliance.utils.services.html">compliance.utils.services package</a><ul>
@@ -64,10 +65,10 @@
 </div>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-compliance.utils.credentials">
-<span id="compliance-utils-credentials-module"></span><h2>compliance.utils.credentials module<a class="headerlink" href="#module-compliance.utils.credentials" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-utils-credentials-module"></span><h2>compliance.utils.credentials module<a class="headerlink" href="#module-compliance.utils.credentials" title="Permalink to this heading">¶</a></h2>
 <p>Compliance credentials configuration.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.utils.credentials.Config">
@@ -95,7 +96,7 @@
 
 </section>
 <section id="module-compliance.utils.data_parse">
-<span id="compliance-utils-data-parse-module"></span><h2>compliance.utils.data_parse module<a class="headerlink" href="#module-compliance.utils.data_parse" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-utils-data-parse-module"></span><h2>compliance.utils.data_parse module<a class="headerlink" href="#module-compliance.utils.data_parse" title="Permalink to this heading">¶</a></h2>
 <p>Compliance automation data and formatting utilities module.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compliance.utils.data_parse.deep_merge">
@@ -113,13 +114,13 @@
 the appropriate separators for all instances of JSON generated
 by this library.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – The data structure to be formatted.</p></li>
 <li><p><strong>add_kwargs</strong> – Additional json.dumps options</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A formatted JSON string.</p>
 </dd>
 </dl>
@@ -130,14 +131,14 @@ by this library.</p>
 <span class="sig-prename descclassname"><span class="pre">compliance.utils.data_parse.</span></span><span class="sig-name descname"><span class="pre">get_sha256_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/data_parse.html#get_sha256_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.data_parse.get_sha256_hash" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a SHA256 hash based on the supplied key values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>key</strong> – An iterable of key values.</p></li>
 <li><p><strong>size</strong> – The size of the returned hash.  Defaults to full hash.  If
 size provided is greater than the hash size the full hash is returned.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a SHA256 hash for the key values supplied.</p>
 </dd>
 </dl>
@@ -149,14 +150,14 @@ size provided is greater than the hash size the full hash is returned.</p></li>
 <dd><p>Provide the element from the <code class="docutils literal notranslate"><span class="pre">data</span></code> dictionary defined by the <code class="docutils literal notranslate"><span class="pre">key</span></code>.</p>
 <p>The key may be a key path depicted by dot notation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – A dictionary</p></li>
 <li><p><strong>key</strong> – A dictionary key string that may be a key path depicted by dot
 notation.  For example “foo.bar”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The dictionary value from <code class="docutils literal notranslate"><span class="pre">data</span></code> associated to the <code class="docutils literal notranslate"><span class="pre">key</span></code>.</p>
 </dd>
 </dl>
@@ -164,7 +165,7 @@ notation.  For example “foo.bar”.</p></li>
 
 </section>
 <section id="module-compliance.utils.exceptions">
-<span id="compliance-utils-exceptions-module"></span><h2>compliance.utils.exceptions module<a class="headerlink" href="#module-compliance.utils.exceptions" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-utils-exceptions-module"></span><h2>compliance.utils.exceptions module<a class="headerlink" href="#module-compliance.utils.exceptions" title="Permalink to this heading">¶</a></h2>
 <p>Compliance automation custom exceptions module.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="compliance.utils.exceptions.DependencyFetcherNotFoundError">
@@ -217,12 +218,12 @@ notation.  For example “foo.bar”.</p></li>
 
 </section>
 <section id="module-compliance.utils.http">
-<span id="compliance-utils-http-module"></span><h2>compliance.utils.http module<a class="headerlink" href="#module-compliance.utils.http" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-utils-http-module"></span><h2>compliance.utils.http module<a class="headerlink" href="#module-compliance.utils.http" title="Permalink to this heading">¶</a></h2>
 <p>Compliance HTTP helpers.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="compliance.utils.http.BaseSession">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.utils.http.</span></span><span class="sig-name descname"><span class="pre">BaseSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">baseurl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/http.html#BaseSession"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.http.BaseSession" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">requests.sessions.Session</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></p>
 <p>Subclass of requests.Session to support a base URL.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compliance.utils.http.BaseSession.prepare_request">
@@ -234,17 +235,17 @@ notation.  For example “foo.bar”.</p></li>
 
 </section>
 <section id="module-compliance.utils.path">
-<span id="compliance-utils-path-module"></span><h2>compliance.utils.path module<a class="headerlink" href="#module-compliance.utils.path" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-utils-path-module"></span><h2>compliance.utils.path module<a class="headerlink" href="#module-compliance.utils.path" title="Permalink to this heading">¶</a></h2>
 <p>Compliance automation path formatting utilities module.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compliance.utils.path.get_module_path">
 <span class="sig-prename descclassname"><span class="pre">compliance.utils.path.</span></span><span class="sig-name descname"><span class="pre">get_module_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/path.html#get_module_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.path.get_module_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide the full module dot notation path based on the file path provided.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> – absolute or relative path to a file or directory.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the module path in dot notation.</p>
 </dd>
 </dl>
@@ -257,10 +258,10 @@ notation.  For example “foo.bar”.</p></li>
 <p>The top level directory contains the <code class="docutils literal notranslate"><span class="pre">controls.json</span></code> file.
 This function returns <code class="docutils literal notranslate"><span class="pre">None</span></code> if a top level path can not be found.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> – absolute or relative path to a file or directory.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the absolute path to the top level directory.</p>
 </dd>
 </dl>
@@ -271,7 +272,7 @@ This function returns <code class="docutils literal notranslate"><span class="pr
 <span class="sig-prename descclassname"><span class="pre">compliance.utils.path.</span></span><span class="sig-name descname"><span class="pre">load_evidences_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/path.html#load_evidences_modules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.path.load_evidences_modules" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load all evidences modules found within the <code class="docutils literal notranslate"><span class="pre">path</span></code> directory structure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> – absolute path to a top level directory.</p>
 </dd>
 </dl>
@@ -282,7 +283,7 @@ This function returns <code class="docutils literal notranslate"><span class="pr
 <span class="sig-prename descclassname"><span class="pre">compliance.utils.path.</span></span><span class="sig-name descname"><span class="pre">substitute_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_tmpl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/utils/path.html#substitute_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.utils.path.substitute_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Substitute the config values on the given path template.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path_tmpl</strong> – a string template of a path</p>
 </dd>
 </dl>
@@ -290,7 +291,7 @@ This function returns <code class="docutils literal notranslate"><span class="pr
 
 </section>
 <section id="module-compliance.utils.test">
-<span id="compliance-utils-test-module"></span><h2>compliance.utils.test module<a class="headerlink" href="#module-compliance.utils.test" title="Permalink to this headline">¶</a></h2>
+<span id="compliance-utils-test-module"></span><h2>compliance.utils.test module<a class="headerlink" href="#module-compliance.utils.test" title="Permalink to this heading">¶</a></h2>
 <p>Compliance automation underlying test framework utilities module.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compliance.utils.test.parse_test_id">
@@ -315,7 +316,7 @@ path structure is different from the suggested one.</p>
 
 </section>
 <section id="module-compliance.utils">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-compliance.utils" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-compliance.utils" title="Permalink to this heading">¶</a></h2>
 <p>Compliance automation utilities package.</p>
 </section>
 </section>
@@ -371,7 +372,7 @@ path structure is different from the suggested one.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -391,7 +392,7 @@ path structure is different from the suggested one.</p>
         <li class="right" >
           <a href="compliance.scripts.html" title="compliance.scripts package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance.utils package</a></li> 
@@ -399,7 +400,7 @@ path structure is different from the suggested one.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>

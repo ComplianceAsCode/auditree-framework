@@ -1,18 +1,19 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Running on Travis &#8212; Auditree Framework 1.22.1 documentation</title>
+    <title>Running on Travis &#8212; Auditree Framework 1.23.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
@@ -35,7 +36,7 @@
         <li class="right" >
           <a href="coding-standards.html" title="Coding Standards"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Running on Travis</a></li> 
       </ul>
     </div>  
@@ -46,7 +47,7 @@
           <div class="body" role="main">
             
   <section id="running-on-travis">
-<span id="id1"></span><h1>Running on Travis<a class="headerlink" href="#running-on-travis" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Running on Travis<a class="headerlink" href="#running-on-travis" title="Permalink to this heading">¶</a></h1>
 <p>Running the Auditree framework from a CI like Travis can be really useful for
 executing your compliance checks periodically. Thus you can track the
 current level of compliance for different standards and also notify
@@ -78,7 +79,7 @@ and run <code class="docutils literal notranslate"><span class="pre">compliance<
 evidence collector repository) and <cite>official</cite> runs (which will send
 notifications and push evidences to Git).</p>
 <section id="travis-artifacts">
-<h2>Travis artifacts<a class="headerlink" href="#travis-artifacts" title="Permalink to this headline">¶</a></h2>
+<h2>Travis artifacts<a class="headerlink" href="#travis-artifacts" title="Permalink to this heading">¶</a></h2>
 <p>This is a typical <cite>.travis.yml</cite> file:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
 <span class="nt">python</span><span class="p">:</span><span class="w"></span>
@@ -97,7 +98,7 @@ notifications and push evidences to Git).</p>
 <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code> and then generate the credentials file from
 using Travis environment variables.</p>
 <section id="credentials-generation">
-<h3>Credentials generation<a class="headerlink" href="#credentials-generation" title="Permalink to this headline">¶</a></h3>
+<h3>Credentials generation<a class="headerlink" href="#credentials-generation" title="Permalink to this heading">¶</a></h3>
 <p>This is an implementation you might want to use for your project of
 <code class="docutils literal notranslate"><span class="pre">gen-credentials.py</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
@@ -181,7 +182,7 @@ tracked).</p></li>
 </ul>
 </section>
 <section id="travis-run-sh">
-<h3><code class="docutils literal notranslate"><span class="pre">travis/run.sh</span></code><a class="headerlink" href="#travis-run-sh" title="Permalink to this headline">¶</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">travis/run.sh</span></code><a class="headerlink" href="#travis-run-sh" title="Permalink to this heading">¶</a></h3>
 <p>Travis will call this script in two different ways:</p>
 <ul class="simple">
 <li><p>As part of a change in the repo, so it would be considered a
@@ -280,7 +281,7 @@ have stored the official configuration into <code class="docutils literal notran
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -300,13 +301,13 @@ have stored the official configuration into <code class="docutils literal notran
         <li class="right" >
           <a href="coding-standards.html" title="Coding Standards"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.22.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Running on Travis</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>
