@@ -15,8 +15,10 @@
 """Compliance check automation module."""
 
 import unittest
+from datetime import datetime as dt
 
 from compliance.config import get_config
+from compliance.utils.exceptions import EvidenceNotFoundError
 
 import inflection
 
@@ -314,6 +316,12 @@ class ComplianceCheck(unittest.TestCase):
         """
         locker = evidence_locker or self.locker
         metadata = locker.get_evidence_metadata(evidence_path, evidence_dt)
+        if not metadata:
+            ev_dt_str = (evidence_dt or dt.utcnow()).strftime('%Y-%m-%d')
+            raise EvidenceNotFoundError(
+                f'Evidence {evidence_path} is not found in the locker '
+                f'for {ev_dt_str}. It may not be a valid evidence path.'
+            )
         metadata.update({'path': evidence_path, 'locker_url': locker.repo_url})
         if metadata.get('partitions'):
             path, file_name = evidence_path.rsplit('/', 1)
