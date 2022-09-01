@@ -1,3 +1,10 @@
+# [1.23.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.23.0)
+
+- [ADDED] Locker shallow clone depth configuration.
+- [ADDED] Multiple remote lockers for fetching evidence.
+- [FIXED] Correctly acquire the locker lock when iterating repository commits.
+- [FIXED] Raise the `EvidenceNotFoundError` exception for missing evidence.
+
 # [1.22.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.22.1)
 
 - [FIXED] Set Python version to 3.7 in publish/deploy GH action to match other actions.
