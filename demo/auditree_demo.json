@@ -1,6 +1,7 @@
 {
   "locker": {
-      "url": "https://github.com/MY_ORG/MY_EVIDENCE_REPO"
+      "default_branch": "main",
+      "repo_url": "https://github.com/MY_ORG/MY_EVIDENCE_REPO"
   },
   "notify": {
     "slack": {
