@@ -1,5 +1,5 @@
 {
   "arboretum.auditree.checks.test_python_packages.PythonPackageCheck": ["demo.arboretum.accred"],
-  "demo_examples.checks.test_world_clock.WorldClockCheck": ["demo.custom.accred"],
+  "demo_examples.checks.test_github_api_versions.GitHubAPIVersionsCheck": ["demo.custom.accred"],
   "demo_examples.checks.test_image_content.ImageCheck": ["demo.custom.accred"]
 }
