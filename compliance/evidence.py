@@ -80,6 +80,8 @@ class _BaseEvidence(object):
         self._evidence_dt = kwargs.get('evidence_dt')
         self._raw_content = None
         self._signature = None
+        self.binary_content = kwargs.get('binary_content', False)
+        self.filtered_content = kwargs.get('filtered_content', False)
 
     @classmethod
     def from_evidence(cls, evidence):
@@ -223,8 +225,12 @@ class _BaseEvidence(object):
         if self.extension == 'json':
             self._content = format_json(json.loads(content))
         if sign:
+            if self.binary_content:
+                data_bytes = self._content
+            else:
+                data_bytes = self._content.encode()
             self._digest, self._signature = self.agent.hash_and_sign(
-                self._content.encode()
+                data_bytes
             )
 
     def set_digest(self, digest):
@@ -291,8 +297,6 @@ class RawEvidence(_BaseEvidence):
         )
         self.part_fields = partition.get('fields')
         self.part_root = partition.get('root')
-        self.binary_content = kwargs.get('binary_content', False)
-        self.filtered_content = kwargs.get('filtered_content', False)
 
     @property
     def is_partitioned(self):
