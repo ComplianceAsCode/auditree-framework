@@ -19,6 +19,8 @@ DOC_TARGET?=doc
 develop:
 	pip install -q -e .[dev] --upgrade --upgrade-strategy eager
 	pre-commit install
+
+update-pre-commit:
 	pre-commit autoupdate
 
 install:

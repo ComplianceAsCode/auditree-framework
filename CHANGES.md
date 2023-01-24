@@ -1,3 +1,10 @@
+# [UNRELEASED](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/UNRELEASED)
+
+- [FIXED] Update pre-commit dependencies.
+- [CHANGED] Use python 3.8 in GitHub Actions as newer flake8 does not support less than that.
+- [CHANGED] Dot not update pre-commit hooks during "make develop"
+- [ADDED] Add basic pre-commit hooks.
+
 # [1.23.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.23.0)
 
 - [ADDED] Locker shallow clone depth configuration.
