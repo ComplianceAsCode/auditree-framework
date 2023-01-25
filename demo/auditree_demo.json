@@ -14,5 +14,10 @@
         "title": "Check results for demo.arboretum.accred accreditation"
       }
     }
+  },
+  "org": {
+    "gh": {
+      "orgs": ["nasa", "esa"]
+    }
   }
 }

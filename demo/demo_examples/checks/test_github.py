@@ -1,5 +1,4 @@
-# -*- mode:python; coding:utf-8 -*-
-# Copyright (c) 2020 IBM Corp. All rights reserved.
+# Copyright (c) 2023 EnterpriseDB. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +16,11 @@ import json
 
 from compliance.check import ComplianceCheck
 from compliance.evidence import with_raw_evidences
+
+from parameterized import parameterized
+
+from demo_examples.evidence import utils
+
 
 class GitHubAPIVersionsCheck(ComplianceCheck):
     """Perform analysis on GitHub supported versions API response evidence."""
@@ -70,3 +74,26 @@ class GitHubAPIVersionsCheck(ComplianceCheck):
         :returns: notification dictionary.
         """
         return {'subtitle': 'Supported GitHub API Versions Violation', 'body': None}
+
+
+class GitHubOrgs(ComplianceCheck):
+    """Perform analysis on GitHub some orgs."""
+
+    @property
+    def title(self):
+        return 'GitHub Org checks'
+
+    @parameterized.expand(utils.get_gh_orgs)
+    def test_members_is_not_empty(self, org):
+        """
+        Check whether the GitHub org is not empty
+        """
+        evidence = self.locker.get_evidence(f'raw/github/{org}_members.json')
+        members = json.loads(evidence.content)
+        if not members:
+            self.add_failures(org, 'There is nobody!')
+        elif len(members) < 5:
+            self.add_warnings(org, 'There are people int there, but less than 5!')
+
+    def get_reports(self):
+        return [f'github/members.md']
