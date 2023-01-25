@@ -1,0 +1,3 @@
+[flake8]
+ignore = P1,C812,C813,C814,C815,C816,W503
+max-line-length = 88
