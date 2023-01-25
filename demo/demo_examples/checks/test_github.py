@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""GitHub demo checks."""
+
 import json
 
 from compliance.check import ComplianceCheck
 from compliance.evidence import with_raw_evidences
 
-from parameterized import parameterized
-
 from demo_examples.evidence import utils
+
+from parameterized import parameterized
 
 
 class GitHubAPIVersionsCheck(ComplianceCheck):
@@ -46,17 +48,19 @@ class GitHubAPIVersionsCheck(ComplianceCheck):
         if not version_list:
             self.add_failures(
                 'Supported GitHub API Versions Violation',
-                f'No API versions were indicated as supported by GitHub.'
+                'No API versions were indicated as supported by GitHub.'
             )
         elif len(version_list) == 1:
             self.add_warnings(
                 'Supported GitHub API Versions Warning',
-                f'There is only one supported version. Get with the program: {versions_str}'
+                'There is only one supported version. '
+                f'Get with the program: {versions_str}'
             )
         elif len(version_list) > 1:
             self.add_warnings(
                 'Supported GitHub API Versions Warning',
-                f'There are more than one supported versions. Check the docs for the latest changes: {versions_str}'
+                'There are more than one supported versions. '
+                f'Check the docs for the latest changes: {versions_str}'
             )
 
     def get_reports(self):
@@ -81,13 +85,16 @@ class GitHubOrgs(ComplianceCheck):
 
     @property
     def title(self):
+        """
+        Return the title of the checks.
+
+        :returns: the title of the checks
+        """
         return 'GitHub Org checks'
 
     @parameterized.expand(utils.get_gh_orgs)
     def test_members_is_not_empty(self, org):
-        """
-        Check whether the GitHub org is not empty
-        """
+        """Check whether the GitHub org is not empty."""
         evidence = self.locker.get_evidence(f'raw/github/{org}_members.json')
         members = json.loads(evidence.content)
         if not members:
@@ -96,4 +103,5 @@ class GitHubOrgs(ComplianceCheck):
             self.add_warnings(org, 'There are people int there, but less than 5!')
 
     def get_reports(self):
-        return [f'github/members.md']
+        """Return GitHub report name."""
+        return ['github/members.md']

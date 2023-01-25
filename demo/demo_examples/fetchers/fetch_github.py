@@ -11,22 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+"""Demo fetchers for GitHub."""
+
 import json
 
-from compliance.evidence import store_raw_evidence, RawEvidence, DAY
+from compliance.evidence import DAY, RawEvidence, store_raw_evidence
 from compliance.fetch import ComplianceFetcher
-
-from parameterized import parameterized
 
 from demo_examples.evidence import utils
 
-class GitHubAPIVersionsFetcher(ComplianceFetcher):
+from parameterized import parameterized
+
+
+class GitHubFetcher(ComplianceFetcher):
     """Fetch the current supported GitHub API versions."""
 
     @classmethod
     def setUpClass(cls):
+        """Initialise the fetcher class with common functionality."""
         cls.client = cls.session(
-            'https://api.github.com/',  **{"Accept": "application/json"}
+            'https://api.github.com/', **{'Accept': 'application/json'}
         )
 
     @store_raw_evidence('github/api_versions.json')
@@ -40,7 +45,7 @@ class GitHubAPIVersionsFetcher(ComplianceFetcher):
 
     @parameterized.expand(utils.get_gh_orgs)
     def fetch_github_members(self, org):
-        """Fetch GitHub members from the organization"""
+        """Fetch GitHub members from the organization."""
         # We don't use the helper decorator in this case, so we have to manage
         # the envidence life-cycle: creation, fetch and store in the locker.
         evidence = RawEvidence(

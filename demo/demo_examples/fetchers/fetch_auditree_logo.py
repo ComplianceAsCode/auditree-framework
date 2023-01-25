@@ -11,9 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""A demo fetcher that gets a logo image."""
 
 from compliance.evidence import store_raw_evidence
 from compliance.fetch import ComplianceFetcher
+
 
 class ImageFetcher(ComplianceFetcher):
     """Fetch the Auditree logo image and store as evidence."""
