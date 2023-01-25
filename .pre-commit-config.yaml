@@ -1,13 +1,20 @@
 repos:
--   repo: https://github.com/pre-commit/mirrors-yapf
-    rev: v0.31.0
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      -   id: trailing-whitespace
+      -   id: check-yaml
+      -   id: fix-encoding-pragma
+          args: ["--remove"]  # Not needed on python3
+-   repo: https://github.com/google/yapf
+    rev: v0.32.0
     hooks:
     -   id: yapf
         args: [--in-place, --parallel, --recursive, --style, .yapf-config]
         files: "^(compliance|test)"
         stages: [commit]
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+-   repo: https://github.com/PyCQA/flake8
+    rev: 5.0.4
     hooks:
     -   id: flake8
         args: [
@@ -35,7 +42,7 @@ repos:
         files: "^(compliance|test)"
         stages: [commit]
 -   repo: https://github.com/PyCQA/bandit
-    rev: 1.7.0
+    rev: 1.7.4
     hooks:
     -   id: bandit
         args: [--recursive]
