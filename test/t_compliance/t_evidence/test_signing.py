@@ -35,6 +35,10 @@ class TestSigningEvidence(unittest.TestCase):
             '81ddd37cb8aba90077a717b7d6c067815add58e658bb2'
             'be0dea4d4d9301c762d'
         )
+        self.binary_evidence = b'This is my binary evidence.'
+        self.expected_binary_digest = (
+            '447c95ece8e82129ec767de76c6d98c35280036b364055248d217d8f73fd1082'
+        )
 
         self.agent = ComplianceAgent(name='auditree.local')
         self.unknown_agent = ComplianceAgent(name='unknown.local')
@@ -112,6 +116,17 @@ lQIDAQAB
         self.assertEqual(self.agent, evidence.agent)
         self.assertEqual(self.evidence, evidence.content)
         self.assertEqual(self.expected_digest, evidence.digest)
+
+    def test_binary_evidence_sign(self):
+        """Ensure evidence is correctly signed."""
+        evidence = RawEvidence(
+            'evidence.txt', 'test', agent=self.agent, binary_content=True
+        )
+        evidence.set_content(self.binary_evidence)
+
+        self.assertEqual(self.agent, evidence.agent)
+        self.assertEqual(self.binary_evidence, evidence.content)
+        self.assertEqual(self.expected_binary_digest, evidence.digest)
 
     def test_evidence_no_sign(self):
         """Ensure evidence is not signed when `sign=False`."""

@@ -18,10 +18,10 @@ from compliance.evidence import DAY, ReportEvidence, RawEvidence
 get_config().add_evidences(
     [
         RawEvidence(
-            'world_clock_utc.json',
-            'time',
+            'api_versions.json',
+            'github',
             DAY,
-            'Coordinated Universal Time'
+            'Supported GitHub API versions'
         ),
         RawEvidence(
             'auditree_logo.png',
@@ -31,10 +31,10 @@ get_config().add_evidences(
             binary_content=True
         ),
         ReportEvidence(
-            'world_clock.md',
-            'time',
+            'api_versions.md',
+            'github',
             DAY,
-            'World Clock Analysis report.'
+            'Supported GitHub versions report.'
         ),
         ReportEvidence(
             'image_check.md',

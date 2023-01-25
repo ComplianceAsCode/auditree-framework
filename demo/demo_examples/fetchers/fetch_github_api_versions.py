@@ -11,17 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 
 from compliance.evidence import store_raw_evidence
 from compliance.fetch import ComplianceFetcher
 
-class WorldClockFetcher(ComplianceFetcher):
-    """Fetch the current coordinated universal time."""
+class GitHubAPIVersionsFetcher(ComplianceFetcher):
+    """Fetch the current supported GitHub API versions."""
 
-    @store_raw_evidence('time/world_clock_utc.json')
-    def fetch_world_clock_utc(self):
-        """Fetch the universal time."""
-        session = self.session('http://worldclockapi.com/api/json')
-        clock = session.get('utc/now')
-        clock.raise_for_status()
-        return clock.text
+    @store_raw_evidence('github/api_versions.json')
+    def fetch_api_versions(self):
+        """Fetch the current supported GitHub API versions."""
+        # This is where you might e.g. fetch your evidence
+        # from a remote API
+        session = self.session('https://api.github.com/')
+        versions = session.get(
+            'versions',
+            headers={"Accept": "application/json"})
+        versions.raise_for_status()
+        return versions.text
