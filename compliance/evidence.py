@@ -28,7 +28,7 @@ from compliance.utils.exceptions import (
     DependencyUnavailableError,
     EvidenceNotFoundError,
     StaleEvidenceError,
-    UnverifiedEvidenceError
+    UnverifiedEvidenceError,
 )
 from compliance.utils.path import FETCH_PREFIX, substitute_config
 
@@ -36,9 +36,9 @@ HOUR = 60 * 60
 DAY = HOUR * 24
 YEAR = DAY * 365
 
-CONTENT_FLAGS = ['binary_content', 'filtered_content']
+CONTENT_FLAGS = ["binary_content", "filtered_content"]
 
-LazyLoader = namedtuple('LazyLoader', 'path ev_class')
+LazyLoader = namedtuple("LazyLoader", "path ev_class")
 
 
 class _BaseEvidence(object):
@@ -62,26 +62,26 @@ class _BaseEvidence(object):
       Defaults to `None` (which translates to "now").
     """
 
-    EVIDENCE_TYPE = 'base'
+    EVIDENCE_TYPE = "base"
 
-    def __init__(self, name, category, ttl=DAY, description='', **kwargs):
+    def __init__(self, name, category, ttl=DAY, description="", **kwargs):
         self._name = name
         self.category = category
         self.ttl = ttl
         self.description = description
         self.locker = None
-        self._agent = kwargs.get('agent') or ComplianceAgent()
+        self._agent = kwargs.get("agent") or ComplianceAgent()
         if self._agent.name and self.description:
-            self.description = f'{self._agent.name}: {self.description}'
+            self.description = f"{self._agent.name}: {self.description}"
         self._config = get_config()
         self._content = None
         self._content_raw = None
         self._digest = None
-        self._evidence_dt = kwargs.get('evidence_dt')
+        self._evidence_dt = kwargs.get("evidence_dt")
         self._raw_content = None
         self._signature = None
-        self.binary_content = kwargs.get('binary_content', False)
-        self.filtered_content = kwargs.get('filtered_content', False)
+        self.binary_content = kwargs.get("binary_content", False)
+        self.filtered_content = kwargs.get("filtered_content", False)
 
     @classmethod
     def from_evidence(cls, evidence):
@@ -89,10 +89,10 @@ class _BaseEvidence(object):
         for content_flag in CONTENT_FLAGS:
             if hasattr(evidence, content_flag):
                 kwargs[content_flag] = getattr(evidence, content_flag)
-        if hasattr(evidence, 'part_fields') or hasattr(evidence, 'part_root'):
-            kwargs['partition'] = {
-                'fields': getattr(evidence, 'part_fields', None),
-                'root': getattr(evidence, 'part_root', None)
+        if hasattr(evidence, "part_fields") or hasattr(evidence, "part_root"):
+            kwargs["partition"] = {
+                "fields": getattr(evidence, "part_fields", None),
+                "root": getattr(evidence, "part_root", None),
             }
         new_evidence = cls(
             evidence.name,
@@ -100,14 +100,12 @@ class _BaseEvidence(object):
             evidence.ttl,
             evidence.description,
             agent=evidence.agent,
-            **kwargs
+            **kwargs,
         )
         new_evidence.locker = evidence.locker
         new_evidence.set_digest(evidence.digest)
         new_evidence.set_signature(evidence.signature)
-        new_evidence.set_content(
-            evidence.content, sign=evidence.signature is None
-        )
+        new_evidence.set_content(evidence.content, sign=evidence.signature is None)
         return new_evidence
 
     @classmethod
@@ -137,7 +135,7 @@ class _BaseEvidence(object):
 
     @property
     def extension(self):
-        return PurePath(self.name).suffix.lstrip('.')
+        return PurePath(self.name).suffix.lstrip(".")
 
     @property
     def agent(self):
@@ -151,36 +149,41 @@ class _BaseEvidence(object):
     def clear_sign(self):
         retval = []
         if self._agent and self._agent.name:
-            retval.append('-----BEGIN AGENT-----')
+            retval.append("-----BEGIN AGENT-----")
             retval.append(self._agent.name)
-            retval.append('-----END AGENT-----')
+            retval.append("-----END AGENT-----")
         if self._content:
-            retval.append('-----BEGIN CONTENT-----')
+            retval.append("-----BEGIN CONTENT-----")
             retval.append(self._content)
-            retval.append('-----END CONTENT-----')
+            retval.append("-----END CONTENT-----")
         if self._digest:
-            retval.append('-----BEGIN DIGEST-----')
+            retval.append("-----BEGIN DIGEST-----")
             retval.append(self._digest)
-            retval.append('-----END DIGEST-----')
+            retval.append("-----END DIGEST-----")
         if self._signature:
-            retval.append('-----BEGIN SIGNATURE-----')
+            retval.append("-----BEGIN SIGNATURE-----")
             retval.append(self._signature)
-            retval.append('-----END SIGNATURE-----')
-        return '\n'.join(retval)
+            retval.append("-----END SIGNATURE-----")
+        return "\n".join(retval)
 
     @property
     def content_as_json(self):
-        if self.extension != 'json':
-            raise ValueError(f'{self.name} does not have JSON content.')
-        if not hasattr(self, '_content_as_json'):
+        if self.extension != "json":
+            raise ValueError(f"{self.name} does not have JSON content.")
+        if not hasattr(self, "_content_as_json"):
             self._content_as_json = json.loads(self.content)
         return self._content_as_json
 
     @property
     def is_empty(self):
-        return not self.content or not self.content.strip() or (
-            self.extension == 'json' and self.content_as_json != 0
-            and not self.content_as_json
+        return (
+            not self.content
+            or not self.content.strip()
+            or (
+                self.extension == "json"
+                and self.content_as_json != 0
+                and not self.content_as_json
+            )
         )
 
     @property
@@ -200,8 +203,8 @@ class _BaseEvidence(object):
         :returns: `True` if the evidence is signed, else `False`.
         """
         metadata = locker.get_evidence_metadata(self.path)
-        self._digest = metadata.get('digest')
-        self._signature = metadata.get('signature')
+        self._digest = metadata.get("digest")
+        self._signature = metadata.get("signature")
         return self._signature is not None
 
     def set_agent(self, agent):
@@ -222,16 +225,14 @@ class _BaseEvidence(object):
         self._content = content
         if self._content is None:
             return  # Don't sign `None` evidence.
-        if self.extension == 'json':
+        if self.extension == "json":
             self._content = format_json(json.loads(content))
         if sign:
             if self.binary_content:
                 data_bytes = self._content
             else:
                 data_bytes = self._content.encode()
-            self._digest, self._signature = self.agent.hash_and_sign(
-                data_bytes
-            )
+            self._digest, self._signature = self.agent.hash_and_sign(data_bytes)
 
     def set_digest(self, digest):
         """
@@ -267,11 +268,9 @@ class _BaseEvidence(object):
             self.agent.load_public_key_from_locker(locker)
         signature = locker.get_evidence_metadata(
             self.path, evidence_dt=self._evidence_dt
-        ).get('signature')
+        ).get("signature")
         if not signature:
-            raise UnverifiedEvidenceError(
-                f'Evidence {self.path} is not signed.', self
-            )
+            raise UnverifiedEvidenceError(f"Evidence {self.path} is not signed.", self)
         return self.agent.verify(self.content.encode(), signature)
 
 
@@ -286,22 +285,22 @@ class RawEvidence(_BaseEvidence):
     configuration settings, if both are provided.
     """
 
-    EVIDENCE_TYPE = 'raw'
+    EVIDENCE_TYPE = "raw"
 
     def __init__(self, *args, **kwargs):
         """Construct and initialize the raw evidence object."""
         super().__init__(*args, **kwargs)
-        lp_config = self._config.get('locker.partitions', {})
+        lp_config = self._config.get("locker.partitions", {})
         partition = kwargs.get(
-            'partition', lp_config.get(f'{self.category}/{self.name}', {})
+            "partition", lp_config.get(f"{self.category}/{self.name}", {})
         )
-        self.part_fields = partition.get('fields')
-        self.part_root = partition.get('root')
+        self.part_fields = partition.get("fields")
+        self.part_root = partition.get("root")
 
     @property
     def is_partitioned(self):
         """Raw evidence partitioned status."""
-        return self.part_fields is not None and self.extension == 'json'
+        return self.part_fields is not None and self.extension == "json"
 
     @property
     def partition_keys(self):
@@ -314,7 +313,7 @@ class RawEvidence(_BaseEvidence):
 
         :returns: A list of key values where the key values are lists as well.
         """
-        if getattr(self, '_partition_keys', None) is None:
+        if getattr(self, "_partition_keys", None) is None:
             keys = set()
             if self.part_root:
                 root = parse_dot_key(json.loads(self._content), self.part_root)
@@ -348,7 +347,7 @@ class RawEvidence(_BaseEvidence):
             data = self._partition(data, key)
         else:
             part = data
-            root = self.part_root.split('.')
+            root = self.part_root.split(".")
             for field in root[:-1]:
                 part = part[field]
             part[root[-1]] = self._partition(part[root[-1]], key)
@@ -363,27 +362,27 @@ class RawEvidence(_BaseEvidence):
 class DerivedEvidence(_BaseEvidence):
     """The derived evidence class."""
 
-    EVIDENCE_TYPE = 'derived'
+    EVIDENCE_TYPE = "derived"
 
 
 class ReportEvidence(_BaseEvidence):
     """The report evidence class."""
 
-    EVIDENCE_TYPE = 'reports'
+    EVIDENCE_TYPE = "reports"
 
 
 class TmpEvidence(_BaseEvidence):
     """The temporary evidence class."""
 
-    EVIDENCE_TYPE = 'tmp'
+    EVIDENCE_TYPE = "tmp"
 
 
 class ExternalEvidence(_BaseEvidence):
     """The external evidence class."""
 
-    EVIDENCE_TYPE = 'external'
+    EVIDENCE_TYPE = "external"
 
-    def __init__(self, name, category, ttl=YEAR, description='', **kwargs):
+    def __init__(self, name, category, ttl=YEAR, description="", **kwargs):
         """Construct and initialize the external evidence object."""
         super().__init__(name, category, ttl, description, **kwargs)
 
@@ -398,8 +397,8 @@ class _EvidenceContextManager(object):
 
     def __enter__(self):
         path = self.evidence_path
-        if not path.startswith(f'{self.evidence_type}/'):
-            path = f'{self.evidence_type}/{path}'
+        if not path.startswith(f"{self.evidence_type}/"):
+            path = f"{self.evidence_type}/{path}"
         self.evidence = get_evidence_by_path(path)
         if self.locker.validate(self.evidence):
             self.evidence = None
@@ -435,7 +434,7 @@ class raw_evidence(_EvidenceContextManager):  # noqa: N801
         :param evidence_path: The path to the raw evidence within the evidence
           locker.  For example, ``src/my_raw_evidence.json``.
         """
-        super().__init__(locker, evidence_path, 'raw')
+        super().__init__(locker, evidence_path, "raw")
 
 
 class tmp_evidence(_EvidenceContextManager):  # noqa: N801
@@ -463,7 +462,7 @@ class tmp_evidence(_EvidenceContextManager):  # noqa: N801
         :param evidence_path: The path to the raw evidence within the evidence
           locker.  For example, ``src/my_tmp_evidence.json``.
         """
-        super().__init__(locker, evidence_path, 'tmp')
+        super().__init__(locker, evidence_path, "tmp")
 
 
 class derived_evidence(object):  # noqa: N801
@@ -526,24 +525,20 @@ class derived_evidence(object):  # noqa: N801
     def __enter__(self):
         """Perform fetcher derived evidence pre-processing."""
         target_path = self.target
-        if not target_path.startswith('derived/'):
-            target_path = f'derived/{target_path}'
+        if not target_path.startswith("derived/"):
+            target_path = f"derived/{target_path}"
         target_evidence = get_evidence_by_path(target_path)
         if self.locker.validate(target_evidence):
             return
-        self.evidences = {'derived': target_evidence}
+        self.evidences = {"derived": target_evidence}
         if isinstance(self.sources, list):
             for src in self.sources:
                 self.evidences[src] = get_evidence_by_path(src, self.locker)
         elif isinstance(self.sources, dict):
             for src_name, src_path in self.sources.items():
-                self.evidences[src_name] = get_evidence_by_path(
-                    src_path, self.locker
-                )
+                self.evidences[src_name] = get_evidence_by_path(src_path, self.locker)
         elif isinstance(self.sources, str):
-            self.evidences['source'] = get_evidence_by_path(
-                self.sources, self.locker
-            )
+            self.evidences["source"] = get_evidence_by_path(self.sources, self.locker)
         else:
             self.evidences = None
         return self.evidences
@@ -551,7 +546,7 @@ class derived_evidence(object):  # noqa: N801
     def __exit__(self, typ, val, traceback):
         """Perform fetcher derived evidence post-processing."""
         if self.evidences and traceback is None:
-            self.locker.add_evidence(self.evidences['derived'])
+            self.locker.add_evidence(self.evidences["derived"])
 
 
 class evidences(object):  # noqa: N801
@@ -619,14 +614,12 @@ class evidences(object):  # noqa: N801
                 evidence[evidence_name] = self._get_evidence(from_evidence)
         else:
             rtval_dict = False
-            evidence['evidence'] = self._get_evidence(self.from_evidences)
+            evidence["evidence"] = self._get_evidence(self.from_evidences)
         if not evidence:
-            raise EvidenceNotFoundError('No evidence found!')
-        if hasattr(self, 'check'):
+            raise EvidenceNotFoundError("No evidence found!")
+        if hasattr(self, "check"):
             for ev in evidence.values():
-                self.check.add_evidence_metadata(
-                    ev.path, evidence_locker=ev.locker
-                )
+                self.check.add_evidence_metadata(ev.path, evidence_locker=ev.locker)
         if rtval_dict:
             return evidence
         return next(iter(evidence.values()))
@@ -672,7 +665,7 @@ __init_map = {
         ExternalEvidence,
         RawEvidence,
         ReportEvidence,
-        TmpEvidence
+        TmpEvidence,
     ]
 }
 
@@ -723,7 +716,7 @@ def get_evidence_by_path(path, locker=None):
     evidence = get_config().get_evidence(path)
 
     try:
-        split = path.strip('/').split('/')
+        split = path.strip("/").split("/")
         evidence_type, category, name = split[-3:]
     except ValueError:
         raise ValueError(f'Invalid evidence path format "{path}"')
@@ -740,7 +733,7 @@ def get_evidence_by_path(path, locker=None):
         return evidence
 
     if evidence_type not in __init_map:
-        raise ValueError(f'Unable to create evidence of type {evidence_type}')
+        raise ValueError(f"Unable to create evidence of type {evidence_type}")
     if locker:
         try:
             evidence = locker.get_evidence(path)
@@ -780,25 +773,25 @@ def get_evidence_dependency(path, locker, fetcher=None):
         except (StaleEvidenceError, EvidenceNotFoundError):
             rerun = None
             if fetcher:
-                module, clss, method = fetcher.rsplit('.', 2)
-                rerun = {'module': module, 'class': clss, 'method': method}
+                module, clss, method = fetcher.rsplit(".", 2)
+                rerun = {"module": module, "class": clss, "method": method}
             else:
                 for frame_info in inspect.stack()[1:]:
                     if frame_info.function.startswith(FETCH_PREFIX):
                         frame = frame_info.frame
                         rerun = {
-                            'module': inspect.getmodule(frame).__name__,
-                            'class': frame.f_locals['self'].__class__.__name__,
-                            'method': frame.f_code.co_name
+                            "module": inspect.getmodule(frame).__name__,
+                            "class": frame.f_locals["self"].__class__.__name__,
+                            "method": frame.f_code.co_name,
                         }
                         break
             if not rerun:
                 raise DependencyFetcherNotFoundError(
-                    f'Cannot re-run, no fetcher found for evidence {path}.'
+                    f"Cannot re-run, no fetcher found for evidence {path}."
                 )
             locker.dependency_rerun.append(rerun)
             raise DependencyUnavailableError(
-                f'evidence dependency {path} is currently unavailable.'
+                f"evidence dependency {path} is currently unavailable."
             )
     return evidence
 
@@ -820,10 +813,9 @@ def store_raw_evidence(evidence_path):
     """
 
     def decorator(f):
-
         @wraps(f)  # required for preserving the function context
         def wrapper(self, *args, **kwargs):
-            return _store_wrapper(self, evidence_path, f, 'raw')
+            return _store_wrapper(self, evidence_path, f, "raw")
 
         return wrapper
 
@@ -843,10 +835,9 @@ def store_tmp_evidence(evidence_path):
     """
 
     def decorator(f):
-
         @wraps(f)  # required for preserving the function context
         def wrapper(self, *args, **kwargs):
-            return _store_wrapper(self, evidence_path, f, 'tmp')
+            return _store_wrapper(self, evidence_path, f, "tmp")
 
         return wrapper
 
@@ -873,12 +864,11 @@ def store_derived_evidence(evidences, target):
     """
 
     def decorator(f):
-
         @wraps(f)  # required for preserving the function context
         def wrapper(self, *args, **kwargs):
             target_path = target
-            if not target_path.startswith('derived/'):
-                target_path = f'derived/{target_path}'
+            if not target_path.startswith("derived/"):
+                target_path = f"derived/{target_path}"
             target_evidence = get_evidence_by_path(target_path)
             if self.locker.validate(target_evidence):
                 return
@@ -906,7 +896,7 @@ def with_raw_evidences(*from_evidences):
     """
 
     def decorator(f):
-        return _with_evidence_decorator(from_evidences, f, 'raw')
+        return _with_evidence_decorator(from_evidences, f, "raw")
 
     return decorator
 
@@ -925,7 +915,7 @@ def with_external_evidences(*from_evidences):
     """
 
     def decorator(f):
-        return _with_evidence_decorator(from_evidences, f, 'external')
+        return _with_evidence_decorator(from_evidences, f, "external")
 
     return decorator
 
@@ -944,7 +934,7 @@ def with_derived_evidences(*from_evidences):
     """
 
     def decorator(f):
-        return _with_evidence_decorator(from_evidences, f, 'derived')
+        return _with_evidence_decorator(from_evidences, f, "derived")
 
     return decorator
 
@@ -963,15 +953,15 @@ def with_tmp_evidences(*from_evidences):
     """
 
     def decorator(f):
-        return _with_evidence_decorator(from_evidences, f, 'tmp')
+        return _with_evidence_decorator(from_evidences, f, "tmp")
 
     return decorator
 
 
 def _store_wrapper(self, evidence_path, func, type_name):
     path = evidence_path
-    if not path.startswith(f'{type_name}/'):
-        path = f'{type_name}/{path}'
+    if not path.startswith(f"{type_name}/"):
+        path = f"{type_name}/{path}"
     evidence = get_evidence_by_path(path)
     if self.locker.validate(evidence):
         return
@@ -998,7 +988,7 @@ def _with_evidence_decorator(from_evidences, f, type_str):
             path = str(PurePath(type_str, path))
         from_evs.append(LazyLoader(path, ev_class))
 
-    if hasattr(f, 'args'):
+    if hasattr(f, "args"):
         f.args.extend(from_evs)
         return f
 
@@ -1019,7 +1009,5 @@ def _evidence_wrapper(self, from_evidences, func):
             ev = fe.ev_class.from_evidence(ev)
         evidences.append(ev)
     for evidence in evidences:
-        self.add_evidence_metadata(
-            evidence.path, evidence_locker=evidence.locker
-        )
+        self.add_evidence_metadata(evidence.path, evidence_locker=evidence.locker)
     return func(self, *evidences)

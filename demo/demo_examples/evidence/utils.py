@@ -19,4 +19,4 @@ from compliance.config import get_config
 
 def get_gh_orgs():
     """Return the GitHub organization names."""
-    return get_config().get('org.gh.orgs')
+    return get_config().get("org.gh.orgs")

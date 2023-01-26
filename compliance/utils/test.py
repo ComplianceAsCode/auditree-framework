@@ -34,14 +34,14 @@ def parse_test_id(test_id):
     Note: scope/type/accreditation might not be returned if your
     path structure is different from the suggested one.
     """
-    parts = test_id.split('.')
+    parts = test_id.split(".")
     full_path = len(parts) == 6
     return {
-        'scope': full_path and parts[0],
-        'type': full_path and parts[1],
-        'accreditation': full_path and parts[2],
-        'file': parts[-3],
-        'class': parts[-2],
-        'method': parts[-1],
-        'class_path': '.'.join(parts[0:-1])
+        "scope": full_path and parts[0],
+        "type": full_path and parts[1],
+        "accreditation": full_path and parts[2],
+        "file": parts[-3],
+        "class": parts[-2],
+        "method": parts[-1],
+        "class_path": ".".join(parts[0:-1]),
     }

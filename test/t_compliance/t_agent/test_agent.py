@@ -14,6 +14,7 @@
 """Compliance automation agent tests module."""
 
 import unittest
+
 try:
     from mock import Mock, create_autospec, mock_open, patch
 except ImportError:
@@ -30,11 +31,10 @@ class TestSigningEvidence(unittest.TestCase):
 
     def setUp(self):
         """Prepare the test fixture."""
-        self.name = 'auditree.local'
-        self.evidence = b'This is my evidence.'
+        self.name = "auditree.local"
+        self.evidence = b"This is my evidence."
         self.expected_digest = (
-            '81ddd37cb8aba90077a717b7d6c067815add58e658bb2'
-            'be0dea4d4d9301c762d'
+            "81ddd37cb8aba90077a717b7d6c067815add58e658bb2" "be0dea4d4d9301c762d"
         )
         self.priv_key = """
 -----BEGIN RSA PRIVATE KEY-----
@@ -81,18 +81,16 @@ lQIDAQAB
         # Mock empty locker.
         self.mock_empty_locker = create_autospec(Locker)
         self.mock_empty_locker.get_evidence.side_effect = Mock(
-            side_effect=EvidenceNotFoundError('Evidence not found in locker.')
+            side_effect=EvidenceNotFoundError("Evidence not found in locker.")
         )
 
         # Mock locker containing public key evidence.
         mock_locker_evidence = create_autospec(RawEvidence)
-        mock_locker_evidence.content_as_json = {
-            self.name: self.pub_key.decode()
-        }
+        mock_locker_evidence.content_as_json = {self.name: self.pub_key.decode()}
         self.mock_locker = create_autospec(Locker)
         self.mock_locker.get_evidence.return_value = mock_locker_evidence
 
-    @patch('compliance.agent.get_config')
+    @patch("compliance.agent.get_config")
     def test_empty_agent_from_config(self, get_config_mock):
         """Test load empty agent from configuration."""
         get_config_mock.return_value = {}
@@ -105,10 +103,10 @@ lQIDAQAB
         self.assertFalse(agent.signable())
         self.assertFalse(agent.verifiable())
 
-    @patch('compliance.agent.get_config')
+    @patch("compliance.agent.get_config")
     def test_agent_from_config_no_key(self, get_config_mock):
         """Test load agent with no key from configuration."""
-        get_config_mock.return_value = {'agent_name': self.name}
+        get_config_mock.return_value = {"agent_name": self.name}
 
         agent = ComplianceAgent.from_config()
 
@@ -118,14 +116,15 @@ lQIDAQAB
         self.assertFalse(agent.signable())
         self.assertFalse(agent.verifiable())
 
-    @patch('compliance.agent.get_config')
+    @patch("compliance.agent.get_config")
     def test_agent_from_config(self, get_config_mock):
         """Test load agent from configuration."""
         get_config_mock.return_value = {
-            'agent_name': self.name, 'agent_private_key': '/path/to/key'
+            "agent_name": self.name,
+            "agent_private_key": "/path/to/key",
         }
 
-        with patch('builtins.open', mock_open(read_data=self.priv_key)):
+        with patch("builtins.open", mock_open(read_data=self.priv_key)):
             agent = ComplianceAgent.from_config()
 
         self.assertEqual(agent.name, self.name)
@@ -258,7 +257,7 @@ lQIDAQAB
         agent.public_key = self.pub_key
         _digest, signature = agent.hash_and_sign(self.evidence)
 
-        self.evidence += b'foo'  # Tamper with evidence.
+        self.evidence += b"foo"  # Tamper with evidence.
 
         self.assertEqual(agent.name, self.name)
         self.assertTrue(agent.signable())

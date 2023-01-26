@@ -26,45 +26,45 @@ from .. import build_test_mock
 class BaseNotifierTest(unittest.TestCase):
     """Base notifier test class."""
 
-    @patch('compliance.notify.get_config')
+    @patch("compliance.notify.get_config")
     def test_notify_with_runbooks(self, get_config_mock):
         """Test that _BaseMDNotifier notifications have runbook links."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {'infra': ['#channel']}
+        config_mock.get.return_value = {"infra": ["#channel"]}
 
         get_config_mock.return_value = config_mock
 
         results = {
-            'compliance.test.runbook': {
-                'status': 'warn', 'test': build_test_mock(fails=1)
+            "compliance.test.runbook": {
+                "status": "warn",
+                "test": build_test_mock(fails=1),
             },
-            'compliance.test.other_runbook': {
-                'status': 'fail', 'test': build_test_mock('two', warns=1)
-            }
+            "compliance.test.other_runbook": {
+                "status": "fail",
+                "test": build_test_mock("two", warns=1),
+            },
         }
 
         controls = create_autospec(ControlDescriptor)
-        controls.get_accreditations.return_value = ['infra']
+        controls.get_accreditations.return_value = ["infra"]
         notifier = _BaseMDNotifier(results, controls, push_error=False)
 
         split_tests = notifier._split_by_status(notifier.messages)
 
         results_by_status = {
-            'pass': split_tests[0],
-            'fail': split_tests[1],
-            'warn': split_tests[2],
-            'error': split_tests[3]
+            "pass": split_tests[0],
+            "fail": split_tests[1],
+            "warn": split_tests[2],
+            "error": split_tests[3],
         }
 
-        markdown = '\n'.join(
-            notifier._generate_accred_content('unittests', results_by_status)
+        markdown = "\n".join(
+            notifier._generate_accred_content("unittests", results_by_status)
         )
 
         self.assertIn(
-            ' | [Run Book](http://mockedrunbooks/path/to/runbook_one)',
-            markdown
+            " | [Run Book](http://mockedrunbooks/path/to/runbook_one)", markdown
         )
         self.assertIn(
-            ' | [Run Book](http://mockedrunbooks/path/to/runbook_two)',
-            markdown
+            " | [Run Book](http://mockedrunbooks/path/to/runbook_two)", markdown
         )

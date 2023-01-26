@@ -50,16 +50,16 @@ class Fixer(object):
             return
 
         for test_id, test_desc in self._results.items():
-            if test_desc['status'] != 'fail':
+            if test_desc["status"] != "fail":
                 continue
 
-            test_obj = test_desc['test'].test
-            method_name = parse_test_id(test_id)['method']
-            candidate = method_name.replace('test_', 'fix_')
+            test_obj = test_desc["test"].test
+            method_name = parse_test_id(test_id)["method"]
+            candidate = method_name.replace("test_", "fix_")
 
             if len(test_obj.tests) > 1 and hasattr(test_obj, candidate):
                 getattr(test_obj, candidate)(self)
-            elif hasattr(test_obj, 'fix_failures'):
+            elif hasattr(test_obj, "fix_failures"):
                 test_obj.fix_failures(self)
 
     def execute_fix(self, test_obj, fct, args=None):
@@ -89,10 +89,8 @@ class Fixer(object):
         """
         args = args or {}
         if self._dry_run:
-            self._out.write(f'DRY-RUN: {fct.__doc__.format(**args)}\n')
+            self._out.write(f"DRY-RUN: {fct.__doc__.format(**args)}\n")
         else:
-            success = fct(
-                **dict(list(args.items()) + [('creds', self._creds)])
-            )
+            success = fct(**dict(list(args.items()) + [("creds", self._creds)]))
             if success:
                 test_obj.fixed_failure_count += 1

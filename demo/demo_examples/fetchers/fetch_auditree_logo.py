@@ -20,7 +20,7 @@ from compliance.fetch import ComplianceFetcher
 class ImageFetcher(ComplianceFetcher):
     """Fetch the Auditree logo image and store as evidence."""
 
-    @store_raw_evidence('images/auditree_logo.png')
+    @store_raw_evidence("images/auditree_logo.png")
     def fetch_auditree_logo(self):
         """Fetch the Auditree logo."""
-        return open('at-logo.png', 'rb').read()
+        return open("at-logo.png", "rb").read()

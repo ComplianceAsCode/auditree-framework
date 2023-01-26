@@ -64,10 +64,10 @@ class LockerPushError(Exception):
 
     def __str__(self):
         """Display the error as a string."""
-        msg = 'Push to remote locker failed.\n'
+        msg = "Push to remote locker failed.\n"
         if self.push_info:
             msg += (
-                f'       Summary: {self.push_info.summary}'
-                f'       Error Flags: {self.push_info.flags}'
+                f"       Summary: {self.push_info.summary}"
+                f"       Error Flags: {self.push_info.flags}"
             )
         return msg

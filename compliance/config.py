@@ -30,38 +30,30 @@ class ComplianceConfig(object):
     """
 
     DEFAULTS = {
-        'locker': {
-            'dirname': 'compliance',
-            'repo_url': 'https://github.com/YOUR_ORG/YOUR_PROJECT'
+        "locker": {
+            "dirname": "compliance",
+            "repo_url": "https://github.com/YOUR_ORG/YOUR_PROJECT",
         },
-        'runbooks': {
-            'enabled': False, 'base_url': 'https://example.com/runbooks'
-        },
-        'notify': {
+        "runbooks": {"enabled": False, "base_url": "https://example.com/runbooks"},
+        "notify": {
             # Slack channel to use for an accreditation
             # E.g. {"mycompany.soc2": ["#compliance"]}
-            'slack': {},
-
+            "slack": {},
             # GH repo to use for an accreditation
             # E.g. {"mycompany.soc2": {"repo": ["my-org/accr1-repo"]}}
-            'gh_issues': {},
-
+            "gh_issues": {},
             # GHE repo to use for an accreditation
             # Deprecated (use gh_issues), included for backward compatibility.
             # E.g. {"mycompany.soc2": {"repo": ["my-org/accr1-repo"]}}
-            'ghe_issues': {},
-
+            "ghe_issues": {},
             # Pagerduty service id to use for an accreditation
             # E.g. {"mycompany.soc2": "ABCDEFG"}
-            'pagerduty': {},
-
+            "pagerduty": {},
             # Security Advisor FindingsAPI endpoint to use for an accreditation
             # E.g. {"mycompany.soc2": "https://my.findings.api/findings"}
-            'findings': {}
+            "findings": {},
         },
-        'org': {
-            'name': 'YOUR_ORG', 'settings': {}
-        }
+        "org": {"name": "YOUR_ORG", "settings": {}},
     }
 
     def __init__(self):
@@ -77,7 +69,7 @@ class ComplianceConfig(object):
     def creds(self):
         """Credentials used for locker management and running fetchers."""
         if self.creds_path is None:
-            raise ValueError('Path to credentials file not provided')
+            raise ValueError("Path to credentials file not provided")
 
         if self._creds is None:
             self._creds = Config(self.creds_path)
@@ -106,7 +98,7 @@ class ComplianceConfig(object):
         try:
             self._config = json.loads(Path(config_file).read_text())
         except ValueError as err:
-            err.args += (config_file, )
+            err.args += (config_file,)
             raise
 
     def get(self, config_path, default=None):
@@ -118,7 +110,7 @@ class ComplianceConfig(object):
         :param config_path: dot notation path with the following format
           ``'key[.subkey]``. For instance, ``locker.dirname``.
         """
-        chunks = config_path.split('.')
+        chunks = config_path.split(".")
         value = self._config
         for c in chunks:
             if value is None:
@@ -148,9 +140,8 @@ class ComplianceConfig(object):
         :param evidence_list: a list of evidence objects.
         """
         for e in evidence_list:
-            if (not self.dependency_rerun
-                    and e.path in self._evidence_cache.keys()):
-                raise ValueError(f'Evidence {e.path} duplicated')
+            if not self.dependency_rerun and e.path in self._evidence_cache.keys():
+                raise ValueError(f"Evidence {e.path} duplicated")
             self._evidence_cache[e.path] = e
 
     def get_template_dir(self, test_obj=None):
@@ -169,7 +160,7 @@ class ComplianceConfig(object):
         if test_obj is not None:
             paths = list(Path(inspect.getfile(test_obj.__class__)).parents)
         for path in paths[:-1]:
-            templates = Path(path, 'templates')
+            templates = Path(path, "templates")
             if templates.is_dir():
                 return str(templates)
 

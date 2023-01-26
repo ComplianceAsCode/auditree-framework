@@ -26,7 +26,7 @@ class BaseSession(requests.Session):
         All requests using this session will be run against this URL.
         """
         super(BaseSession, self).__init__()
-        self.baseurl = baseurl.strip('/')
+        self.baseurl = baseurl.strip("/")
 
     def prepare_request(self, request):
         """Prefix with self.baseurl if request.url does not include it."""

@@ -14,6 +14,7 @@
 """Compliance automation evidence signing tests module."""
 
 import unittest
+
 try:
     from mock import Mock, create_autospec
 except ImportError:
@@ -30,18 +31,17 @@ class TestSigningEvidence(unittest.TestCase):
 
     def setUp(self):
         """Prepare the test fixture."""
-        self.evidence = 'This is my evidence.'
+        self.evidence = "This is my evidence."
         self.expected_digest = (
-            '81ddd37cb8aba90077a717b7d6c067815add58e658bb2'
-            'be0dea4d4d9301c762d'
+            "81ddd37cb8aba90077a717b7d6c067815add58e658bb2" "be0dea4d4d9301c762d"
         )
-        self.binary_evidence = b'This is my binary evidence.'
+        self.binary_evidence = b"This is my binary evidence."
         self.expected_binary_digest = (
-            '447c95ece8e82129ec767de76c6d98c35280036b364055248d217d8f73fd1082'
+            "447c95ece8e82129ec767de76c6d98c35280036b364055248d217d8f73fd1082"
         )
 
-        self.agent = ComplianceAgent(name='auditree.local')
-        self.unknown_agent = ComplianceAgent(name='unknown.local')
+        self.agent = ComplianceAgent(name="auditree.local")
+        self.unknown_agent = ComplianceAgent(name="unknown.local")
         self.agent.private_key = self.unknown_agent.private_key = """
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAxYosRYnahnSuH3SmNupnzQhxJsDEhqChKjrcyN19L8+vcjUU
@@ -87,7 +87,7 @@ lQIDAQAB
         # Mock empty locker.
         self.mock_empty_locker = create_autospec(Locker)
         self.mock_empty_locker.get_evidence.side_effect = Mock(
-            side_effect=EvidenceNotFoundError('Evidence not found in locker.')
+            side_effect=EvidenceNotFoundError("Evidence not found in locker.")
         )
 
         # Mock locker containing public key evidence.
@@ -96,21 +96,21 @@ lQIDAQAB
         self.mock_locker = create_autospec(Locker)
         self.mock_locker.get_evidence.return_value = mock_locker_evidence
         self.mock_locker.get_evidence_metadata.return_value = {
-            'digest': self.expected_digest,
-            'signature': (
-                'jMKH9pWRc8g2ai0sSvXv+XRD6rptlOpU9wJHePuzIby4fmmk/ls'
-                '0WKdxP4fKz1sPtMNsH1mLx7EhM9/vBDGRj85gkGDS2x+FFXkUte'
-                'VNPUAaW9sJx+Fhd8YdRkuyxxKx3lmMQuwopzrnSA+SH0LX22b+d'
-                'DtFxTwzg/r2kFenaqNPWlRHAd07T/RNq2DFA/+mdIY4mE8zz8bS'
-                'B/IiJmKupLdTGxNBuu32wSJq4aGVZ7QXdkk4rzXcgKoS4PfooLS'
-                'pmlive1T1ifbT6khMlTWC46Nx+fv8T+JoN2hB9Mf9PQ0ZCuuZeE'
-                '8RYYyttqa+b/YExraesjIjY8X63wxM9FtNvQ=='
-            )
+            "digest": self.expected_digest,
+            "signature": (
+                "jMKH9pWRc8g2ai0sSvXv+XRD6rptlOpU9wJHePuzIby4fmmk/ls"
+                "0WKdxP4fKz1sPtMNsH1mLx7EhM9/vBDGRj85gkGDS2x+FFXkUte"
+                "VNPUAaW9sJx+Fhd8YdRkuyxxKx3lmMQuwopzrnSA+SH0LX22b+d"
+                "DtFxTwzg/r2kFenaqNPWlRHAd07T/RNq2DFA/+mdIY4mE8zz8bS"
+                "B/IiJmKupLdTGxNBuu32wSJq4aGVZ7QXdkk4rzXcgKoS4PfooLS"
+                "pmlive1T1ifbT6khMlTWC46Nx+fv8T+JoN2hB9Mf9PQ0ZCuuZeE"
+                "8RYYyttqa+b/YExraesjIjY8X63wxM9FtNvQ=="
+            ),
         }
 
     def test_evidence_sign(self):
         """Ensure evidence is correctly signed."""
-        evidence = RawEvidence('evidence.txt', 'test', agent=self.agent)
+        evidence = RawEvidence("evidence.txt", "test", agent=self.agent)
         evidence.set_content(self.evidence)
 
         self.assertEqual(self.agent, evidence.agent)
@@ -120,7 +120,7 @@ lQIDAQAB
     def test_binary_evidence_sign(self):
         """Ensure evidence is correctly signed."""
         evidence = RawEvidence(
-            'evidence.txt', 'test', agent=self.agent, binary_content=True
+            "evidence.txt", "test", agent=self.agent, binary_content=True
         )
         evidence.set_content(self.binary_evidence)
 
@@ -130,7 +130,7 @@ lQIDAQAB
 
     def test_evidence_no_sign(self):
         """Ensure evidence is not signed when `sign=False`."""
-        evidence = RawEvidence('evidence.txt', 'test', agent=self.agent)
+        evidence = RawEvidence("evidence.txt", "test", agent=self.agent)
         evidence.set_content(self.evidence, sign=False)
 
         self.assertEqual(self.agent, evidence.agent)
@@ -140,7 +140,7 @@ lQIDAQAB
 
     def test_none_evidence_no_sign(self):
         """Ensure `None` evidence is not signed."""
-        evidence = RawEvidence('evidence.txt', 'test', agent=self.agent)
+        evidence = RawEvidence("evidence.txt", "test", agent=self.agent)
         evidence.set_content(None)
 
         self.assertEqual(self.agent, evidence.agent)
@@ -150,7 +150,7 @@ lQIDAQAB
 
     def test_signed_evidence_verify_success(self):
         """Ensure valid, signed evidence can be verified."""
-        evidence = RawEvidence('evidence.txt', 'test', agent=self.agent)
+        evidence = RawEvidence("evidence.txt", "test", agent=self.agent)
         evidence.set_content(self.evidence)
 
         self.assertEqual(self.agent, evidence.agent)
@@ -161,7 +161,7 @@ lQIDAQAB
 
     def test_none_evidence_verify_success(self):
         """Ensure `None` evidence can be verified."""
-        evidence = RawEvidence('evidence.txt', 'test', agent=self.agent)
+        evidence = RawEvidence("evidence.txt", "test", agent=self.agent)
         evidence.set_content(None)
 
         self.assertEqual(self.agent, evidence.agent)
@@ -172,7 +172,7 @@ lQIDAQAB
 
     def test_unsigned_evidence_verify_success(self):
         """Ensure unsigned evidence can be verified."""
-        evidence = RawEvidence('evidence.txt', 'test', agent=self.agent)
+        evidence = RawEvidence("evidence.txt", "test", agent=self.agent)
         evidence.set_content(self.evidence, sign=False)
 
         self.assertEqual(self.agent, evidence.agent)
@@ -183,21 +183,19 @@ lQIDAQAB
 
     def test_tampered_evidence_verify_failure(self):
         """Ensure invalid, signed evidence can not be verified."""
-        evidence = RawEvidence('evidence.txt', 'test', agent=self.agent)
+        evidence = RawEvidence("evidence.txt", "test", agent=self.agent)
         evidence.set_content(self.evidence)
-        evidence._content += 'foo'  # Tamper with evidence.
+        evidence._content += "foo"  # Tamper with evidence.
 
         self.assertEqual(self.agent, evidence.agent)
-        self.assertEqual(self.evidence + 'foo', evidence.content)
+        self.assertEqual(self.evidence + "foo", evidence.content)
         self.assertEqual(self.expected_digest, evidence.digest)
         self.assertTrue(evidence.is_signed(self.mock_locker))
         self.assertFalse(evidence.verify_signature(self.mock_locker))
 
     def test_unknown_signed_evidence_verify_failure(self):
         """Ensure evidence cannot be verified if the public key is unknown."""
-        evidence = RawEvidence(
-            'evidence.txt', 'test', agent=self.unknown_agent
-        )
+        evidence = RawEvidence("evidence.txt", "test", agent=self.unknown_agent)
         evidence.set_content(self.evidence)
 
         self.assertEqual(self.unknown_agent, evidence.agent)
@@ -208,7 +206,7 @@ lQIDAQAB
 
     def test_signed_evidence_verify_failure_missing_public_keys(self):
         """Ensure evidence cannot be verified if public keys are missing."""
-        evidence = RawEvidence('evidence.txt', 'test', agent=self.agent)
+        evidence = RawEvidence("evidence.txt", "test", agent=self.agent)
         evidence.set_content(self.evidence)
 
         self.assertEqual(self.agent, evidence.agent)

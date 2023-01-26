@@ -31,8 +31,8 @@ class ControlDescriptor(object):
         """Construct and initialize the ControlDescriptor object."""
         self._controls = {}
         self._paths = []
-        for d in dirs or ['.']:
-            json_file = Path(d, 'controls.json').resolve()
+        for d in dirs or ["."]:
+            json_file = Path(d, "controls.json").resolve()
             if not json_file.is_file():
                 continue
             self._controls.update(json.loads(json_file.read_text()))
@@ -51,7 +51,7 @@ class ControlDescriptor(object):
     @property
     def accred_checks(self):
         """Provide all checks by accreditation (key) as a dictionary."""
-        if not hasattr(self, '_accred_checks'):
+        if not hasattr(self, "_accred_checks"):
             self._accred_checks = defaultdict(set)
             for check in self._controls.keys():
                 accreds = self.get_accreditations(check)
@@ -74,9 +74,7 @@ class ControlDescriptor(object):
         check_details = self._controls.get(test_path, {})
         if isinstance(check_details, list):
             return set(check_details)
-        accreditations = [
-            itertools.chain(*c.values()) for c in check_details.values()
-        ]
+        accreditations = [itertools.chain(*c.values()) for c in check_details.values()]
         return set(itertools.chain(*accreditations))
 
     def is_test_included(self, test_path, accreditations):

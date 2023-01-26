@@ -15,6 +15,7 @@
 
 import json
 import unittest
+
 try:
     from mock import patch, create_autospec
 except ImportError:
@@ -30,106 +31,100 @@ from .. import build_test_mock
 class SlackNotifierTest(unittest.TestCase):
     """SlackNotifier test class."""
 
-    @patch('requests.post')
-    @patch('compliance.notify.get_config')
+    @patch("requests.post")
+    @patch("compliance.notify.get_config")
     def test_notify_error(self, get_config_mock, post_mock):
         """Test that SlackNotifier notifies a test with Error."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {'infra': ['#channel']}
+        config_mock.get.return_value = {"infra": ["#channel"]}
         get_config_mock.return_value = config_mock
 
         results = {
-            'compliance.test.example': {
-                'status': 'error', 'test': build_test_mock()
-            }
+            "compliance.test.example": {"status": "error", "test": build_test_mock()}
         }
         controls = create_autospec(ControlDescriptor)
-        controls.get_accreditations.return_value = ['infra']
+        controls.get_accreditations.return_value = ["infra"]
         notifier = SlackNotifier(results, controls)
         notifier.notify()
         self.assertTrue(post_mock.called)
 
         args, kwargs = post_mock.call_args
-        self.assertTrue(args[0].startswith('https://hooks.slack.com'))
-        msg = json.loads(kwargs['data'])
-        self.assertIn('failed to execute', msg['attachments'][0]['text'])
+        self.assertTrue(args[0].startswith("https://hooks.slack.com"))
+        msg = json.loads(kwargs["data"])
+        self.assertIn("failed to execute", msg["attachments"][0]["text"])
 
-    @patch('requests.post')
-    @patch('compliance.notify.get_config')
+    @patch("requests.post")
+    @patch("compliance.notify.get_config")
     def test_notify_two_errors(self, get_config_mock, post_mock):
         """Test that SlackNotifier notifies two tests with Error."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {'infra': ['#channel']}
+        config_mock.get.return_value = {"infra": ["#channel"]}
         get_config_mock.return_value = config_mock
 
         results = {
-            'compliance.test.example': {
-                'status': 'error', 'test': build_test_mock()
+            "compliance.test.example": {"status": "error", "test": build_test_mock()},
+            "compliance.test.other_example": {
+                "status": "error",
+                "test": build_test_mock("two"),
             },
-            'compliance.test.other_example': {
-                'status': 'error', 'test': build_test_mock('two')
-            }
         }
         controls = create_autospec(ControlDescriptor)
-        controls.get_accreditations.return_value = ['infra']
+        controls.get_accreditations.return_value = ["infra"]
         notifier = SlackNotifier(results, controls)
         notifier.notify()
 
         self.assertTrue(post_mock.called)
         args, kwargs = post_mock.call_args
-        self.assertTrue(args[0].startswith('https://hooks.slack.com'))
-        msg = json.loads(kwargs['data'])
-        self.assertEqual(len(msg['attachments']), 3)
-        self.assertEqual('PASSED checks', msg['attachments'][2]['title'])
-        for att in msg['attachments'][:-1]:
-            self.assertIn('failed to execute', att['text'])
+        self.assertTrue(args[0].startswith("https://hooks.slack.com"))
+        msg = json.loads(kwargs["data"])
+        self.assertEqual(len(msg["attachments"]), 3)
+        self.assertEqual("PASSED checks", msg["attachments"][2]["title"])
+        for att in msg["attachments"][:-1]:
+            self.assertIn("failed to execute", att["text"])
 
-    @patch('requests.post')
-    @patch('compliance.notify.get_config')
+    @patch("requests.post")
+    @patch("compliance.notify.get_config")
     def test_do_not_notify_if_unknown_acc(self, get_config_mock, post_mock):
         """Test that SlackNotifier does not notify if accred is unknown."""
         results = {
-            'compliance.test.example': {
-                'status': 'error', 'test': build_test_mock()
-            }
+            "compliance.test.example": {"status": "error", "test": build_test_mock()}
         }
         controls = create_autospec(ControlDescriptor)
-        controls.get_accreditations.return_value = ['SOMETHING-WRONG']
+        controls.get_accreditations.return_value = ["SOMETHING-WRONG"]
         notifier = SlackNotifier(results, controls)
         notifier.notify()
         post_mock.assert_not_called()
 
-    @patch('requests.post')
-    @patch('compliance.notify.get_config')
+    @patch("requests.post")
+    @patch("compliance.notify.get_config")
     def test_notify_with_runbooks(self, get_config_mock, post_mock):
         """Test that SlackNotifier notifications have runbook links."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {'infra': ['#channel']}
+        config_mock.get.return_value = {"infra": ["#channel"]}
 
         get_config_mock.return_value = config_mock
 
         results = {
-            'compliance.test.runbook': {
-                'status': 'error', 'test': build_test_mock()
+            "compliance.test.runbook": {"status": "error", "test": build_test_mock()},
+            "compliance.test.other_runbook": {
+                "status": "error",
+                "test": build_test_mock("two"),
             },
-            'compliance.test.other_runbook': {
-                'status': 'error', 'test': build_test_mock('two')
-            }
         }
         controls = create_autospec(ControlDescriptor)
-        controls.get_accreditations.return_value = ['infra']
+        controls.get_accreditations.return_value = ["infra"]
         notifier = SlackNotifier(results, controls)
         notifier.notify()
 
         self.assertTrue(post_mock.called)
         args, kwargs = post_mock.call_args
-        self.assertTrue(args[0].startswith('https://hooks.slack.com'))
-        msg = json.loads(kwargs['data'])
-        self.assertEqual(len(msg['attachments']), 3)
-        self.assertEqual('PASSED checks', msg['attachments'][2]['title'])
-        for att in msg['attachments'][:-1]:
-            testname = att['title'].rsplit(' ', 1)[1]
-            url = f'http://mockedrunbooks/path/to/runbook_{testname}'
+        self.assertTrue(args[0].startswith("https://hooks.slack.com"))
+        msg = json.loads(kwargs["data"])
+        self.assertEqual(len(msg["attachments"]), 3)
+        self.assertEqual("PASSED checks", msg["attachments"][2]["title"])
+        for att in msg["attachments"][:-1]:
+            testname = att["title"].rsplit(" ", 1)[1]
+            url = f"http://mockedrunbooks/path/to/runbook_{testname}"
             notifier.logger.warning(testname)
             notifier.logger.warning(url)
-            self.assertIn(f' | <{url}|Run Book>', att['text'])
+            self.assertIn(f" | <{url}|Run Book>", att["text"])

@@ -34,88 +34,80 @@ class FDNotifierTest(unittest.TestCase):
         """Check that FDNotifier notifies that there are no results."""
         notifier = FDNotifier({}, {}, self.fd)
         notifier.notify()
-        self.assertEqual(
-            self.fd.getvalue(), '\n-- NOTIFICATIONS --\n\nNo results\n'
-        )
+        self.assertEqual(self.fd.getvalue(), "\n-- NOTIFICATIONS --\n\nNo results\n")
 
     def test_notify_normal_run(self):
         """Check that FDNotifier notifies a test with Error."""
         results = {
-            'compliance.test.one': {
-                'status': 'error', 'test': build_test_mock()
+            "compliance.test.one": {"status": "error", "test": build_test_mock()},
+            "compliance.test.two": {
+                "status": "warn",
+                "test": build_test_mock("two", warns=1),
             },
-            'compliance.test.two': {
-                'status': 'warn', 'test': build_test_mock('two', warns=1)
+            "compliance.test.three": {
+                "status": "fail",
+                "test": build_test_mock("three", fails=1),
             },
-            'compliance.test.three': {
-                'status': 'fail', 'test': build_test_mock('three', fails=1)
-            },
-            'compliance.test.four': {
-                'status': 'pass', 'test': build_test_mock('four')
-            }
+            "compliance.test.four": {"status": "pass", "test": build_test_mock("four")},
         }
         controls = create_autospec(ControlDescriptor)
-        controls.get_accreditations.return_value = ['infra-internal']
+        controls.get_accreditations.return_value = ["infra-internal"]
         notifier = FDNotifier(results, controls, self.fd)
         notifier.notify()
         self.assertIn(
             (
-                '\n-- NOTIFICATIONS --\n\n'
-                'Notifications for INFRA-INTERNAL accreditation'
+                "\n-- NOTIFICATIONS --\n\n"
+                "Notifications for INFRA-INTERNAL accreditation"
             ),
-            self.fd.getvalue()
+            self.fd.getvalue(),
         )
         self.assertIn(
             (
-                'mock check title one - ERROR () Reports: (none) '
-                '| <http://mockedrunbooks/path/to/runbook_one|Run Book>\n'
-                'Check compliance.test.one failed to execute'
+                "mock check title one - ERROR () Reports: (none) "
+                "| <http://mockedrunbooks/path/to/runbook_one|Run Book>\n"
+                "Check compliance.test.one failed to execute"
             ),
-            self.fd.getvalue()
+            self.fd.getvalue(),
         )
         self.assertIn(
             (
-                'mock check title two - WARN (1 warnings) Reports: (none) '
-                '| <http://mockedrunbooks/path/to/runbook_two|Run Book>'
+                "mock check title two - WARN (1 warnings) Reports: (none) "
+                "| <http://mockedrunbooks/path/to/runbook_two|Run Book>"
             ),
-            self.fd.getvalue()
+            self.fd.getvalue(),
         )
         self.assertIn(
             (
-                'mock check title three - FAIL (1 failures) Reports: (none) '
-                '| <http://mockedrunbooks/path/to/runbook_three|Run Book>'
+                "mock check title three - FAIL (1 failures) Reports: (none) "
+                "| <http://mockedrunbooks/path/to/runbook_three|Run Book>"
             ),
-            self.fd.getvalue()
+            self.fd.getvalue(),
         )
-        self.assertIn(
-            'PASSED checks: mock check title four', self.fd.getvalue()
-        )
+        self.assertIn("PASSED checks: mock check title four", self.fd.getvalue())
 
     def test_notify_push_error(self):
         """Check that FDNotifier notifies a test with Error."""
         results = {
-            'compliance.test.one': {
-                'status': 'error', 'test': build_test_mock()
+            "compliance.test.one": {"status": "error", "test": build_test_mock()},
+            "compliance.test.two": {
+                "status": "warn",
+                "test": build_test_mock("two", warns=1),
             },
-            'compliance.test.two': {
-                'status': 'warn', 'test': build_test_mock('two', warns=1)
+            "compliance.test.three": {
+                "status": "fail",
+                "test": build_test_mock("three", fails=1),
             },
-            'compliance.test.three': {
-                'status': 'fail', 'test': build_test_mock('three', fails=1)
-            },
-            'compliance.test.four': {
-                'status': 'pass', 'test': build_test_mock('four')
-            }
+            "compliance.test.four": {"status": "pass", "test": build_test_mock("four")},
         }
         controls = create_autospec(ControlDescriptor)
-        controls.get_accreditations.return_value = ['infra-internal']
+        controls.get_accreditations.return_value = ["infra-internal"]
         notifier = FDNotifier(results, controls, self.fd, push_error=True)
         notifier.notify()
         self.assertEqual(
             (
-                '\n-- NOTIFICATIONS --\n\n'
-                'All accreditation checks:  '
-                'Evidence/Results failed to push to remote locker.\n'
+                "\n-- NOTIFICATIONS --\n\n"
+                "All accreditation checks:  "
+                "Evidence/Results failed to push to remote locker.\n"
             ),
-            self.fd.getvalue()
+            self.fd.getvalue(),
         )

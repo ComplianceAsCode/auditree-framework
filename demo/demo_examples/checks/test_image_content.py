@@ -28,23 +28,20 @@ class ImageCheck(ComplianceCheck):
 
         :returns: the title of the checks
         """
-        return 'Auditree Image'
+        return "Auditree Image"
 
-    @with_raw_evidences('images/auditree_logo.png')
+    @with_raw_evidences("images/auditree_logo.png")
     def test_image_content_with_decorator(self, evidence):
         """Check that the evidence content exists using decorator."""
         if not evidence.content:
-            self.add_failures(
-                'Using decorator', 'auditree_logo.png evidence is empty'
-            )
+            self.add_failures("Using decorator", "auditree_logo.png evidence is empty")
 
     def test_image_content_with_ctx_mgr(self):
         """Check that the evidence content exists using context manager."""
-        with evidences(self, 'raw/images/auditree_logo.png') as evidence:
+        with evidences(self, "raw/images/auditree_logo.png") as evidence:
             if not evidence.content:
                 self.add_failures(
-                    'Using context manager',
-                    'auditree_logo.png evidence is empty'
+                    "Using context manager", "auditree_logo.png evidence is empty"
                 )
 
     def get_reports(self):
@@ -53,7 +50,7 @@ class ImageCheck(ComplianceCheck):
 
         :returns: the report(s) generated for this check
         """
-        return ['images/image_check.md']
+        return ["images/image_check.md"]
 
     def msg_image_content_with_decorator(self):
         """
@@ -61,7 +58,7 @@ class ImageCheck(ComplianceCheck):
 
         :returns: notification dictionary.
         """
-        return {'body': None}
+        return {"body": None}
 
     def msg_image_content_with_ctx_mgr(self):
         """
@@ -69,4 +66,4 @@ class ImageCheck(ComplianceCheck):
 
         :returns: notification dictionary.
         """
-        return {'body': None}
+        return {"body": None}
