@@ -9,6 +9,7 @@
 - [ADDED] Documentation about using @parameterized.
 - [CHANGED] Unify github demo code in one single place.
 - [FIXED] flake8 now scans demo code too.
+- [CHANGED] Removed yapf in favour of black as code formatter.
 
 # [1.23.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.23.0)
 

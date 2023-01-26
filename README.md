@@ -44,14 +44,14 @@ make develop
 
 #### Code style and formatting
 
-This repository uses [yapf][yapf] for code formatting and [flake8][flake8] for code styling.  It also
+This repository uses [black][black] for code formatting and [flake8][flake8] for code styling.  It also
 uses [pre-commit][pre-commit] hooks that are integrated into the development process and the CI.  When
 you run `make develop` you are ensuring that the pre-commit hooks are installed and updated to their
 latest versions for this repository.  This ensures that all delivered code has been properly formatted
 and passes the linter rules.  See the [pre-commit configuration file][pre-commit-config] for details on
-`yapf` and `flake8` configurations.
+`black` and `flake8` configurations.
 
-Since `yapf` and `flake8` are installed as part of the `pre-commit` hooks, running `yapf` and `flake8`
+Since `black` and `flake8` are installed as part of the `pre-commit` hooks, running `black` and `flake8`
 manually must be done through `pre-commit`.  See examples below:
 
 ```shell
@@ -59,17 +59,17 @@ make code-format
 make code-lint
 ```
 
-...will run `yapf` and `flake8` on the entire repo and is equivalent to:
+...will run `black` and `flake8` on the entire repo and is equivalent to:
 
 ```shell
-pre-commit run yapf --all-files
+pre-commit run black --all-files
 pre-commit run flake8 --all-files
 ```
 
 ...and when looking to limit execution to a subset of files do similar to:
 
 ```shell
-pre-commit run yapf --files compliance/*
+pre-commit run black --files compliance/*
 pre-commit run flake8 --files compliance/*
 ```
 
@@ -152,7 +152,7 @@ We have a tool called [Plant](https://github.com/ComplianceAsCode/auditree-plant
 [python-badge]: https://img.shields.io/badge/python-v3.6+-blue.svg
 [python]: https://www.python.org/downloads/
 [quick start guide]: https://github.com/ComplianceAsCode/auditree-framework/blob/master/doc-source/quick-start.rst
-[yapf]: https://github.com/google/yapf
+[black]: https://github.com/psf/black
 [lint-test]: https://github.com/ComplianceAsCode/auditree-framework/actions?query=workflow%3A%22format+%7C+lint+%7C+test%22
 [pypi-upload]: https://github.com/ComplianceAsCode/auditree-framework/actions?query=workflow%3A%22PyPI+upload%22
 [credentials]: https://complianceascode.github.io/auditree-framework/design-principles.html#credentials
