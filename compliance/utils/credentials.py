@@ -97,13 +97,13 @@ class Config():
         """
         Retrieve sections and keys by account.
 
-        ``section``: the section from which to retrieve keys.
-        ``key``: the key in the section whose value you want to retrieve. if
-            not specified, returns the whole section as a dictionary.
-        ``account``: if provided, fetches the value for the specific account.
-            assumes the account is prefixed to the key and separated by _.
-        ``default``: if provided, returns this value if a value cannot be
-            found; otherwise raises an exception.
+        :param section: the section from which to retrieve keys.
+        :parm key: the key in the section whose value you want to retrieve. if
+          not specified, returns the whole section as a dictionary.
+        :param account: if provided, fetches the value for the specific account.
+          assumes the account is prefixed to the key and separated by _.
+        :param default: if provided, returns this value if a value cannot be
+          found; otherwise raises an exception.
         """
         if key is None:
             return self[section]
