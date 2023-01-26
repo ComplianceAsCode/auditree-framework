@@ -2,10 +2,13 @@
 
 - [FIXED] Update pre-commit dependencies.
 - [CHANGED] Use python 3.8 in GitHub Actions as newer flake8 does not support less than that.
-- [CHANGED] Dot not update pre-commit hooks during "make develop"
+- [CHANGED] Dot not update pre-commit hooks during "make develop".
 - [ADDED] Add basic pre-commit hooks.
-- [FIXED] Support for agent signing of binary content
-- [FIXED] Demo fetcher/check for World Clock API replaced with GitHub API example
+- [FIXED] Support for agent signing of binary content.
+- [FIXED] Demo fetcher/check for World Clock API replaced with GitHub API example.
+- [ADDED] Documentation about using @parameterized.
+- [CHANGED] Unify github demo code in one single place.
+- [FIXED] flake8 now scans demo code too.
 
 # [1.23.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.23.0)
 
