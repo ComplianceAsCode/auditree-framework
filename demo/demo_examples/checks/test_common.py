@@ -11,5 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Common checks module."""
 
-from arboretum.auditree.checks.test_python_packages import PythonPackageCheck
+from arboretum.auditree.checks.test_python_packages import PythonPackageCheck  # noqa

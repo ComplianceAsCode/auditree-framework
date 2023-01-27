@@ -1,10 +1,7 @@
 # -*- mode: gitignore; -*-
 
 # Sphinx documentation
-doc/_build/
-doc/modules.rst
-doc/compliance*.rst
-doc/.doctrees
+doc
 
 ### Emacs
 

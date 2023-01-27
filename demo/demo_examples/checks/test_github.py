@@ -1,5 +1,4 @@
-# -*- mode:python; coding:utf-8 -*-
-# Copyright (c) 2020 IBM Corp. All rights reserved.
+# Copyright (c) 2023 EnterpriseDB. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,10 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""GitHub demo checks."""
+
 import json
 
 from compliance.check import ComplianceCheck
 from compliance.evidence import with_raw_evidences
+
+from demo_examples.evidence import utils
+
+from parameterized import parameterized
+
 
 class GitHubAPIVersionsCheck(ComplianceCheck):
     """Perform analysis on GitHub supported versions API response evidence."""
@@ -42,17 +48,19 @@ class GitHubAPIVersionsCheck(ComplianceCheck):
         if not version_list:
             self.add_failures(
                 'Supported GitHub API Versions Violation',
-                f'No API versions were indicated as supported by GitHub.'
+                'No API versions were indicated as supported by GitHub.'
             )
         elif len(version_list) == 1:
             self.add_warnings(
                 'Supported GitHub API Versions Warning',
-                f'There is only one supported version. Get with the program: {versions_str}'
+                'There is only one supported version. '
+                f'Get with the program: {versions_str}'
             )
         elif len(version_list) > 1:
             self.add_warnings(
                 'Supported GitHub API Versions Warning',
-                f'There are more than one supported versions. Check the docs for the latest changes: {versions_str}'
+                'There are more than one supported versions. '
+                f'Check the docs for the latest changes: {versions_str}'
             )
 
     def get_reports(self):
@@ -70,3 +78,30 @@ class GitHubAPIVersionsCheck(ComplianceCheck):
         :returns: notification dictionary.
         """
         return {'subtitle': 'Supported GitHub API Versions Violation', 'body': None}
+
+
+class GitHubOrgs(ComplianceCheck):
+    """Perform analysis on GitHub some orgs."""
+
+    @property
+    def title(self):
+        """
+        Return the title of the checks.
+
+        :returns: the title of the checks
+        """
+        return 'GitHub Org checks'
+
+    @parameterized.expand(utils.get_gh_orgs)
+    def test_members_is_not_empty(self, org):
+        """Check whether the GitHub org is not empty."""
+        evidence = self.locker.get_evidence(f'raw/github/{org}_members.json')
+        members = json.loads(evidence.content)
+        if not members:
+            self.add_failures(org, 'There is nobody!')
+        elif len(members) < 5:
+            self.add_warnings(org, 'There are people int there, but less than 5!')
+
+    def get_reports(self):
+        """Return GitHub report name."""
+        return ['github/members.md']

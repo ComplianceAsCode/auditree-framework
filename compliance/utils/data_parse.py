@@ -25,7 +25,7 @@ def parse_dot_key(data, key):
 
     :param data: A dictionary
     :param key: A dictionary key string that may be a key path depicted by dot
-      notation.  For example "foo.bar".
+      notation. For example "foo.bar".
 
     :returns: The dictionary value from ``data`` associated to the ``key``.
     """
@@ -74,8 +74,8 @@ def format_json(data, **addl_kwargs):
 
 
 def deep_merge(a, b, path=None, append=False):
-    """
-    Merge two dicts, taking into account any sub (or sub-sub-*) dicts.
+    r"""
+    Merge two dicts, taking into account any sub (or sub-sub-\*) dicts.
 
     If ``append`` is ``True`` then list values from ``b`` will be appended to
     ``a``'s.  Modified from: https://stackoverflow.com/a/7205107/566346

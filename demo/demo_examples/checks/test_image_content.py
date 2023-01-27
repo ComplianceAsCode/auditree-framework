@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
+"""Image content demo."""
 
 from compliance.check import ComplianceCheck
 from compliance.evidence import evidences, with_raw_evidences
+
 
 class ImageCheck(ComplianceCheck):
     """Perform analysis on image evidence."""

@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Evidence module."""
+
 from compliance.config import get_config
-from compliance.evidence import DAY, ReportEvidence, RawEvidence
+from compliance.evidence import DAY, RawEvidence, ReportEvidence
 
 get_config().add_evidences(
     [

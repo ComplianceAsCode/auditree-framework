@@ -46,3 +46,6 @@ docs:
 	# Build the API docs from the source code - overwrites those files, which are ignored by git
 	sphinx-apidoc -o doc-source compliance
 	sphinx-build doc-source $(DOC_TARGET)
+
+clean-docs:
+	$(RM) -r $(DOC_TARGET)
