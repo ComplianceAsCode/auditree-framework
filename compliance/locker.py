@@ -27,23 +27,21 @@ from urllib.parse import urlparse
 from compliance.agent import ComplianceAgent
 from compliance.config import get_config
 from compliance.evidence import CONTENT_FLAGS, TmpEvidence, get_evidence_class
-from compliance.utils.data_parse import (
-    format_json, get_sha256_hash, parse_dot_key
-)
+from compliance.utils.data_parse import format_json, get_sha256_hash, parse_dot_key
 from compliance.utils.exceptions import (
     EvidenceNotFoundError,
     HistoricalEvidenceNotFoundError,
     LockerPushError,
     StaleEvidenceError,
-    UnverifiedEvidenceError
+    UnverifiedEvidenceError,
 )
 
 import git
 
-INDEX_FILE = 'index.json'
+INDEX_FILE = "index.json"
 DAY = 60 * 60 * 24
 AE_DEFAULT = 30 * DAY
-READMES = ['README.md', 'readme.md', 'Readme.md']
+READMES = ["README.md", "readme.md", "Readme.md"]
 AE_EXEMPT = [INDEX_FILE] + READMES
 NOT_EVIDENCE = AE_EXEMPT
 KB = 1000
@@ -73,7 +71,7 @@ class Locker(object):
         ttl_tolerance=0,
         gitconfig=None,
         local_path=None,
-        use_extra_lockers=True
+        use_extra_lockers=True,
     ):
         """
         Construct and initialize the locker object.
@@ -100,20 +98,20 @@ class Locker(object):
         if self.creds is not None:
             service_hostname = urlparse(self.repo_url).hostname
             token = None
-            if 'github.com' in service_hostname:
-                token = self.creds['github'].token
-            elif 'github' in service_hostname:
-                token = self.creds['github_enterprise'].token
-            elif 'bitbucket' in service_hostname:
-                token = self.creds['bitbucket'].token
-            elif 'gitlab' in service_hostname:
-                token = self.creds['gitlab'].token
+            if "github.com" in service_hostname:
+                token = self.creds["github"].token
+            elif "github" in service_hostname:
+                token = self.creds["github_enterprise"].token
+            elif "bitbucket" in service_hostname:
+                token = self.creds["bitbucket"].token
+            elif "gitlab" in service_hostname:
+                token = self.creds["gitlab"].token
             if token:
                 self.repo_url_with_creds = re.sub(
-                    '://', f'://{token}@', self.repo_url_with_creds
+                    "://", f"://{token}@", self.repo_url_with_creds
                 )
         self.default_branch = self.branch = get_config().get(
-            'locker.default_branch', default='master'
+            "locker.default_branch", default="master"
         )
         if branch:
             self.branch = branch
@@ -121,9 +119,9 @@ class Locker(object):
         if name is not None:
             self.name = name
         elif repo_url is not None and name is None:
-            self.name = repo_url.rsplit('/', 1)[1]
+            self.name = repo_url.rsplit("/", 1)[1]
         elif repo_url is None and name is None:
-            self.name = 'example'
+            self.name = "example"
         if local_path:
             self.local_path = local_path
         else:
@@ -131,11 +129,9 @@ class Locker(object):
         self._do_push = do_push
         self.ttl_tolerance = ttl_tolerance
         self.gitconfig = gitconfig or {}
-        self.logger = logging.getLogger(name=f'compliance.locker.{self.name}')
+        self.logger = logging.getLogger(name=f"compliance.locker.{self.name}")
         self._handler = logging.StreamHandler()
-        self._handler.setFormatter(
-            logging.Formatter('\n%(levelname)s: %(message)s')
-        )
+        self._handler.setFormatter(logging.Formatter("\n%(levelname)s: %(message)s"))
         self.logger.handlers.clear()
         self.logger.addHandler(self._handler)
         self.logger.setLevel(logging.INFO)
@@ -146,8 +142,8 @@ class Locker(object):
             self._extra_lockers = self._get_extra_lockers()
         else:
             self._extra_lockers = []
-        self._clone_depth = get_config().get('locker.depth')
-        days = get_config().get('locker.shallow_days')
+        self._clone_depth = get_config().get("locker.depth")
+        days = get_config().get("locker.shallow_days")
         self._clone_shallow_since_days = days
 
     @property
@@ -189,16 +185,14 @@ class Locker(object):
         :returns: a list of touched files.
         """
         index_files = [
-            f[0]
-            for f in self.repo.index.entries.keys()
-            if is_index_file(f[0])
+            f[0] for f in self.repo.index.entries.keys() if is_index_file(f[0])
         ]
         touched_files = []
         for f in index_files:
             content = json.loads(Path(self.local_path, f).read_text())
             for t, desc in content.items():
                 if type(desc) is dict:
-                    ts = desc.get('last_update')
+                    ts = desc.get("last_update")
                 else:
                     ts = desc
                 if ts == self.commit_date:
@@ -215,21 +209,21 @@ class Locker(object):
 
     def _get_extra_lockers(self):
         """Get extra locker configurations."""
-        extra_lockers_cfg = get_config().get('locker.extra', [])
-        prev_repo_url = get_config().get('locker.prev_repo_url')
+        extra_lockers_cfg = get_config().get("locker.extra", [])
+        prev_repo_url = get_config().get("locker.prev_repo_url")
         if prev_repo_url:
-            extra_lockers_cfg.append({'repo_url': prev_repo_url})
+            extra_lockers_cfg.append({"repo_url": prev_repo_url})
         extra_lockers = []
         for extra_locker_cfg in extra_lockers_cfg:
             extra_locker = Locker(
-                branch=extra_locker_cfg.get('branch'),
+                branch=extra_locker_cfg.get("branch"),
                 creds=self.creds,
-                local_path=extra_locker_cfg.get('local_path'),
-                repo_url=extra_locker_cfg['repo_url'],
-                use_extra_lockers=False
+                local_path=extra_locker_cfg.get("local_path"),
+                repo_url=extra_locker_cfg["repo_url"],
+                use_extra_lockers=False,
             )
-            extra_locker.clone_depth = extra_locker_cfg.get('depth')
-            days = extra_locker_cfg.get('shallow_days')
+            extra_locker.clone_depth = extra_locker_cfg.get("depth")
+            days = extra_locker_cfg.get("shallow_days")
             extra_locker.clone_shallow_since_days = days
             extra_locker.get_locker_repo(locker=extra_locker.name)
             extra_lockers.append(extra_locker)
@@ -249,8 +243,7 @@ class Locker(object):
         :returns: a list of fetcher methods to re-execute.
         """
         return {
-            f'{r["module"]}.{r["class"]}.{r["method"]}'
-            for r in self.dependency_rerun
+            f'{r["module"]}.{r["class"]}.{r["method"]}' for r in self.dependency_rerun
         }
 
     def init(self):
@@ -267,12 +260,12 @@ class Locker(object):
 
     def logger_init_msgs(self):
         """Log locker initialization information."""
-        gpgsign = self.gitconfig.get('commit', {}).get('gpgsign')
+        gpgsign = self.gitconfig.get("commit", {}).get("gpgsign")
         if self._do_push and not gpgsign:
             self.logger.warning(
-                'Commits may not be cryptographically signed, best '
-                'practice is to set gitconfig.commit.gpgsign to true '
-                'in your locker configuration.'
+                "Commits may not be cryptographically signed, best "
+                "practice is to set gitconfig.commit.gpgsign to true "
+                "in your locker configuration."
             )
 
     def add_evidence(self, evidence, checks=None, evidence_used=None):
@@ -290,19 +283,19 @@ class Locker(object):
           applicable for check generated ReportEvidence.
         """
         if evidence.content is None:
-            raise ValueError(f'Evidence {evidence.name} has no content')
+            raise ValueError(f"Evidence {evidence.name} has no content")
 
         path = Path(self.local_path, evidence.dir_path)
         path.mkdir(parents=True, exist_ok=True)
-        if getattr(evidence, 'is_partitioned', False):
+        if getattr(evidence, "is_partitioned", False):
             for key in evidence.partition_keys:
-                ev_name = f'{get_sha256_hash(key, 10)}_{evidence.name}'
+                ev_name = f"{get_sha256_hash(key, 10)}_{evidence.name}"
                 Path(path, ev_name).write_text(evidence.get_partition(key))
-        elif not getattr(evidence, 'binary_content', False):
+        elif not getattr(evidence, "binary_content", False):
             Path(path, evidence.name).write_text(evidence.content)
         else:
             Path(path, evidence.name).write_bytes(evidence.content)
-        if not evidence.path.startswith('tmp/'):
+        if not evidence.path.startswith("tmp/"):
             self.index(evidence, checks, evidence_used)
 
     def index(self, evidence, checks=None, evidence_used=None):
@@ -322,38 +315,38 @@ class Locker(object):
             if index_file.is_file():
                 metadata = json.loads(index_file.read_text())
             ev_meta = metadata.get(evidence.name, {})
-            old_parts = ev_meta.get('partitions', {}).keys()
+            old_parts = ev_meta.get("partitions", {}).keys()
             metadata[evidence.name] = {
-                'last_update': self.commit_date,
-                'ttl': evidence.ttl,
-                'description': evidence.description
+                "last_update": self.commit_date,
+                "ttl": evidence.ttl,
+                "description": evidence.description,
             }
             if evidence.signature:
                 metadata[evidence.name].update(
                     {
-                        'agent_name': evidence.agent.name,
-                        'digest': evidence.digest,
-                        'signature': evidence.signature,
+                        "agent_name": evidence.agent.name,
+                        "digest": evidence.digest,
+                        "signature": evidence.signature,
                     }
                 )
             if evidence.is_empty:
-                metadata[evidence.name]['empty'] = True
+                metadata[evidence.name]["empty"] = True
             tombstones = None
-            if getattr(evidence, 'is_partitioned', False):
+            if getattr(evidence, "is_partitioned", False):
                 unpartitioned = self.get_file(evidence.path)
                 if Path(unpartitioned).is_file():
                     # Remove/tombstone unpartitioned evidence file
                     # replaced by partitioned evidence files
                     self.repo.index.remove([unpartitioned], working_tree=True)
                     tombstones = self.create_tombstone_metadata(
-                        evidence.name, ev_meta, 'Evidence is partitioned'
+                        evidence.name, ev_meta, "Evidence is partitioned"
                     )
                 parts = {}
                 for key in evidence.partition_keys:
                     sha256_hash = get_sha256_hash(key, 10)
                     parts[sha256_hash] = key
                     repo_file = self.get_file(
-                        f'{evidence.dir_path}/{sha256_hash}_{evidence.name}'
+                        f"{evidence.dir_path}/{sha256_hash}_{evidence.name}"
                     )
                     repo_files.append(repo_file)
                 dead_parts = set(old_parts) - set(parts.keys())
@@ -362,37 +355,35 @@ class Locker(object):
                     # no longer part of the evidence content
                     self.remove_partitions(evidence, dead_parts)
                     tombstones = self.create_tombstone_metadata(
-                        dead_parts,
-                        ev_meta,
-                        'Partition no longer part of evidence'
+                        dead_parts, ev_meta, "Partition no longer part of evidence"
                     )
                 metadata[evidence.name].update(
                     {
-                        'partition_fields': evidence.part_fields,
-                        'partition_root': evidence.part_root,
-                        'partitions': parts
+                        "partition_fields": evidence.part_fields,
+                        "partition_root": evidence.part_root,
+                        "partitions": parts,
                     }
                 )
                 if tombstones is None:
                     # Preserve prior tombstones
-                    tombstones = ev_meta.get('tombstones')
+                    tombstones = ev_meta.get("tombstones")
             else:
                 # Remove/tombstone partitioned evidence files
                 # replaced by unpartitioned evidence file
                 self.remove_partitions(evidence, old_parts)
                 tombstones = self.create_tombstone_metadata(
-                    old_parts, ev_meta, 'Evidence no longer partitioned'
+                    old_parts, ev_meta, "Evidence no longer partitioned"
                 )
                 repo_files.append(self.get_file(evidence.path))
             if tombstones:
-                metadata[evidence.name]['tombstones'] = tombstones
+                metadata[evidence.name]["tombstones"] = tombstones
             for content_flag in CONTENT_FLAGS:
                 if getattr(evidence, content_flag, False):
                     metadata[evidence.name][content_flag] = True
             if checks is not None:
-                metadata[evidence.name]['checks'] = checks
+                metadata[evidence.name]["checks"] = checks
             if evidence_used is not None:
-                metadata[evidence.name]['evidence'] = evidence_used
+                metadata[evidence.name]["evidence"] = evidence_used
             index_file.write_text(format_json(metadata))
             self.repo.index.add(repo_files)
 
@@ -410,7 +401,7 @@ class Locker(object):
         if not hashes:
             return
         path = PurePath(self.local_path, evidence.dir_path)
-        ev_files = [str(path.joinpath(f'{h}_{evidence.name}')) for h in hashes]
+        ev_files = [str(path.joinpath(f"{h}_{evidence.name}")) for h in hashes]
         self.repo.index.remove(ev_files, working_tree=True)
 
     def create_tombstone_metadata(self, candidate, metadata, reason):
@@ -424,25 +415,25 @@ class Locker(object):
 
         :returns: a list of tombstones.
         """
-        tombstones = metadata.get('tombstones', {})
+        tombstones = metadata.get("tombstones", {})
         if isinstance(candidate, str):
             tombstones.setdefault(candidate, []).append(
                 {
-                    'eol': self.commit_date,
-                    'last_update': metadata['last_update'],
-                    'reason': reason
+                    "eol": self.commit_date,
+                    "last_update": metadata["last_update"],
+                    "reason": reason,
                 }
             )
         else:
             for part in candidate:
                 tombstones.setdefault(part, []).append(
                     {
-                        'eol': self.commit_date,
-                        'last_update': metadata['last_update'],
-                        'partition_fields': metadata['partition_fields'],
-                        'partition_root': metadata['partition_root'],
-                        'partition_key': metadata['partitions'][part],
-                        'reason': reason
+                        "eol": self.commit_date,
+                        "last_update": metadata["last_update"],
+                        "partition_fields": metadata["partition_fields"],
+                        "partition_root": metadata["partition_root"],
+                        "partition_key": metadata["partitions"][part],
+                        "reason": reason,
                     }
                 )
         return tombstones
@@ -455,11 +446,7 @@ class Locker(object):
         updated evidence.
         """
         self.repo.index.add(
-            [
-                f[0]
-                for f in self.repo.index.entries.keys()
-                if is_index_file(f[0])
-            ]
+            [f[0] for f in self.repo.index.entries.keys() if is_index_file(f[0])]
         )
 
     def get_index_file(self, evidence):
@@ -540,9 +527,7 @@ class Locker(object):
         """
         missing_errs = (EvidenceNotFoundError, HistoricalEvidenceNotFoundError)
         try:
-            evidence = self._get_evidence(
-                evidence_path, ignore_ttl, evidence_dt
-            )
+            evidence = self._get_evidence(evidence_path, ignore_ttl, evidence_dt)
             evidence.locker = self
             return evidence
         except missing_errs as missing_err:
@@ -568,14 +553,13 @@ class Locker(object):
         :returns: The evidence object with content.
         """
         self._validate_evidence(evidence, ignore_ttl)
-        if getattr(evidence, 'is_partitioned', False):
+        if getattr(evidence, "is_partitioned", False):
             metadata = self.get_evidence_metadata(evidence.path, evidence_dt)
             content = None
-            for part_hash in metadata['partitions'].keys():
+            for part_hash in metadata["partitions"].keys():
                 data = json.loads(
                     self._get_file_content(
-                        f'{evidence.dir_path}/{part_hash}_{evidence.name}',
-                        evidence_dt
+                        f"{evidence.dir_path}/{part_hash}_{evidence.name}", evidence_dt
                     )
                 )
                 if content is None:
@@ -594,17 +578,17 @@ class Locker(object):
                 self._get_file_content(
                     evidence.path,
                     evidence_dt,
-                    getattr(evidence, 'binary_content', False)
+                    getattr(evidence, "binary_content", False),
                 ),
-                sign=False
+                sign=False,
             )
-        ign_sig = get_config().get('locker.ignore_signatures', default=False)
+        ign_sig = get_config().get("locker.ignore_signatures", default=False)
         if not ign_sig and evidence.is_signed(self):
             if not evidence.verify_signature(self):
                 raise UnverifiedEvidenceError(
-                    f'Evidence {evidence.path} is signed but the signature '
-                    'could not be verified.',
-                    evidence
+                    f"Evidence {evidence.path} is signed but the signature "
+                    "could not be verified.",
+                    evidence,
                 )
         return evidence
 
@@ -633,39 +617,36 @@ class Locker(object):
         self.get_locker_repo()
         self.init_config()
 
-    def get_locker_repo(self, locker='evidence locker'):
+    def get_locker_repo(self, locker="evidence locker"):
         """
         Pull (clone) the remote repository to the local git repository.
 
         :param locker: the locker "name" used in logging
         """
-        if Path(self.local_path, '.git').is_dir():
-            self.logger.info(f'Using {locker} found in {self.local_path}...')
-            if not hasattr(self, 'repo'):
+        if Path(self.local_path, ".git").is_dir():
+            self.logger.info(f"Using {locker} found in {self.local_path}...")
+            if not hasattr(self, "repo"):
                 self.repo = git.Repo(self.local_path)
         else:
             self.logger.info(
-                f'Cloning {locker} {self.repo_url} to {self.local_path}...'
+                f"Cloning {locker} {self.repo_url} to {self.local_path}..."
             )
-            kwargs = {'branch': self.default_branch}
+            kwargs = {"branch": self.default_branch}
             addl_msg = None
             if self.clone_depth:
-                kwargs['depth'] = self.clone_depth
+                kwargs["depth"] = self.clone_depth
             if self.clone_shallow_since_days:
                 days = self.clone_shallow_since_days + 1
                 since_dt = dt.utcnow() - timedelta(days=days)
-                since = since_dt.strftime('%Y/%m/%d')
-                kwargs['shallow_since'] = since
-                addl_msg = f'{locker.title()} contains commits since {since}'
+                since = since_dt.strftime("%Y/%m/%d")
+                kwargs["shallow_since"] = since
+                addl_msg = f"{locker.title()} contains commits since {since}"
             start = time.perf_counter()
             self.repo = git.Repo.clone_from(
-                self.repo_url_with_creds,
-                self.local_path,
-                single_branch=True,
-                **kwargs
+                self.repo_url_with_creds, self.local_path, single_branch=True, **kwargs
             )
             duration = time.perf_counter() - start
-            self.logger.info(f'{locker.title()} cloned in {duration:.3f}s')
+            self.logger.info(f"{locker.title()} cloned in {duration:.3f}s")
             if addl_msg:
                 self.logger.info(addl_msg)
         self._checkout_branch()
@@ -685,16 +666,14 @@ class Locker(object):
         """
         self.write_pkg_indexes()
         if not message:
-            updated_files = '\n'.join(self.touched_files)
+            updated_files = "\n".join(self.touched_files)
             message = (
-                f'Files updated at local time {time.ctime(time.time())}'
-                f'\n\n{updated_files}'
+                f"Files updated at local time {time.ctime(time.time())}"
+                f"\n\n{updated_files}"
             )
-        self.logger.info(
-            f'Committing changes to local locker in {self.local_path}...'
-        )
+        self.logger.info(f"Committing changes to local locker in {self.local_path}...")
         try:
-            diff = self.repo.index.diff('HEAD')
+            diff = self.repo.index.diff("HEAD")
             if len(diff) > 0:
                 self.repo.git.commit(message=message)
         except git.BadName:
@@ -705,24 +684,22 @@ class Locker(object):
         if self._do_push:
             remote = self.repo.remote()
             self.logger.info(
-                f'Syncing local locker with remote repo {self.repo_url}...'
+                f"Syncing local locker with remote repo {self.repo_url}..."
             )
             remote.fetch()
             if not self._new_branch:
                 remote.pull(rebase=True)
             self._log_large_files()
-            self.logger.info(
-                f'Pushing local locker to remote repo {self.repo_url}...'
-            )
+            self.logger.info(f"Pushing local locker to remote repo {self.repo_url}...")
             push_info = remote.push(
                 self.branch,
-                force=get_config().get('locker.force_push', default=False),
-                set_upstream=True
+                force=get_config().get("locker.force_push", default=False),
+                set_upstream=True,
             )[0]
             if push_info.flags >= git.remote.PushInfo.ERROR:
                 raise LockerPushError(push_info)
 
-    def add_content_to_locker(self, content, folder='', filename=None):
+    def add_content_to_locker(self, content, folder="", filename=None):
         """
         Add non-evidence text content to the local locker.
 
@@ -731,14 +708,14 @@ class Locker(object):
         :param filename: the name of the file in the local locker.
         """
         if not filename:
-            raise ValueError('You must provide a filename.')
+            raise ValueError("You must provide a filename.")
         path = Path(self.local_path, folder)
         path.mkdir(parents=True, exist_ok=True)
         results_file = Path(path, filename)
         results_file.write_text(content)
         self.repo.index.add([str(results_file)])
 
-    def get_content_from_locker(self, folder='', filename=None):
+    def get_content_from_locker(self, folder="", filename=None):
         """
         Read non-evidence text content from the local locker.
 
@@ -746,7 +723,7 @@ class Locker(object):
         :param filename: the name of the file in the local locker.
         """
         if not filename:
-            raise ValueError('You must provide a filename.')
+            raise ValueError("You must provide a filename.")
         file_path = Path(self.local_path, folder, filename)
         content = None
         if file_path.is_file():
@@ -760,7 +737,7 @@ class Locker(object):
         :returns: reports metadata.
         """
         metadata = {}
-        for idx in Path(self.local_path, 'reports').rglob(INDEX_FILE):
+        for idx in Path(self.local_path, "reports").rglob(INDEX_FILE):
             for rpt_name, rpt_metadata in json.loads(idx.read_text()).items():
                 rpt_path = idx.relative_to(self.local_path).with_name(rpt_name)
                 metadata[str(rpt_path)] = rpt_metadata
@@ -778,7 +755,7 @@ class Locker(object):
         :returns: a set of abandoned evidence file relative paths.
         """
         abandoned_evidence = set()
-        for f in self._get_git_files('evidence'):
+        for f in self._get_git_files("evidence"):
             metadata = self.get_evidence_metadata(f.path, dt.utcnow())
             if self._evidence_abandoned(metadata, threshold):
                 abandoned_evidence.add(f.path)
@@ -794,12 +771,10 @@ class Locker(object):
         :returns: a list of empty evidence file relative paths.
         """
         empty_evidence = []
-        for f in self._get_git_files('index'):
+        for f in self._get_git_files("index"):
             for ev_name, ev_meta in json.loads(f.data_stream.read()).items():
-                if ev_meta.get('empty', False):
-                    empty_evidence.append(
-                        str(PurePath(f.path).with_name(ev_name))
-                    )
+                if ev_meta.get("empty", False):
+                    empty_evidence.append(str(PurePath(f.path).with_name(ev_name)))
         return empty_evidence
 
     def get_large_files(self, size=LF_DEFAULT):
@@ -840,9 +815,9 @@ class Locker(object):
         :returns: the latest commit containing the file specified.
         """
         commit = None
-        options = {'max_count': 1}
+        options = {"max_count": 1}
         if dt:
-            options['until'] = dt.strftime('%Y-%m-%d')
+            options["until"] = dt.strftime("%Y-%m-%d")
         try:
             with self.lock:
                 commit = next(self.repo.iter_commits(paths=path, **options))
@@ -862,20 +837,17 @@ class Locker(object):
         pkg_index_path = Path(self.get_index_file_by_path(evidence_path))
         if not pkg_index_path.is_file():
             return
-        ev_path, ev_name = evidence_path.rsplit('/', 1)
+        ev_path, ev_name = evidence_path.rsplit("/", 1)
         if evidence_dt:
             pkg_index_path = str(PurePath(ev_path, INDEX_FILE))
             commit = self.get_latest_commit(pkg_index_path, evidence_dt)
             if not commit:
                 return
-            metadata = json.loads(
-                commit.tree[pkg_index_path].data_stream.read()
-            )
+            metadata = json.loads(commit.tree[pkg_index_path].data_stream.read())
         else:
             metadata = json.loads(pkg_index_path.read_text())
         return metadata.get(
-            ev_name,
-            self._get_partitioned_evidence_metadata(metadata, ev_name)
+            ev_name, self._get_partitioned_evidence_metadata(metadata, ev_name)
         )
 
     def __enter__(self):
@@ -895,18 +867,18 @@ class Locker(object):
         configured push it up to the `repo_url`.
         """
         if exc_type:
-            self.logger.error(' '.join([str(exc_type), str(exc_val)]))
+            self.logger.error(" ".join([str(exc_type), str(exc_val)]))
         self.checkin()
         if self.repo_url_with_creds:
             self.push()
         return
 
     def _repo_init(self):
-        if Path(self.local_path, '.git').is_dir():
-            self.logger.info(f'Using locker found in {self.local_path}...')
+        if Path(self.local_path, ".git").is_dir():
+            self.logger.info(f"Using locker found in {self.local_path}...")
             self.repo = git.Repo(self.local_path)
         else:
-            self.logger.info(f'Creating locker in {self.local_path}...')
+            self.logger.info(f"Creating locker in {self.local_path}...")
             self.repo = git.Repo.init(self.local_path)
         self._checkout_branch()
         self.init_config()
@@ -918,77 +890,71 @@ class Locker(object):
             self.repo.git.checkout(self.branch)
         except git.exc.GitCommandError:
             self._new_branch = True
-            self.repo.git.checkout('-b', self.branch)
+            self.repo.git.checkout("-b", self.branch)
 
     def _get_evidence(self, evidence_path, ignore_ttl=False, evidence_dt=None):
         agent = None
         evidence = None
         try:
             metadata = self.get_evidence_metadata(evidence_path, evidence_dt)
-            if metadata and metadata.get('agent_name'):
+            if metadata and metadata.get("agent_name"):
                 agent = ComplianceAgent(
-                    name=metadata.get('agent_name'),
-                    use_agent_dir=evidence_path.startswith(
-                        ComplianceAgent.AGENTS_DIR
-                    )
+                    name=metadata.get("agent_name"),
+                    use_agent_dir=evidence_path.startswith(ComplianceAgent.AGENTS_DIR),
                 )
-            class_type, category, evidence_name = evidence_path.split('/')[-3:]
+            class_type, category, evidence_name = evidence_path.split("/")[-3:]
             evidence_class_obj = get_evidence_class(class_type)
             evidence = evidence_class_obj(
                 evidence_name,
                 category,
-                metadata['ttl'],
-                metadata['description'],
+                metadata["ttl"],
+                metadata["description"],
                 partition={
-                    'fields': metadata.get('partition_fields'),
-                    'root': metadata.get('partition_root')
+                    "fields": metadata.get("partition_fields"),
+                    "root": metadata.get("partition_root"),
                 },
-                binary_content=metadata.get('binary_content', False),
-                filtered_content=metadata.get('filtered_content', False),
+                binary_content=metadata.get("binary_content", False),
+                filtered_content=metadata.get("filtered_content", False),
                 agent=agent,
-                evidence_dt=evidence_dt
+                evidence_dt=evidence_dt,
             )
         except TypeError:
-            ev_dt_str = (evidence_dt or dt.utcnow()).strftime('%Y-%m-%d')
+            ev_dt_str = (evidence_dt or dt.utcnow()).strftime("%Y-%m-%d")
             raise EvidenceNotFoundError(
-                f'Evidence {evidence_path} is not found in the locker '
-                f'for {ev_dt_str}. It may not be a valid evidence path.'
+                f"Evidence {evidence_path} is not found in the locker "
+                f"for {ev_dt_str}. It may not be a valid evidence path."
             )
         return self.load_content(evidence, ignore_ttl, evidence_dt)
 
     def _get_partitioned_evidence_metadata(self, metadata, evidence_name):
         try:
-            part, ev_name = evidence_name.split('_', 1)
-            if part in metadata.get(ev_name, {}).get('partitions', {}).keys():
+            part, ev_name = evidence_name.split("_", 1)
+            if part in metadata.get(ev_name, {}).get("partitions", {}).keys():
                 return metadata[ev_name]
         except ValueError:
             return
 
     def _evidence_ttl_expired(self, evidence, last_update):
         expired = False
-        last_update_ts = dt.strptime(last_update, '%Y-%m-%dT%H:%M:%S.%f')
+        last_update_ts = dt.strptime(last_update, "%Y-%m-%dT%H:%M:%S.%f")
         time_diff = dt.utcnow() - last_update_ts
         if time_diff.total_seconds() >= evidence.ttl - self.ttl_tolerance:
             expired = True
         return expired
 
     def _stale_message(self, message):
-        self._handler.setFormatter(logging.Formatter('%(message)s'))
+        self._handler.setFormatter(logging.Formatter("%(message)s"))
         self.logger.info(message)
-        self._handler.setFormatter(
-            logging.Formatter('%(levelname)s: %(message)s')
-        )
+        self._handler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
 
     def _evidence_abandoned(self, metadata=None, threshold=None):
-        if metadata is None or metadata.get('last_update') is None:
+        if metadata is None or metadata.get("last_update") is None:
             return True
-        last_update = dt.strptime(
-            metadata['last_update'], '%Y-%m-%dT%H:%M:%S.%f'
-        )
+        last_update = dt.strptime(metadata["last_update"], "%Y-%m-%dT%H:%M:%S.%f")
         time_diff = dt.utcnow() - last_update
         if threshold is None:
             threshold = AE_DEFAULT
-        threshold += metadata.get('ttl', 0)
+        threshold += metadata.get("ttl", 0)
         if time_diff.total_seconds() >= threshold:
             return True
         return False
@@ -1000,59 +966,51 @@ class Locker(object):
         commit = self.get_latest_commit(file_path, file_dt)
         if not commit:
             raise HistoricalEvidenceNotFoundError(
-                f'Evidence {file_path} was not found in the locker '
+                f"Evidence {file_path} was not found in the locker "
                 f'for {file_dt.strftime("%Y-%m-%d")}'
             )
         return commit.tree[file_path].data_stream.read()
 
     def _validate_evidence(self, evidence, ignore_ttl):
         if evidence.path in self.forced_evidence:
-            raise StaleEvidenceError(
-                f'Evidence {evidence.path} is forced stale'
-            )
+            raise StaleEvidenceError(f"Evidence {evidence.path} is forced stale")
 
         paths = []
         metadata = self.get_evidence_metadata(evidence.path) or {}
-        if getattr(evidence, 'is_partitioned', False):
-            for part_hash in metadata['partitions'].keys():
+        if getattr(evidence, "is_partitioned", False):
+            for part_hash in metadata["partitions"].keys():
                 paths.append(
-                    PurePath(
-                        evidence.dir_path, f'{part_hash}_{evidence.name}'
-                    )
+                    PurePath(evidence.dir_path, f"{part_hash}_{evidence.name}")
                 )
         else:
             paths.append(PurePath(evidence.path))
         for path in paths:
             if not Path(self.local_path, path).is_file():
-                raise ValueError(
-                    f'Evidence {path} was not found in the locker'
-                )
-        ttl_expired = self._evidence_ttl_expired(
-            evidence, metadata['last_update']
-        )
+                raise ValueError(f"Evidence {path} was not found in the locker")
+        ttl_expired = self._evidence_ttl_expired(evidence, metadata["last_update"])
         if not ignore_ttl and ttl_expired:
-            raise StaleEvidenceError(f'Evidence {evidence.path} is stale')
+            raise StaleEvidenceError(f"Evidence {evidence.path} is stale")
 
-    def _get_git_files(self, file_type='all'):
+    def _get_git_files(self, file_type="all"):
         iz = {
-            'all': lambda g: g.type == 'blob',
-            'evidence': is_evidence_file,
-            'index': is_index_file
+            "all": lambda g: g.type == "blob",
+            "evidence": is_evidence_file,
+            "index": is_index_file,
         }
         return filter(iz[file_type], self.repo.head.commit.tree.traverse())
 
     def _log_large_files(self):
         large_files = self.get_large_files(
-            get_config().get('locker.large_file_threshold', LF_DEFAULT)
+            get_config().get("locker.large_file_threshold", LF_DEFAULT)
         )
         if large_files:
-            msg = ['LARGE FILES (Hosting service may reject due to size):\n']
+            msg = ["LARGE FILES (Hosting service may reject due to size):\n"]
             for fpath, size in large_files.items():
-                formatted_size = f'{size/MB:.1f} MB'
-                if formatted_size == '0.0 MB':
-                    formatted_size = f'{str(size)} Bytes'
-                msg.append(f'      {fpath} is {formatted_size}')
-            self.logger.info('\n'.join(msg) + '\n')
+                formatted_size = f"{size/MB:.1f} MB"
+                if formatted_size == "0.0 MB":
+                    formatted_size = f"{str(size)} Bytes"
+                msg.append(f"      {fpath} is {formatted_size}")
+            self.logger.info("\n".join(msg) + "\n")
 
 
 def is_evidence_file(git_obj):
@@ -1064,9 +1022,9 @@ def is_evidence_file(git_obj):
     :returns: True or False (Object is or isn't an evidence file)
     """
     return (
-        git_obj.type == 'blob'
-        and not git_obj.path.startswith('notifications/')
-        and git_obj.path != 'check_results.json'
+        git_obj.type == "blob"
+        and not git_obj.path.startswith("notifications/")
+        and git_obj.path != "check_results.json"
         and PurePath(git_obj.path).name not in NOT_EVIDENCE
     )
 
@@ -1081,4 +1039,4 @@ def is_index_file(obj):
     """
     if isinstance(obj, str):
         return PurePath(obj).name == INDEX_FILE
-    return obj.type == 'blob' and PurePath(obj.path).name == INDEX_FILE
+    return obj.type == "blob" and PurePath(obj.path).name == INDEX_FILE

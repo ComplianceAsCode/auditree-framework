@@ -20,8 +20,8 @@ from compliance.utils.credentials import Config
 
 import requests
 
-PAGERDUTY_API_URL = 'https://api.pagerduty.com'
-PD_EVENTS_V2_URL = 'https://events.pagerduty.com/v2/enqueue'
+PAGERDUTY_API_URL = "https://api.pagerduty.com"
+PD_EVENTS_V2_URL = "https://events.pagerduty.com/v2/enqueue"
 # 100 is the maximum page size
 PAGES_LIMIT = 100
 
@@ -29,8 +29,8 @@ PAGES_LIMIT = 100
 def _init_request(path, params, headers, creds):
     credentials = creds or Config()
     hdrs = {
-        'Accept': 'application/vnd.pagerduty+json;version=2',
-        'Authorization': f'Token token={credentials["pagerduty"].api_key}'
+        "Accept": "application/vnd.pagerduty+json;version=2",
+        "Authorization": f'Token token={credentials["pagerduty"].api_key}',
     }
     if headers:
         hdrs.update(headers)
@@ -53,15 +53,15 @@ def get(path, params=None, headers=None, creds=None):
     """
     url, params, hdrs = _init_request(path, params, headers, creds)
     offset = 0
-    params.update({'limit': PAGES_LIMIT, 'offset': offset})
+    params.update({"limit": PAGES_LIMIT, "offset": offset})
     more = True
     while more:
         r = requests.get(url, headers=hdrs, params=params)
         yield r
-        more = r.json().get('more', False)
+        more = r.json().get("more", False)
         if more:
             offset = offset + PAGES_LIMIT
-            params.update({'offset': offset})
+            params.update({"offset": offset})
 
 
 def delete(path, params=None, headers=None, creds=None):
@@ -113,35 +113,26 @@ def post(path, params=None, headers=None, creds=None):
 
 
 def send_event(
-    action,
-    check,
-    title,
-    source,
-    severity='error',
-    details='',
-    links=None,
-    creds=None
+    action, check, title, source, severity="error", details="", links=None, creds=None
 ):
     """Send an event to PD using the Events API."""
     credentials = creds or Config()
 
     msg = {
-        'event_action': action,
-        'routing_key': credentials['pagerduty'].events_integration_key,
-        'dedup_key': check,
-        'payload': {
-            'summary': title,
-            'source': source,
-            'severity': severity,
-            'custom_details': details
+        "event_action": action,
+        "routing_key": credentials["pagerduty"].events_integration_key,
+        "dedup_key": check,
+        "payload": {
+            "summary": title,
+            "source": source,
+            "severity": severity,
+            "custom_details": details,
         },
-        'links': links or []
+        "links": links or [],
     }
-    headers = {'Content-Type': 'application/json'}
+    headers = {"Content-Type": "application/json"}
 
-    response = requests.post(
-        PD_EVENTS_V2_URL, headers=headers, data=json.dumps(msg)
-    )
+    response = requests.post(PD_EVENTS_V2_URL, headers=headers, data=json.dumps(msg))
     response.raise_for_status()
-    if response.json().get('status') != 'success':
-        raise RuntimeError('PagerDuty Error: ' + response.json())
+    if response.json().get("status") != "success":
+        raise RuntimeError("PagerDuty Error: " + response.json())

@@ -13,4 +13,6 @@
 # limitations under the License.
 """A demo common fetcher module."""
 
-from arboretum.auditree.fetchers.fetch_python_packages import PythonPackageFetcher  # noqa
+from arboretum.auditree.fetchers.fetch_python_packages import (  # noqa
+    PythonPackageFetcher,
+)

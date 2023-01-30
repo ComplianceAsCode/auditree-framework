@@ -31,15 +31,15 @@ class LockerNotifierTest(unittest.TestCase):
     def setUp(self):
         """Initialize each test."""
         self.results = {}
-        for status in ['pass', 'fail', 'error', 'warn']:
+        for status in ["pass", "fail", "error", "warn"]:
             name, result = self._generate_result(status)
             self.results[name] = result
 
-    @patch('compliance.notify.datetime')
+    @patch("compliance.notify.datetime")
     def test_notify_sends_content_to_locker(self, datetime_mock):
         """Test locker notifier sends content to locker as expected."""
         controls_mock = create_autospec(ControlDescriptor)
-        controls_mock.get_accreditations.return_value = ['foo']
+        controls_mock.get_accreditations.return_value = ["foo"]
         locker_mock = create_autospec(Locker)
         datetime_mock.utcnow.return_value = datetime(2019, 10, 14)
 
@@ -50,15 +50,13 @@ class LockerNotifierTest(unittest.TestCase):
         args, kwargs = locker_mock.add_content_to_locker.call_args
         self.assertEqual(len(args), 3)
         self.assertEqual(kwargs, {})
-        self.assertTrue(
-            args[0].startswith('# CHECK RESULTS: 2019-10-14 00:00:00')
-        )
-        self.assertTrue('## Notification for FOO accreditation' in args[0])
-        self.assertTrue('### Passed Checks' in args[0])
-        self.assertTrue('### Errored Checks' in args[0])
-        self.assertTrue('### Failures/Warnings' in args[0])
-        self.assertEqual(args[1], 'notifications')
-        self.assertEqual(args[2], 'alerts_summary.md')
+        self.assertTrue(args[0].startswith("# CHECK RESULTS: 2019-10-14 00:00:00"))
+        self.assertTrue("## Notification for FOO accreditation" in args[0])
+        self.assertTrue("### Passed Checks" in args[0])
+        self.assertTrue("### Errored Checks" in args[0])
+        self.assertTrue("### Failures/Warnings" in args[0])
+        self.assertEqual(args[1], "notifications")
+        self.assertEqual(args[2], "alerts_summary.md")
 
     def _build_check_mock(self, name):
         check_mock = MagicMock()
@@ -67,10 +65,10 @@ class LockerNotifierTest(unittest.TestCase):
 
     def _generate_result(self, status):
         return (
-            f'compliance.test.{status}_example',
+            f"compliance.test.{status}_example",
             {
-                'status': status,
-                'timestamp': time.time(),
-                'test': self._build_check_mock(f'{status}_example')
-            }
+                "status": status,
+                "timestamp": time.time(),
+                "test": self._build_check_mock(f"{status}_example"),
+            },
         )

@@ -33,7 +33,10 @@ from compliance.notify import get_notifiers
 from compliance.report import ReportBuilder
 from compliance.utils.exceptions import LockerPushError
 from compliance.utils.path import (
-    CHECK_PREFIX, FETCH_PREFIX, get_toplevel_dirpath, load_evidences_modules
+    CHECK_PREFIX,
+    FETCH_PREFIX,
+    get_toplevel_dirpath,
+    load_evidences_modules,
 )
 
 
@@ -90,49 +93,49 @@ class _BaseRunner(object):
     def _load_compliance_config(self):
         creds_path = Path(self.opts.creds_path).expanduser()
         if not creds_path.is_file():
-            raise ValueError(f'{creds_path} file does not exist.')
+            raise ValueError(f"{creds_path} file does not exist.")
         self.config = get_config()
         self.config.creds_path = str(creds_path)
         self.config.load(self.opts.compliance_config)
 
     def _init_dirs(self):
         self.dirs = set()
-        for p in [Path(path).resolve() for path in self.extra_opts + ['.']]:
+        for p in [Path(path).resolve() for path in self.extra_opts + ["."]]:
             if p.exists():
                 dirpath = get_toplevel_dirpath(p)
                 if dirpath is None:
                     continue
                 self.dirs.add(dirpath)
         if not self.dirs:
-            raise ValueError('Could not find a controls.json file.')
+            raise ValueError("Could not find a controls.json file.")
         for d in self.dirs:
             load_evidences_modules(d)
 
     def _create_the_locker(self, ttl_tolerance):
-        dirname = self.config.get('locker.dirname')
+        dirname = self.config.get("locker.dirname")
         mode = self.opts.evidence
 
-        gitconfig = self.config.get('locker.gitconfig')
-        if mode == 'local':
+        gitconfig = self.config.get("locker.gitconfig")
+        if mode == "local":
             return Locker(
                 name=dirname,
                 ttl_tolerance=ttl_tolerance,
                 gitconfig=gitconfig,
-                branch=self.config.get('locker.branch'),
-                local_path=self.config.get('locker.local_path')
+                branch=self.config.get("locker.branch"),
+                local_path=self.config.get("locker.local_path"),
             )
-        repo_url = self.config.get('locker.repo_url')
+        repo_url = self.config.get("locker.repo_url")
         if repo_url is None:
             raise ValueError(f'Evidence mode "{mode}" requires a URL.')
         return Locker(
             name=dirname,
             repo_url=repo_url,
             creds=self.config.creds,
-            do_push=True if mode == 'full-remote' else False,
+            do_push=True if mode == "full-remote" else False,
             ttl_tolerance=ttl_tolerance,
             gitconfig=gitconfig,
-            branch=self.config.get('locker.branch'),
-            local_path=self.config.get('locker.local_path')
+            branch=self.config.get("locker.branch"),
+            local_path=self.config.get("locker.local_path"),
         )
 
 
@@ -142,7 +145,7 @@ class FetchMode(_BaseRunner):
     def __enter__(self):
         """Initialize fetcher mode processing."""
         super(FetchMode, self).__enter__()
-        self.init_locker(self.config.get('locker.ttl_tolerance', 0))
+        self.init_locker(self.config.get("locker.ttl_tolerance", 0))
         return self
 
     def __exit__(self, typ, val, traceback):
@@ -165,7 +168,7 @@ class FetchMode(_BaseRunner):
             tl = unittest.TestLoader()
             tl.testMethodPrefix = FETCH_PREFIX
             candidates = self.get_test_candidates(
-                tl.discover(loc, f'{FETCH_PREFIX}*.py')
+                tl.discover(loc, f"{FETCH_PREFIX}*.py")
             )
             for candidate in candidates:
                 if issubclass(candidate.__class__, ComplianceFetcher):
@@ -173,34 +176,32 @@ class FetchMode(_BaseRunner):
             for load_err in tl.errors:
                 try:
                     locate = re.search(
-                        '^Failed to import test module: (.+?)\n.*?', load_err
+                        "^Failed to import test module: (.+?)\n.*?", load_err
                     )
-                    if locate.group(1).split('.')[-1].startswith(FETCH_PREFIX):
+                    if locate.group(1).split(".")[-1].startswith(FETCH_PREFIX):
                         self.load_errors.add(load_err)
                 except AttributeError:
                     pass
         if not (self.opts.include or self.opts.exclude):
             return fetchers
-        include = {f'{f.__module__}.{f.__name__}' for f in fetchers}
+        include = {f"{f.__module__}.{f.__name__}" for f in fetchers}
         if self.opts.include:
             include = set(json.loads(Path(self.opts.include).read_text()))
             for test in include:
                 if test in fetchers:
                     continue
-                test_name, test_class = test.rsplit('.', 1)
+                test_name, test_class = test.rsplit(".", 1)
                 try:
                     # Attempt to import missing fetchers.
                     fetchers.add(getattr(import_module(test_name), test_class))
-                    import_module('.'.join([test.split('.')[0], 'evidences']))
+                    import_module(".".join([test.split(".")[0], "evidences"]))
                 except (AttributeError, ModuleNotFoundError):
                     continue
         exclude = set()
         if self.opts.exclude:
             exclude = set(json.loads(Path(self.opts.exclude).read_text()))
         include -= exclude
-        return filter(
-            lambda f: f'{f.__module__}.{f.__name__}' in include, fetchers
-        )
+        return filter(lambda f: f"{f.__module__}.{f.__name__}" in include, fetchers)
 
     def run_fetchers(self, reruns=None):
         """
@@ -231,7 +232,7 @@ class FetchMode(_BaseRunner):
         )
         return all(
             (
-                'DependencyUnavailableError' in tb.split('Traceback')[-1]
+                "DependencyUnavailableError" in tb.split("Traceback")[-1]
                 for (_, tb) in runner.run(fetchers).errors
             )
         )
@@ -248,11 +249,10 @@ class CheckMode(_BaseRunner):
         :param extra_opts: additional arguments provided from the command line.
         """
         super(CheckMode, self).__init__(opts, extra_opts)
-        self.accreds = [a.strip() for a in opts.check.split(',')]
+        self.accreds = [a.strip() for a in opts.check.split(",")]
         # Backward compatibility to support ghe_issues option
         self.notifiers = [
-            n.strip().replace('ghe_issues', 'gh_issues')
-            for n in opts.notify.split(',')
+            n.strip().replace("ghe_issues", "gh_issues") for n in opts.notify.split(",")
         ]
         self.push_error = False
 
@@ -288,18 +288,19 @@ class CheckMode(_BaseRunner):
             tl = unittest.TestLoader()
             tl.testMethodPrefix = CHECK_PREFIX
             candidates = self.get_test_candidates(
-                tl.discover(loc, f'{CHECK_PREFIX}*.py')
+                tl.discover(loc, f"{CHECK_PREFIX}*.py")
             )
             for test in [c.__class__ for c in candidates]:
-                path = f'{test.__module__}.{test.__name__}'
+                path = f"{test.__module__}.{test.__name__}"
                 tests_found.add(path)
-                in_accred_grouping = self.controls.is_test_included(
-                    path, self.accreds
-                )
+                in_accred_grouping = self.controls.is_test_included(path, self.accreds)
                 if issubclass(test, ComplianceCheck) and in_accred_grouping:
                     test.tests = [
-                        method for method in dir(test) if (
-                            method.startswith(CHECK_PREFIX) and (
+                        method
+                        for method in dir(test)
+                        if (
+                            method.startswith(CHECK_PREFIX)
+                            and (
                                 inspect.ismethod(getattr(test, method))
                                 or inspect.isfunction(getattr(test, method))
                             )
@@ -309,13 +310,13 @@ class CheckMode(_BaseRunner):
             for load_err in tl.errors:
                 try:
                     locate = re.search(
-                        '^Failed to import test module: (.+?)\n.*?', load_err
+                        "^Failed to import test module: (.+?)\n.*?", load_err
                     )
                     for accred in self.accreds:
                         for check in self.controls.accred_checks[accred]:
                             if check.startswith(locate.group(1)):
                                 self.load_errors.add(
-                                    f'Unable to load {check}\n\n{load_err}'
+                                    f"Unable to load {check}\n\n{load_err}"
                                 )
                                 tests_found.add(check)
                 except AttributeError:
@@ -327,9 +328,9 @@ class CheckMode(_BaseRunner):
         for check_not_found in expected_checks - tests_found:
             self.load_errors.add(
                 (
-                    f'Unable to load {check_not_found}\n\n'
-                    f'The check {check_not_found} was not found.  '
-                    'Please validate that the path provided is correct.'
+                    f"Unable to load {check_not_found}\n\n"
+                    f"The check {check_not_found} was not found.  "
+                    "Please validate that the path provided is correct."
                 )
             )
         return checks
@@ -354,8 +355,8 @@ class CheckMode(_BaseRunner):
 
     def fix_failures(self):
         """Fix failures if fixer methods are included in checks."""
-        if self.opts.fix != 'off':
-            fixer = Fixer(self.results, dry_run=(self.opts.fix == 'dry-run'))
+        if self.opts.fix != "off":
+            fixer = Fixer(self.results, dry_run=(self.opts.fix == "dry-run"))
             fixer.fix()
 
     def build_reports(self):
@@ -370,7 +371,7 @@ class CheckMode(_BaseRunner):
         notifiers = get_notifiers()
         for notifier_name in self.notifiers:
             notifier_args = [self.results, self.controls]
-            if notifier_name == 'locker':
+            if notifier_name == "locker":
                 notifier_args.append(self.locker)
             notifier = notifiers[notifier_name](
                 *notifier_args, push_error=self.push_error
@@ -392,8 +393,8 @@ class ComplianceBaseResult(unittest.TextTestResult):
         super(ComplianceBaseResult, self).stopTest(test)
         if self.showAll:
             time_taken = time.perf_counter() - self.start_time
-            self.stream.write(f'{self.getDescription(test)} - ran in: ')
-            self.stream.writeln(f'{time_taken:.3f}s')
+            self.stream.write(f"{self.getDescription(test)} - ran in: ")
+            self.stream.writeln(f"{time_taken:.3f}s")
             self.stream.flush()
 
 
@@ -412,7 +413,7 @@ class ComplianceCheckResult(ComplianceBaseResult):
         :param test: a ``unittest.TestCase`` object.
         """
         super(ComplianceCheckResult, self).addSuccess(test)
-        self.record(test, 'pass' if test.warnings_count() == 0 else 'warn')
+        self.record(test, "pass" if test.warnings_count() == 0 else "warn")
 
     def addError(self, test, err):  # noqa: N802
         """
@@ -422,7 +423,7 @@ class ComplianceCheckResult(ComplianceBaseResult):
         :param err: a tuple of the form returned by sys.exc_info()
         """
         super(ComplianceCheckResult, self).addError(test, err)
-        self.record(test, 'error')
+        self.record(test, "error")
 
     def addFailure(self, test, err):  # noqa: N802
         """
@@ -432,7 +433,7 @@ class ComplianceCheckResult(ComplianceBaseResult):
         :param err: a tuple of the form returned by sys.exc_info()
         """
         super(ComplianceCheckResult, self).addFailure(test, err)
-        self.record(test, 'fail')
+        self.record(test, "fail")
 
     def record(self, test, status):
         """
@@ -442,9 +443,9 @@ class ComplianceCheckResult(ComplianceBaseResult):
         :param status: a string status (`pass`, `warn`, `fail`, or `error`)
         """
         self.results[test.id()] = {
-            'status': status,
-            'timestamp': time.time(),
-            'test': ComplianceTestWrapper(test)
+            "status": status,
+            "timestamp": time.time(),
+            "test": ComplianceTestWrapper(test),
         }
 
 

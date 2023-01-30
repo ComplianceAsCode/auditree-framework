@@ -26,28 +26,25 @@ from .. import build_test_mock
 class PagerDutyNotifierTest(unittest.TestCase):
     """PagerDutyNotifier test class."""
 
-    @patch('compliance.notify.pagerduty.get')
-    @patch('compliance.notify.pagerduty.send_event')
-    @patch('compliance.notify.get_config')
-    def test_notify_with_runbooks(
-        self, get_config_mock, pd_send_mock, pd_get_mock
-    ):
+    @patch("compliance.notify.pagerduty.get")
+    @patch("compliance.notify.pagerduty.send_event")
+    @patch("compliance.notify.get_config")
+    def test_notify_with_runbooks(self, get_config_mock, pd_send_mock, pd_get_mock):
         """Test that PagerDutyNotifier notifications have runbook links."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {'infra': ['#channel']}
+        config_mock.get.return_value = {"infra": ["#channel"]}
 
         get_config_mock.return_value = config_mock
 
         results = {
-            'compliance.test.runbook': {
-                'status': 'error', 'test': build_test_mock()
+            "compliance.test.runbook": {"status": "error", "test": build_test_mock()},
+            "compliance.test.other_runbook": {
+                "status": "error",
+                "test": build_test_mock("two"),
             },
-            'compliance.test.other_runbook': {
-                'status': 'error', 'test': build_test_mock('two')
-            }
         }
         controls = create_autospec(ControlDescriptor)
-        controls.get_accreditations.return_value = ['infra']
+        controls.get_accreditations.return_value = ["infra"]
         notifier = PagerDutyNotifier(results, controls)
         notifier.notify()
 
@@ -56,32 +53,32 @@ class PagerDutyNotifierTest(unittest.TestCase):
 
         args, kwargs = pd_send_mock.call_args
 
-        for link in kwargs['links']:
-            if link['text'] == 'Runbook':
-                self.assertIn('http://mockedrunbooks/path/to', link['href'])
+        for link in kwargs["links"]:
+            if link["text"] == "Runbook":
+                self.assertIn("http://mockedrunbooks/path/to", link["href"])
 
-    @patch('compliance.notify.pagerduty.get')
-    @patch('compliance.notify.pagerduty.send_event')
-    @patch('compliance.notify.get_config')
-    def test_notify_without_runbooks(
-        self, get_config_mock, pd_send_mock, pd_get_mock
-    ):
+    @patch("compliance.notify.pagerduty.get")
+    @patch("compliance.notify.pagerduty.send_event")
+    @patch("compliance.notify.get_config")
+    def test_notify_without_runbooks(self, get_config_mock, pd_send_mock, pd_get_mock):
         """Test that PagerDutyNotifier notifications have no runbook links."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get.return_value = {'infra': ['#channel']}
+        config_mock.get.return_value = {"infra": ["#channel"]}
 
         get_config_mock.return_value = config_mock
 
         controls = create_autospec(ControlDescriptor)
-        controls.get_accreditations.return_value = ['infra']
+        controls.get_accreditations.return_value = ["infra"]
 
         results = {
-            'compliance.test.runbook': {
-                'status': 'error', 'test': build_test_mock(baseurl='')
+            "compliance.test.runbook": {
+                "status": "error",
+                "test": build_test_mock(baseurl=""),
             },
-            'compliance.test.other_runbook': {
-                'status': 'error', 'test': build_test_mock('two', baseurl='')
-            }
+            "compliance.test.other_runbook": {
+                "status": "error",
+                "test": build_test_mock("two", baseurl=""),
+            },
         }
 
         notifier = PagerDutyNotifier(results, controls)
@@ -92,4 +89,4 @@ class PagerDutyNotifierTest(unittest.TestCase):
 
         args, kwargs = pd_send_mock.call_args
 
-        self.assertEqual(0, len(kwargs['links']))
+        self.assertEqual(0, len(kwargs["links"]))

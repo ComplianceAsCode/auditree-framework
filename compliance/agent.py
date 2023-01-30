@@ -29,8 +29,8 @@ from cryptography.hazmat.primitives.asymmetric.utils import Prehashed
 class ComplianceAgent:
     """Compliance agent class."""
 
-    AGENTS_DIR = 'agents'
-    PUBLIC_KEYS_EVIDENCE_PATH = 'raw/auditree/agent_public_keys.json'
+    AGENTS_DIR = "agents"
+    PUBLIC_KEYS_EVIDENCE_PATH = "raw/auditree/agent_public_keys.json"
 
     def __init__(self, name=None, use_agent_dir=True):
         """Construct and initialize the agent object."""
@@ -126,10 +126,9 @@ class ComplianceAgent:
         signature = self.private_key.sign(
             hashed.digest(),
             padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=padding.PSS.MAX_LENGTH
+                mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH
             ),
-            Prehashed(hashes.SHA256())
+            Prehashed(hashes.SHA256()),
         )
         return hashed.hexdigest(), base64.b64encode(signature).decode()
 
@@ -150,9 +149,9 @@ class ComplianceAgent:
                 data_bytes,
                 padding.PSS(
                     mgf=padding.MGF1(hashes.SHA256()),
-                    salt_length=padding.PSS.MAX_LENGTH
+                    salt_length=padding.PSS.MAX_LENGTH,
                 ),
-                hashes.SHA256()
+                hashes.SHA256(),
             )
             return True
         except InvalidSignature:
@@ -163,19 +162,19 @@ class ComplianceAgent:
         """Load agent from configuration."""
         config = get_config()
         agent = cls(
-            name=config.get('agent_name'),
-            use_agent_dir=config.get('use_agent_dir', True)
+            name=config.get("agent_name"),
+            use_agent_dir=config.get("use_agent_dir", True),
         )
-        private_key_path = config.get('agent_private_key')
-        public_key_path = config.get('agent_public_key')
+        private_key_path = config.get("agent_private_key")
+        public_key_path = config.get("agent_public_key")
         if private_key_path:
-            with open(private_key_path, 'rb') as key_file:
+            with open(private_key_path, "rb") as key_file:
                 agent.private_key = key_file.read()
             agent.public_key = agent.private_key.public_key().public_bytes(
                 encoding=serialization.Encoding.PEM,
-                format=serialization.PublicFormat.SubjectPublicKeyInfo
+                format=serialization.PublicFormat.SubjectPublicKeyInfo,
             )
         elif public_key_path:
-            with open(public_key_path, 'rb') as key_file:
+            with open(public_key_path, "rb") as key_file:
                 agent.public_key = key_file.read()
         return agent

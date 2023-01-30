@@ -23,13 +23,13 @@ from pathlib import Path
 # not passing a value for an optional argument
 _sentinel = object()
 
-logger = logging.getLogger('compliance.utils.credentials')
+logger = logging.getLogger("compliance.utils.credentials")
 
 
-class Config():
+class Config:
     """Handle credentials configuration."""
 
-    def __init__(self, cfg_file='~/.credentials'):
+    def __init__(self, cfg_file="~/.credentials"):
         """
         Create an instance of a dictionary-like configuration object.
 
@@ -69,17 +69,11 @@ class Config():
                 )
                 raise exc
 
-        env_vars = [
-            k for k in environ.keys() if k.startswith(f'{section.upper()}_')
-        ]
-        env_keys = [
-            k.split(section.upper())[1].lstrip('_').lower() for k in env_vars
-        ]
+        env_vars = [k for k in environ.keys() if k.startswith(f"{section.upper()}_")]
+        env_keys = [k.split(section.upper())[1].lstrip("_").lower() for k in env_vars]
         env_values = [environ[e] for e in env_vars]
         if env_vars:
-            logger.debug(
-                f'Loading credentials from ENV vars: {", ".join(env_vars)}'
-            )
+            logger.debug(f'Loading credentials from ENV vars: {", ".join(env_vars)}')
         params = []
         if self._cfg.has_section(section):
             params = self._cfg.options(section)
@@ -89,7 +83,7 @@ class Config():
 
         if env_vars:
             d.update(zip(env_keys, env_values))
-        t = namedtuple(section, ' '.join(list(d.keys())))
+        t = namedtuple(section, " ".join(list(d.keys())))
         t.__getattr__ = _getattr_wrapper
         return t(*list(d.values()))
 
@@ -108,7 +102,7 @@ class Config():
         if key is None:
             return self[section]
         if account:
-            key = '_'.join([account, key])
+            key = "_".join([account, key])
         if default == _sentinel:
             return getattr(self[section], key)
         else:

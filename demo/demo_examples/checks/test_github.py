@@ -34,9 +34,9 @@ class GitHubAPIVersionsCheck(ComplianceCheck):
 
         :returns: the title of the checks
         """
-        return 'GitHub API Versions'
+        return "GitHub API Versions"
 
-    @with_raw_evidences('github/api_versions.json')
+    @with_raw_evidences("github/api_versions.json")
     def test_supported_versions(self, evidence):
         """
         Check whether there are any supported versions.
@@ -44,23 +44,23 @@ class GitHubAPIVersionsCheck(ComplianceCheck):
         Always warn about something, for demo purposes.
         """
         version_list = json.loads(evidence.content)
-        versions_str = ', '.join(version_list)
+        versions_str = ", ".join(version_list)
         if not version_list:
             self.add_failures(
-                'Supported GitHub API Versions Violation',
-                'No API versions were indicated as supported by GitHub.'
+                "Supported GitHub API Versions Violation",
+                "No API versions were indicated as supported by GitHub.",
             )
         elif len(version_list) == 1:
             self.add_warnings(
-                'Supported GitHub API Versions Warning',
-                'There is only one supported version. '
-                f'Get with the program: {versions_str}'
+                "Supported GitHub API Versions Warning",
+                "There is only one supported version. "
+                f"Get with the program: {versions_str}",
             )
         elif len(version_list) > 1:
             self.add_warnings(
-                'Supported GitHub API Versions Warning',
-                'There are more than one supported versions. '
-                f'Check the docs for the latest changes: {versions_str}'
+                "Supported GitHub API Versions Warning",
+                "There are more than one supported versions. "
+                f"Check the docs for the latest changes: {versions_str}",
             )
 
     def get_reports(self):
@@ -69,7 +69,7 @@ class GitHubAPIVersionsCheck(ComplianceCheck):
 
         :returns: the report(s) generated for this check
         """
-        return ['github/api_versions.md']
+        return ["github/api_versions.md"]
 
     def msg_supported_versions(self):
         """
@@ -77,7 +77,7 @@ class GitHubAPIVersionsCheck(ComplianceCheck):
 
         :returns: notification dictionary.
         """
-        return {'subtitle': 'Supported GitHub API Versions Violation', 'body': None}
+        return {"subtitle": "Supported GitHub API Versions Violation", "body": None}
 
 
 class GitHubOrgs(ComplianceCheck):
@@ -90,18 +90,18 @@ class GitHubOrgs(ComplianceCheck):
 
         :returns: the title of the checks
         """
-        return 'GitHub Org checks'
+        return "GitHub Org checks"
 
     @parameterized.expand(utils.get_gh_orgs)
     def test_members_is_not_empty(self, org):
         """Check whether the GitHub org is not empty."""
-        evidence = self.locker.get_evidence(f'raw/github/{org}_members.json')
+        evidence = self.locker.get_evidence(f"raw/github/{org}_members.json")
         members = json.loads(evidence.content)
         if not members:
-            self.add_failures(org, 'There is nobody!')
+            self.add_failures(org, "There is nobody!")
         elif len(members) < 5:
-            self.add_warnings(org, 'There are people int there, but less than 5!')
+            self.add_warnings(org, "There are people int there, but less than 5!")
 
     def get_reports(self):
         """Return GitHub report name."""
-        return ['github/members.md']
+        return ["github/members.md"]

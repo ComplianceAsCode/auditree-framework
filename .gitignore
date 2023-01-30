@@ -2,6 +2,9 @@
 
 # Sphinx documentation
 doc
+doc-source/compliance.rst
+doc-source/compliance.*.rst
+doc-source/modules.rst
 
 ### Emacs
 

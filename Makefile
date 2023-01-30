@@ -31,7 +31,7 @@ uninstall:
 	pip uninstall auditree-framework
 
 code-format:
-	pre-commit run yapf --all-files
+	pre-commit run black --all-files
 
 code-lint:
 	pre-commit run flake8 --all-files

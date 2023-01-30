@@ -24,25 +24,23 @@ class TestUtilityFunctions(unittest.TestCase):
 
     def test_sha256_hash_no_size(self):
         """Test when no size is provided, the full hash is returned."""
-        self.assertEqual(
-            get_sha256_hash(['foo']), hashlib.sha256(b'foo').hexdigest()
-        )
+        self.assertEqual(get_sha256_hash(["foo"]), hashlib.sha256(b"foo").hexdigest())
 
     def test_sha256_hash_oversized(self):
         """Test when size is too big, the full hash is returned."""
-        expected = hashlib.sha256(b'foo').hexdigest()
+        expected = hashlib.sha256(b"foo").hexdigest()
         self.assertEqual(len(expected), 64)
-        self.assertEqual(get_sha256_hash(['foo'], 1000), expected)
+        self.assertEqual(get_sha256_hash(["foo"], 1000), expected)
 
     def test_sha256_hash_sized(self):
         """Test the first 'size' number of characters are returned."""
-        actual = get_sha256_hash(['foo'], 10)
+        actual = get_sha256_hash(["foo"], 10)
         self.assertEqual(len(actual), 10)
-        self.assertTrue(hashlib.sha256(b'foo').hexdigest().startswith(actual))
+        self.assertTrue(hashlib.sha256(b"foo").hexdigest().startswith(actual))
 
     def test_sha256_hash_multiple_keys(self):
         """Test hash is correct when a list of keys is provided."""
         self.assertEqual(
-            get_sha256_hash(['foo', 'bar', 'baz', 1234]),
-            hashlib.sha256(b'foobarbaz1234').hexdigest()
+            get_sha256_hash(["foo", "bar", "baz", 1234]),
+            hashlib.sha256(b"foobarbaz1234").hexdigest(),
         )

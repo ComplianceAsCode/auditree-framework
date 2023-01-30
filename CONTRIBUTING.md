@@ -41,9 +41,9 @@ There are some guidelines to follow when making a common fetcher or check:
 
 ## Code formatting and style
 
-Please ensure all code contributions are formatted by `yapf` and pass all `flake8` linter requirements.
-CI/CD will run `yapf` and `flake8` on all new commits and reject changes if there are failures.  If you
-run `make develop` to setup and maintain your virtual environment then `yapf` and `flake8` will be executed
+Please ensure all code contributions are formatted by `black` and pass all `flake8` linter requirements.
+CI/CD will run `black` and `flake8` on all new commits and reject changes if there are failures.  If you
+run `make develop` to setup and maintain your virtual environment then `black` and `flake8` will be executed
 automatically as part of all git commits.  If you'd like to run things manually you can do so locally by using:
 
 ```shell
@@ -81,4 +81,4 @@ example `[ADDED]`, `[CHANGED]`, etc.
 [Coding Standards]: https://complianceascode.github.io/auditree-framework/coding-standards.html
 [flake8]: https://gitlab.com/pycqa/flake8
 [new collab]: https://github.com/ComplianceAsCode/auditree-framework/issues/new?template=new-collaborator.md
-[yapf]: https://github.com/google/yapf
+[black]: https://github.com/psf/black

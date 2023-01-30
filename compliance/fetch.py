@@ -26,7 +26,7 @@ from compliance.utils.http import BaseSession
 import requests
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-FETCH_TERMINAL_SCRIPT = f'{ROOT}/utils/fetch_local_commands'
+FETCH_TERMINAL_SCRIPT = f"{ROOT}/utils/fetch_local_commands"
 
 
 class ComplianceFetcher(unittest.TestCase):
@@ -35,7 +35,7 @@ class ComplianceFetcher(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """Perform clean up."""
-        if hasattr(cls, '_session'):
+        if hasattr(cls, "_session"):
             cls._session.close()
 
     @classmethod
@@ -51,10 +51,10 @@ class ComplianceFetcher(unittest.TestCase):
 
         :returns: a requests Session object.
         """
-        if url is not None and hasattr(cls, '_session'):
+        if url is not None and hasattr(cls, "_session"):
             cls._session.close()
-            delattr(cls, '_session')
-        if not hasattr(cls, '_session'):
+            delattr(cls, "_session")
+        if not hasattr(cls, "_session"):
             if url:
                 cls._session = BaseSession(url)
             else:
@@ -62,15 +62,15 @@ class ComplianceFetcher(unittest.TestCase):
             if creds:
                 cls._session.auth = creds
             cls._session.headers.update(headers)
-            org = cls.config.raw_config.get('org', {}).get('name', '')
+            org = cls.config.raw_config.get("org", {}).get("name", "")
             ua = f'{org.lower().replace(" ", "-")}-compliance-checks'
-            cls._session.headers.update({'User-Agent': ua})
+            cls._session.headers.update({"User-Agent": ua})
         return cls._session
 
     def __init__(self, *args, **kwargs):
         """Construct and initialize the fetcher test object."""
         super(ComplianceFetcher, self).__init__(*args, **kwargs)
-        if hasattr(ComplianceFetcher, 'config'):
+        if hasattr(ComplianceFetcher, "config"):
             self.config = ComplianceFetcher.config
         else:
             self.config = get_config()
@@ -87,10 +87,10 @@ class ComplianceFetcher(unittest.TestCase):
 
         :returns: the remote content.
         """
-        org = self.config.raw_config.get('org', {}).get('name', '')
+        org = self.config.raw_config.get("org", {}).get("name", "")
         ua = f'{org.lower().replace(" ", "-")}-compliance-checks'
         response = requests.get(
-            url, params=params, auth=creds, headers={'User-Agent': ua}
+            url, params=params, auth=creds, headers={"User-Agent": ua}
         )
         response.raise_for_status()
         return response.content
@@ -110,7 +110,7 @@ class ComplianceFetcher(unittest.TestCase):
         return self.fetchURL(
             db_url,
             params=params,
-            creds=(creds['cloudant'].user, creds['cloudant'].password)
+            creds=(creds["cloudant"].user, creds["cloudant"].password),
         )
 
     def fetchLocalCommands(  # noqa: N802
@@ -121,7 +121,7 @@ class ComplianceFetcher(unittest.TestCase):
         show_exit_status=False,
         show_timestamp=False,
         timeout=20,
-        user=None
+        user=None,
     ):
         """
         Retrieve the output from locally executed commands.
@@ -143,17 +143,19 @@ class ComplianceFetcher(unittest.TestCase):
         """
         cmd = [FETCH_TERMINAL_SCRIPT]
         if user:
-            cmd = ['sudo', '-u', user] + cmd
+            cmd = ["sudo", "-u", user] + cmd
         if show_exit_status:
-            cmd += ['-s']
+            cmd += ["-s"]
         if show_timestamp:
-            cmd += ['-t']
+            cmd += ["-t"]
         if not cwd:
-            cwd = os.path.expanduser('~')
-        stdin = str.encode('\n'.join(commands) + '\n')
-        return check_output(
-            cmd, cwd=cwd, env=env, input=stdin, timeout=timeout
-        ).decode().rstrip()
+            cwd = os.path.expanduser("~")
+        stdin = str.encode("\n".join(commands) + "\n")
+        return (
+            check_output(cmd, cwd=cwd, env=env, input=stdin, timeout=timeout)
+            .decode()
+            .rstrip()
+        )
 
 
 def fetch(url, name):
@@ -168,7 +170,7 @@ def fetch(url, name):
     r = requests.get(url)
     r.raise_for_status()
     path = Path(tempfile.gettempdir(), name)
-    with path.open('wb') as f:
+    with path.open("wb") as f:
         r.raw.decode_content = True
         shutil.copyfileobj(r.raw, f)
     return path

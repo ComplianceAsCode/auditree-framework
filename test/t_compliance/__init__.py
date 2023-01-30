@@ -18,35 +18,29 @@ from unittest.mock import MagicMock, Mock, PropertyMock
 from compliance.check import ComplianceCheck
 
 
-def build_test_mock(
-    name='one', baseurl='http://mockedrunbooks', fails=0, warns=0
-):
+def build_test_mock(name="one", baseurl="http://mockedrunbooks", fails=0, warns=0):
     """Build a mock of a ComplianceCheck, with minimal attributes set."""
     mock_test = MagicMock()
     if baseurl:
-        type(mock_test.test).runbook_url = (
-            PropertyMock(return_value=f'{baseurl}/path/to/runbook_{name}')
+        type(mock_test.test).runbook_url = PropertyMock(
+            return_value=f"{baseurl}/path/to/runbook_{name}"
         )
-        type(mock_test.test).enabled = (PropertyMock(return_value=True))
+        type(mock_test.test).enabled = PropertyMock(return_value=True)
     else:
-        type(mock_test.test).runbook_url = (PropertyMock(return_value=''))
-        type(mock_test.test).enabled = (PropertyMock(return_value=False))
+        type(mock_test.test).runbook_url = PropertyMock(return_value="")
+        type(mock_test.test).enabled = PropertyMock(return_value=False)
 
-    type(mock_test.test).title = (
-        PropertyMock(return_value=f'mock check title {name}')
-    )
+    type(mock_test.test).title = PropertyMock(return_value=f"mock check title {name}")
 
     mock_test.test.failures_count = Mock(return_value=fails)
     mock_test.test.warnings_count = Mock(return_value=warns)
 
-    mock_test.test.__str__.return_value = f'test_{name}'
+    mock_test.test.__str__.return_value = f"test_{name}"
     mock_test.test.fixed_failure_count = 0
     return mock_test
 
 
-def build_compliance_check(
-    class_name, title, report, tests=None, fix_return=True
-):
+def build_compliance_check(class_name, title, report, tests=None, fix_return=True):
     """
     Build an actual :py:class:`compliance.check.ComplianceCheck` subclass.
 
@@ -72,23 +66,23 @@ def build_compliance_check(
     """
     tests = tests or []
     fcts = {
-        'title': property(lambda self: title),
-        'get_reports': lambda self: [report],
-        'fix_one': MagicMock(return_value=fix_return),
-        'tests': property(lambda self: tests)
+        "title": property(lambda self: title),
+        "get_reports": lambda self: [report],
+        "fix_one": MagicMock(return_value=fix_return),
+        "tests": property(lambda self: tests),
     }
 
     for test in tests:
         fcts[test] = lambda self: self.assertEqual(0, 0)
-        fix_fct = 'fix_failures'
+        fix_fct = "fix_failures"
         if len(tests) > 1:
-            fix_fct = test.replace('test_', 'fix_')
+            fix_fct = test.replace("test_", "fix_")
         fcts[fix_fct] = lambda self, fixer, t=test: (
-            fixer.execute_fix(self, self.fix_one, {'param': t})
+            fixer.execute_fix(self, self.fix_one, {"param": t})
         )
 
-    cls = type(class_name, (ComplianceCheck, ), fcts)
-    vars(cls)['fix_one'].__doc__ = 'Fixing {param}'
+    cls = type(class_name, (ComplianceCheck,), fcts)
+    vars(cls)["fix_one"].__doc__ = "Fixing {param}"
 
     return cls
 
@@ -101,5 +95,5 @@ def build_compliance_check_obj(*args, **kwargs):
     single object from this class and returns it.
     """
     cls = build_compliance_check(*args, **kwargs)
-    obj = cls('__doc__')
+    obj = cls("__doc__")
     return obj

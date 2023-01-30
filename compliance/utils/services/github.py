@@ -27,36 +27,35 @@ from compliance.utils.http import BaseSession
 class Github(object):
     """Github service helper class."""
 
-    def __init__(self, config=None, base_url='https://github.com'):
+    def __init__(self, config=None, base_url="https://github.com"):
         """Construct the Github service object."""
         if not config:
             config = Config()
 
         self.base_url = base_url
-        api_url = 'https://api.github.com'
-        service = 'github'
-        if self.base_url != 'https://github.com':
-            service = 'github_enterprise'
-            api_url = f'{self.base_url}/api/v3/'
+        api_url = "https://api.github.com"
+        service = "github"
+        if self.base_url != "https://github.com":
+            service = "github_enterprise"
+            api_url = f"{self.base_url}/api/v3/"
         self._creds = config[service]
         self.session = BaseSession(api_url)
         token = self._creds.token
-        if hasattr(self._creds, 'username'):
+        if hasattr(self._creds, "username"):
             self.session.auth = (self._creds.username, token)
         else:
-            self.session.headers['Authorization'] = 'token ' + token
+            self.session.headers["Authorization"] = "token " + token
         self.session.headers.update(
-            {'Accept': 'application/vnd.github.inertia-preview+json'}
+            {"Accept": "application/vnd.github.inertia-preview+json"}
         )
 
     def extract_path_chunks(self, url):
         """Retrieve the path from the url."""
         if not url.startswith(self.base_url):
             raise ValueError(
-                f'URL "{url}" is not valid. '
-                f'Expected base URL is: "{self.base_url}"'
+                f'URL "{url}" is not valid. ' f'Expected base URL is: "{self.base_url}"'
             )
-        return url.split(self.base_url)[1].strip('/').split('/')
+        return url.split(self.base_url)[1].strip("/").split("/")
 
     def extract_owner_repo(self, url):
         """Retrieve the owner (org) and repo from the url."""
@@ -70,10 +69,9 @@ class Github(object):
     def extract_owner_repo_issue(self, url):
         """Retrieve the owner (org), repo and issue number from the url."""
         path_chunks = self.extract_path_chunks(url)
-        if len(path_chunks) != 4 or path_chunks[2] != 'issues':
+        if len(path_chunks) != 4 or path_chunks[2] != "issues":
             raise ValueError(
-                f'URL "{url}" '
-                'needs to include "<owner>/<repo>/issues/<number>"'
+                f'URL "{url}" ' 'needs to include "<owner>/<repo>/issues/<number>"'
             )
         owner, repo, _, issue_number = path_chunks
         return owner, repo, issue_number
@@ -84,12 +82,10 @@ class Github(object):
 
         repo_path looks like: my-gh-org/my-gh-repo
         """
-        owner, repo = repo_path.split('/')
+        owner, repo = repo_path.split("/")
 
         # /repos/:owner/:repo/projects
-        return self._make_request(
-            'get', '/'.join(['repos', owner, repo, 'projects'])
-        )
+        return self._make_request("get", "/".join(["repos", owner, repo, "projects"]))
 
     def get_project(self, project, org=False):
         """
@@ -103,21 +99,21 @@ class Github(object):
         """
         pieces = []
         if org:
-            owner, _, number = project.split('/')
+            owner, _, number = project.split("/")
             # /orgs/:org/projects
-            pieces = ['orgs', owner]
+            pieces = ["orgs", owner]
         else:
-            owner, repo, _, number = project.split('/')
+            owner, repo, _, number = project.split("/")
             # /repos/:owner/:repo/projects
-            pieces = ['repos', owner, repo]
-        pieces.append('projects')
-        r = self._make_request('get', '/'.join(pieces))
-        return [x['id'] for x in r if x['number'] == int(number)][0]
+            pieces = ["repos", owner, repo]
+        pieces.append("projects")
+        r = self._make_request("get", "/".join(pieces))
+        return [x["id"] for x in r if x["number"] == int(number)][0]
 
     def get_columns(self, project_id):
         """Retrieve the columns for a project."""
         return self._make_request(
-            'get', '/'.join(['projects', str(project_id), 'columns'])
+            "get", "/".join(["projects", str(project_id), "columns"])
         )
 
     def get_all_cards(self, columns):
@@ -130,70 +126,62 @@ class Github(object):
     def get_cards(self, column_id):
         """Retrieve all cards for a given project column."""
         return self._paginate_api(
-            '/'.join(['projects', 'columns', str(column_id), 'cards'])
+            "/".join(["projects", "columns", str(column_id), "cards"])
         )
 
     def move_card(self, card, to_column_id):
         """Move a card from one project column to another."""
-        data = {'position': 'bottom', 'column_id': to_column_id}
+        data = {"position": "bottom", "column_id": to_column_id}
         return self._make_request(
-            'post',
-            '/'.join(['projects', 'columns', 'cards', str(card), 'moves']),
-            json=data
+            "post",
+            "/".join(["projects", "columns", "cards", str(card), "moves"]),
+            json=data,
         )
 
     def add_card(self, column_id, message=None, issue=0):
         """Create a card in a project column."""
         data = {}
         if issue > 0:
-            data = {'content_id': issue, 'content_type': 'Issue'}
+            data = {"content_id": issue, "content_type": "Issue"}
         else:
-            data = {'note': message}
+            data = {"note": message}
         return self._make_request(
-            'post',
-            '/'.join(['projects', 'columns', str(column_id), 'cards']),
-            json=data
+            "post",
+            "/".join(["projects", "columns", str(column_id), "cards"]),
+            json=data,
         )
 
     def add_milestone(self, owner, repo, milestone):
         """Create a repository milestone."""
         return self._make_request(
-            'post',
-            '/'.join(['repos', owner, repo, 'milestones']),
-            json=milestone
+            "post", "/".join(["repos", owner, repo, "milestones"]), json=milestone
         )
 
     def list_milestones(
-        self, owner, repo, state='open', sort='due_on', direction='asc'
+        self, owner, repo, state="open", sort="due_on", direction="asc"
     ):
         """Retrieve a repository's milestones."""
         return self._paginate_api(
-            '/'.join(['repos', owner, repo, 'milestones']),
-            **{
-                'state': state, 'sort': sort, 'direction': direction
-            }
+            "/".join(["repos", owner, repo, "milestones"]),
+            **{"state": state, "sort": sort, "direction": direction},
         )
 
-    def add_issue(
-        self, owner, repo, title, body='', annotation=None, **kwargs
-    ):
+    def add_issue(self, owner, repo, title, body="", annotation=None, **kwargs):
         """Create a repository issue."""
-        issue = {'title': title, 'body': body}
+        issue = {"title": title, "body": body}
         issue.update(kwargs)
         if annotation:
-            issue['body'] = self._annotate_body(issue['body'], annotation)
+            issue["body"] = self._annotate_body(issue["body"], annotation)
         return self._make_request(
-            'POST', '/'.join(['repos', owner, repo, 'issues']), json=issue
+            "POST", "/".join(["repos", owner, repo, "issues"]), json=issue
         )
 
     def patch_issue(self, owner, repo, issue, annotation=None, **params):
         """Edit a repository issue."""
-        if annotation and 'body' in params:
-            params['body'] = self._annotate_body(params['body'], annotation)
+        if annotation and "body" in params:
+            params["body"] = self._annotate_body(params["body"], annotation)
         return self._make_request(
-            'PATCH',
-            '/'.join(['repos', owner, repo, 'issues', str(issue)]),
-            json=params
+            "PATCH", "/".join(["repos", owner, repo, "issues", str(issue)]), json=params
         )
 
     def get_issue(self, owner, repo, issue, parse_annotations=False):
@@ -206,10 +194,10 @@ class Github(object):
         be an empty dictionary if there aren't any.
         """
         issue = self._make_request(
-            'get', '/'.join(['repos', owner, repo, 'issues', str(issue)])
+            "get", "/".join(["repos", owner, repo, "issues", str(issue)])
         )
         if parse_annotations:
-            body, annotations = extract_annotations(issue['body'])
+            body, annotations = extract_annotations(issue["body"])
             return issue, body, annotations
         return issue
 
@@ -221,24 +209,20 @@ class Github(object):
         added. If there is existing annotations, the given annotations will
         be merged into them.
         """
-        _, body, old_anno = self.get_issue(
-            owner, repo, issue, parse_annotations=True
-        )
+        _, body, old_anno = self.get_issue(owner, repo, issue, parse_annotations=True)
         new_anno = deep_merge(old_anno, annotations)
-        return self.patch_issue(
-            owner, repo, issue, annotation=new_anno, body=body
-        )
+        return self.patch_issue(owner, repo, issue, annotation=new_anno, body=body)
 
     def get_issue_comments(self, owner, repo, issue, parse_annotations=False):
         """Retrieve a repository issue's comments."""
         comments = self._paginate_api(
-            '/'.join(['repos', owner, repo, 'issues', str(issue), 'comments'])
+            "/".join(["repos", owner, repo, "issues", str(issue), "comments"])
         )
         if parse_annotations:
             annotated_comments = []
             # TODO: make this actually work...
             for comment in comments:
-                body, annotations = extract_annotations(comment['body'])
+                body, annotations = extract_annotations(comment["body"])
                 annotated_comments.extend((body, annotations))
             return comments, annotated_comments
         return comments
@@ -247,12 +231,12 @@ class Github(object):
         """Retrieve a repository's issues by page."""
         params = kwargs
         # get the page number or default to 1
-        params['page'] = params.get('page', 1)
+        params["page"] = params.get("page", 1)
         response = self._make_request(
-            'get',
-            '/'.join(['repos', owner, repo, 'issues']),
+            "get",
+            "/".join(["repos", owner, repo, "issues"]),
             parse=False,
-            params=params
+            params=params,
         )
         return response
 
@@ -262,27 +246,23 @@ class Github(object):
         page = 1
         response = self.get_issues_page(owner, repo, page=page, **kwargs)
         max_page = 1
-        if 'Link' in response.headers:
+        if "Link" in response.headers:
             # Link is only present if there are multiple pages
-            link = response.headers['Link']
-            urls = link.replace('>', '').replace('<', '').split()
-            parsed_url = urlparse(urls[2].strip(';'))
-            max_page = int(parse_qs(parsed_url.query)['page'][0])
+            link = response.headers["Link"]
+            urls = link.replace(">", "").replace("<", "").split()
+            parsed_url = urlparse(urls[2].strip(";"))
+            max_page = int(parse_qs(parsed_url.query)["page"][0])
         while response:
             for i in response.json():
-                all_issues[i['number']] = i
+                all_issues[i["number"]] = i
             page += 1
             if page > max_page:
                 response = False
             else:
-                response = self.get_issues_page(
-                    owner, repo, page=page, **kwargs
-                )
+                response = self.get_issues_page(owner, repo, page=page, **kwargs)
         return all_issues
 
-    def search_issues(
-        self, query, sort=None, order=None, owner=None, repo=None
-    ):
+    def search_issues(self, query, sort=None, order=None, owner=None, repo=None):
         """
         Perform a search against all issues based on the query provided.
 
@@ -290,59 +270,53 @@ class Github(object):
         that repo. Note that this can also be done in the query directly.
         """
         if not query:
-            raise ValueError('Must specify a query')
+            raise ValueError("Must specify a query")
         if owner and repo:
-            query += f' repo:{owner}/{repo}'
-        return self._paginate_api(
-            'search/issues', q=query, sort=sort, order=order
-        )
+            query += f" repo:{owner}/{repo}"
+        return self._paginate_api("search/issues", q=query, sort=sort, order=order)
 
     def add_issue_comment(self, owner, repo, issue, body, annotation=None):
         """Create a comment for a repository issue."""
         if annotation:
             body = self._annotate_body(body, annotation)
         return self._make_request(
-            'POST',
-            '/'.join(['repos', owner, repo, 'issues', str(issue), 'comments']),
-            json={'body': body}
+            "POST",
+            "/".join(["repos", owner, repo, "issues", str(issue), "comments"]),
+            json={"body": body},
         )
 
-    def create_project(self, repo, name, body='', org=False):
+    def create_project(self, repo, name, body="", org=False):
         """Create a repository project."""
-        owner, repo = repo.split('/')
+        owner, repo = repo.split("/")
         return self.creates_for_project(
-            '/'.join(['repos', owner, repo, 'projects']), {
-                'name': name, 'body': body
-            }
+            "/".join(["repos", owner, repo, "projects"]), {"name": name, "body": body}
         )
 
     def create_column(self, project_id, column, org=False):
         """Create a project column."""
         return self.creates_for_project(
-            '/'.join(['projects', str(project_id), 'columns']),
-            {'name': column}
+            "/".join(["projects", str(project_id), "columns"]), {"name": column}
         )
 
     def creates_for_project(self, url, data, org=False):
         """Create a repository project based on a properly formed url."""
         if org:
-            raise NotImplementedError('orgs not supported yet')
-        return self._make_request('post', url, json=data)
+            raise NotImplementedError("orgs not supported yet")
+        return self._make_request("post", url, json=data)
 
     def rand_color(self):
         """Generate a random color for labels."""
         return (
-            f'{secrets.randbelow(255):02X}'
-            f'{secrets.randbelow(255):02X}'
-            f'{secrets.randbelow(255):02X}'
+            f"{secrets.randbelow(255):02X}"
+            f"{secrets.randbelow(255):02X}"
+            f"{secrets.randbelow(255):02X}"
         )
 
     def create_label(self, repo, name, org=False):
         """Create a label within a repository."""
         return self.creates_for_project(
-            '/'.join(['repos', repo, 'labels']), {
-                'name': name, 'color': self.rand_color()
-            }
+            "/".join(["repos", repo, "labels"]),
+            {"name": name, "color": self.rand_color()},
         )
 
     def apply_labels(self, repo, issue, *labels):
@@ -355,9 +329,9 @@ class Github(object):
         POST /repos/:owner/:repo/issues/:number/labels
         """
         response = self._make_request(
-            'post',
-            '/'.join(['repos', repo, 'issues', str(issue), 'labels']),
-            json={'labels': labels}
+            "post",
+            "/".join(["repos", repo, "issues", str(issue), "labels"]),
+            json={"labels": labels},
         )
 
         return response
@@ -373,10 +347,8 @@ class Github(object):
         """
         for line in labels:
             response = self._make_request(
-                'delete',
-                '/'.join(
-                    ['repos', repo, 'issues', str(issue), 'labels', line]
-                )
+                "delete",
+                "/".join(["repos", repo, "issues", str(issue), "labels", line]),
             )
         # Each response has all the labels, so only return the last one
         return response
@@ -389,12 +361,10 @@ class Github(object):
 
         :returns: the repository's metadata details.
         """
-        self.session.headers.update(
-            {'Accept': 'application/vnd.github.v3+json'}
-        )
-        return self._make_request('get', f'repos/{repo}')
+        self.session.headers.update({"Accept": "application/vnd.github.v3+json"})
+        return self._make_request("get", f"repos/{repo}")
 
-    def get_commit_details(self, repo, since, branch='master', path=None):
+    def get_commit_details(self, repo, since, branch="master", path=None):
         """
         Retrieve a repository branch's commit details since a given date/time.
 
@@ -405,13 +375,11 @@ class Github(object):
 
         :returns: the repo branch's commit details since a given date/time.
         """
-        self.session.headers.update(
-            {'Accept': 'application/vnd.github.v3+json'}
-        )
-        opts = {'since': since.strftime('%Y-%m-%dT%H:%M:%SZ'), 'sha': branch}
+        self.session.headers.update({"Accept": "application/vnd.github.v3+json"})
+        opts = {"since": since.strftime("%Y-%m-%dT%H:%M:%SZ"), "sha": branch}
         if path:
-            opts['path'] = path
-        return self._make_request('get', f'repos/{repo}/commits', params=opts)
+            opts["path"] = path
+        return self._make_request("get", f"repos/{repo}/commits", params=opts)
 
     def get_pull_requests(self, repo, since=None, **kwargs):
         """
@@ -423,47 +391,43 @@ class Github(object):
         :returns: Repository pull request metadata
         """
         api_url = f'repos/{repo.strip("/")}/pulls'
-        self.session.headers.update(
-            {'Accept': 'application/vnd.github.v3+json'}
-        )
+        self.session.headers.update({"Accept": "application/vnd.github.v3+json"})
         if not since:
             return self._paginate_api(api_url, **kwargs)
         pull_requests = []
         params = {**kwargs}
-        params['page'] = kwargs.get('page', 1)
+        params["page"] = kwargs.get("page", 1)
         # Sort results by "created" in descending order
-        params['sort'] = 'created'
-        params['direction'] = 'desc'
-        response = self._make_request(
-            'get', api_url, parse=False, params=params
-        )
+        params["sort"] = "created"
+        params["direction"] = "desc"
+        response = self._make_request("get", api_url, parse=False, params=params)
         max_page = 1
-        if 'Link' in response.headers:
+        if "Link" in response.headers:
             # Link is only present if there are multiple pages
-            link = response.headers['Link']
-            urls = link.replace('>', '').replace('<', '').split()
-            parsed_url = urlparse(urls[2].strip(';'))
-            max_page = int(parse_qs(parsed_url.query)['page'][0])
+            link = response.headers["Link"]
+            urls = link.replace(">", "").replace("<", "").split()
+            parsed_url = urlparse(urls[2].strip(";"))
+            max_page = int(parse_qs(parsed_url.query)["page"][0])
         while response:
             for pull_request in response.json():
                 created_at = datetime.strptime(
-                    pull_request['created_at'], '%Y-%m-%dT%H:%M:%SZ'
+                    pull_request["created_at"], "%Y-%m-%dT%H:%M:%SZ"
                 )
                 # Filter based on provided since datetime
                 if created_at < since:
                     response = None
                     break
                 pull_requests.append(pull_request)
-            params['page'] += 1
-            if params['page'] > max_page:
+            params["page"] += 1
+            if params["page"] > max_page:
                 response = None
             else:
                 response = self._make_request(
-                    'get', api_url, parse=False, params=params
+                    "get", api_url, parse=False, params=params
                 )
         return pull_requests
 
-    def get_branch_protection_details(self, repo, branch='master'):
+    def get_branch_protection_details(self, repo, branch="master"):
         """
         Retrieve a repository branch's branch protection details.
 
@@ -473,11 +437,9 @@ class Github(object):
         :returns: the repository branch's branch protection details.
         """
         self.session.headers.update(
-            {'Accept': 'application/vnd.github.zzzax-preview+json'}
+            {"Accept": "application/vnd.github.zzzax-preview+json"}
         )
-        return self._make_request(
-            'get', f'repos/{repo}/branches/{branch}/protection'
-        )
+        return self._make_request("get", f"repos/{repo}/branches/{branch}/protection")
 
     def make_request(self, method, url, parse=True, **kwargs):
         """
@@ -513,33 +475,31 @@ class Github(object):
 
     def _annotate_body(self, body, annotation):
         anno_str = json.dumps(annotation, indent=2)
-        return f'```application/json+utilitarian\n{anno_str}\n```\n{body}'
+        return f"```application/json+utilitarian\n{anno_str}\n```\n{body}"
 
     def _paginate_api(self, api_url, **kwargs):
         params = kwargs
-        params['page'] = params.get('page', 1)
-        response = self._make_request(
-            'get', api_url, parse=False, params=params
-        )
+        params["page"] = params.get("page", 1)
+        response = self._make_request("get", api_url, parse=False, params=params)
         max_page = 1
         all_items = []
-        if 'Link' in response.headers:
+        if "Link" in response.headers:
             # Link is only present if there are multiple pages
-            link = response.headers['Link']
-            urls = link.replace('>', '').replace('<', '').split()
-            parsed_url = urlparse(urls[2].strip(';'))
-            max_page = int(parse_qs(parsed_url.query)['page'][0])
+            link = response.headers["Link"]
+            urls = link.replace(">", "").replace("<", "").split()
+            parsed_url = urlparse(urls[2].strip(";"))
+            max_page = int(parse_qs(parsed_url.query)["page"][0])
         while response:
-            if api_url.startswith('search/'):
-                all_items.extend(response.json()['items'])
+            if api_url.startswith("search/"):
+                all_items.extend(response.json()["items"])
             else:
                 all_items.extend(response.json())
-            params['page'] += 1
-            if params['page'] > max_page:
+            params["page"] += 1
+            if params["page"] > max_page:
                 response = False
             else:
                 response = self._make_request(
-                    'get', api_url, parse=False, params=params
+                    "get", api_url, parse=False, params=params
                 )
         return all_items
 
@@ -552,14 +512,14 @@ def extract_annotations(content):
     and then the annotations themselves as a dictionary.
     """
     body = []
-    annotations_json = ''
+    annotations_json = ""
     started = False
     stopped = False
     for line in content.splitlines():
-        if line == '```application/json+utilitarian':
+        if line == "```application/json+utilitarian":
             started = True
             continue
-        if line == '```' and started:
+        if line == "```" and started:
             stopped = True
             started = False
             continue
@@ -568,11 +528,9 @@ def extract_annotations(content):
         else:
             body.append(line)
 
-    content_no_annotations = '\n'.join(body)
+    content_no_annotations = "\n".join(body)
     if annotations_json:
-        annotations = json.loads(
-            annotations_json, object_pairs_hook=OrderedDict
-        )
+        annotations = json.loads(annotations_json, object_pairs_hook=OrderedDict)
     else:
         annotations = OrderedDict({})
 

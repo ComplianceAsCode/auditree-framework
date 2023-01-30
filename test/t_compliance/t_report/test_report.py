@@ -28,33 +28,33 @@ from .. import build_test_mock
 class ReportTest(unittest.TestCase):
     """ReportBuilder test class."""
 
-    @patch('compliance.report.ReportBuilder.generate_toc')
-    @patch('compliance.report.ReportBuilder.generate_check_results')
-    @patch('compliance.report.get_config')
-    @patch('compliance.report.get_evidence_by_path')
+    @patch("compliance.report.ReportBuilder.generate_toc")
+    @patch("compliance.report.ReportBuilder.generate_check_results")
+    @patch("compliance.report.get_config")
+    @patch("compliance.report.get_evidence_by_path")
     def test_report_fail_to_generate(
         self, evidence_path_mock, get_cfg_mock, gen_chk_mock, gen_toc_mock
     ):
         """Test report generation failure affects on general execution."""
         config_mock = create_autospec(ComplianceConfig)
-        config_mock.get_template_dir.return_value = '/rpt/templates'
+        config_mock.get_template_dir.return_value = "/rpt/templates"
         get_cfg_mock.return_value = config_mock
 
-        report = ReportEvidence('test', 'test', 12345)
+        report = ReportEvidence("test", "test", 12345)
         report.set_content(None)
         evidence_path_mock.return_value = report
 
         locker = create_autospec(Locker())
-        locker.local_path = '/my/fake/locker'
-        locker.get_reports_metadata = MagicMock(return_value={'foo': 'bar'})
+        locker.local_path = "/my/fake/locker"
+        locker.get_reports_metadata = MagicMock(return_value={"foo": "bar"})
 
         test_obj = build_test_mock()
-        test_obj.test.get_reports.return_value = ['test/example.md']
+        test_obj.test.get_reports.return_value = ["test/example.md"]
 
-        results = {'mock.test.test_one': {'status': 'pass', 'test': test_obj}}
+        results = {"mock.test.test_one": {"status": "pass", "test": test_obj}}
         controls = create_autospec(ControlDescriptor)
         builder = ReportBuilder(locker, results, controls)
         builder.build()
-        self.assertEqual(results['mock.test.test_one']['status'], 'error')
-        gen_chk_mock.assert_called_once_with({'foo': 'bar'})
-        gen_toc_mock.assert_called_once_with({'foo': 'bar'})
+        self.assertEqual(results["mock.test.test_one"]["status"], "error")
+        gen_chk_mock.assert_called_once_with({"foo": "bar"})
+        gen_toc_mock.assert_called_once_with({"foo": "bar"})

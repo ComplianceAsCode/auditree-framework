@@ -29,7 +29,7 @@ def parse_dot_key(data, key):
 
     :returns: The dictionary value from ``data`` associated to the ``key``.
     """
-    for key_part in key.split('.'):
+    for key_part in key.split("."):
         data = data.get(key_part)
         if data is None:
             break
@@ -48,7 +48,7 @@ def get_sha256_hash(key, size=None):
     """
     partition_hash = hashlib.sha256()
     for part in key:
-        partition_hash.update(str(part).encode('utf-8'))
+        partition_hash.update(str(part).encode("utf-8"))
     sha256_hash = partition_hash.hexdigest()
     if not size or size > len(sha256_hash):
         size = len(sha256_hash)
@@ -69,7 +69,7 @@ def format_json(data, **addl_kwargs):
     :returns: A formatted JSON string.
     """
     return json.dumps(
-        data, indent=2, sort_keys=True, separators=(',', ': '), **addl_kwargs
+        data, indent=2, sort_keys=True, separators=(",", ": "), **addl_kwargs
     )
 
 

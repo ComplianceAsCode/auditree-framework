@@ -19,8 +19,8 @@ from pathlib import Path, PurePath
 
 from compliance.config import get_config
 
-FETCH_PREFIX = 'fetch_'
-CHECK_PREFIX = 'test_'
+FETCH_PREFIX = "fetch_"
+CHECK_PREFIX = "test_"
 
 
 def get_toplevel_dirpath(path):
@@ -40,7 +40,7 @@ def get_toplevel_dirpath(path):
     if Path(path).resolve().is_dir():
         paths = [Path(path).resolve()] + paths
     for path in paths[:-1]:
-        if Path(path, 'controls.json').is_file():
+        if Path(path, "controls.json").is_file():
             return str(path)
 
 
@@ -55,11 +55,9 @@ def get_module_path(path):
     if path is None:
         return
     for parent in PurePath(path).parents:
-        if parent.name == 'site-packages':
+        if parent.name == "site-packages":
             return _path_to_dot(str(PurePath(path).relative_to(parent)))
-    return _path_to_dot(
-        str(PurePath(path).relative_to(get_toplevel_dirpath(path)))
-    )
+    return _path_to_dot(str(PurePath(path).relative_to(get_toplevel_dirpath(path))))
 
 
 def load_evidences_modules(path):
@@ -68,12 +66,12 @@ def load_evidences_modules(path):
 
     :param path: absolute path to a top level directory.
     """
-    for ev_mod in [p for p in Path(path).rglob('evidences') if p.is_dir()]:
+    for ev_mod in [p for p in Path(path).rglob("evidences") if p.is_dir()]:
         module_name = get_module_path(str(ev_mod))
         spec = None
         try:
             spec = importlib.util.spec_from_file_location(
-                module_name, str(Path(ev_mod, '__init__.py'))
+                module_name, str(Path(ev_mod, "__init__.py"))
             )
         except ImportError:
             continue
@@ -94,4 +92,4 @@ def substitute_config(path_tmpl):
 
 
 def _path_to_dot(path):
-    return path.rstrip('.py').replace('/', '.').replace('\\', '.')
+    return path.rstrip(".py").replace("/", ".").replace("\\", ".")

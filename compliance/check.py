@@ -28,7 +28,7 @@ class ComplianceCheck(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         """Construct and initialize the check test object."""
         super(ComplianceCheck, self).__init__(*args, **kwargs)
-        if hasattr(ComplianceCheck, 'config'):
+        if hasattr(ComplianceCheck, "config"):
             self.config = ComplianceCheck.config
         else:
             self.config = get_config()
@@ -37,13 +37,13 @@ class ComplianceCheck(unittest.TestCase):
     def title(self):
         """Check title, normally used in check reports."""
         raise NotImplementedError(
-            f'Property title not implemented on {self.__class__.__name__}'
+            f"Property title not implemented on {self.__class__.__name__}"
         )
 
     @property
     def reports(self):
         """List of the check reports."""
-        if '_reports' not in self.__dict__.keys():
+        if "_reports" not in self.__dict__.keys():
             self._reports = []
         return self._reports
 
@@ -56,16 +56,16 @@ class ComplianceCheck(unittest.TestCase):
         is based on the runbook base URL and the check's class name.  It is
         assumed that the runbook exists and is in HTML format.
         """
-        runbook_enabled = self.config.get('runbooks.enabled')
-        runbook_baseurl = self.config.get('runbooks.base_url')
+        runbook_enabled = self.config.get("runbooks.enabled")
+        runbook_baseurl = self.config.get("runbooks.base_url")
         if runbook_baseurl and runbook_enabled:
             runbook_name = inflection.underscore(self.__class__.__name__)
-            return f'{runbook_baseurl}/{runbook_name}.html'
+            return f"{runbook_baseurl}/{runbook_name}.html"
 
     @property
     def fixed_failure_count(self):
         """Count of failures fixed by the fix routine."""
-        if '_fixed_failure_count' not in self.__dict__.keys():
+        if "_fixed_failure_count" not in self.__dict__.keys():
             self._fixed_failure_count = 0
         return self._fixed_failure_count
 
@@ -76,47 +76,41 @@ class ComplianceCheck(unittest.TestCase):
     @property
     def warnings(self):
         """Warnings as a property for each check."""
-        if not hasattr(self, '_warnings'):
+        if not hasattr(self, "_warnings"):
             self._warnings = {}
         return self._warnings
 
     @property
     def failures(self):
         """Failures as a property for each check."""
-        if not hasattr(self, '_failures'):
+        if not hasattr(self, "_failures"):
             self._failures = {}
         return self._failures
 
     @property
     def successes(self):
         """Successes as a property for each check."""
-        if not hasattr(self, '_successes'):
+        if not hasattr(self, "_successes"):
             self._successes = {}
         return self._successes
 
     @property
     def evidence_metadata(self):
         """Metadata of all evidence used by each check as a property."""
-        if not hasattr(self, '_evidence_metadata'):
+        if not hasattr(self, "_evidence_metadata"):
             self._evidence_metadata = {}
         return self._evidence_metadata
 
     def id(self):  # noqa: A003
         """Reset the test id if it has been transplanted and return it."""
         return_id = super(ComplianceCheck, self).id()
-        origin = getattr(self, '__origin_module__', None)
+        origin = getattr(self, "__origin_module__", None)
         if origin and not return_id.startswith(origin):
-            original = '.'.join(
-                [self.__origin_module__, self.__class__.__name__]
-            )
-            transplanted = '.'.join(
+            original = ".".join([self.__origin_module__, self.__class__.__name__])
+            transplanted = ".".join(
                 [
                     self.__class__.__module__,
-                    getattr(
-                        self.__class__,
-                        '__qualname__',
-                        self.__class__.__name__
-                    )
+                    getattr(self.__class__, "__qualname__", self.__class__.__name__),
                 ]
             )
             return return_id.replace(transplanted, original)
@@ -128,9 +122,8 @@ class ComplianceCheck(unittest.TestCase):
 
         :param results: contains all the test results.
         """
-        return (
-            self.failures_for_check_count(results)
-            + self.warnings_for_check_count(results)
+        return self.failures_for_check_count(results) + self.warnings_for_check_count(
+            results
         )
 
     def add_warnings(self, section_key, section_value):
@@ -164,9 +157,7 @@ class ComplianceCheck(unittest.TestCase):
 
         :param results: contains all the test results.
         """
-        return sum(
-            t.warnings_count() for t in self._get_all_test_objs(results)
-        )
+        return sum(t.warnings_count() for t in self._get_all_test_objs(results))
 
     def warnings_count(self):
         """Count warnings for a specific test."""
@@ -203,9 +194,7 @@ class ComplianceCheck(unittest.TestCase):
 
         :param results: contains all the test results.
         """
-        return sum(
-            t.failures_count() for t in self._get_all_test_objs(results)
-        )
+        return sum(t.failures_count() for t in self._get_all_test_objs(results))
 
     def failures_count(self):
         """Count failures for a specific test."""
@@ -242,9 +231,7 @@ class ComplianceCheck(unittest.TestCase):
 
         :param results: contains all the test results.
         """
-        return sum(
-            t.successes_count() for t in self._get_all_test_objs(results)
-        )
+        return sum(t.successes_count() for t in self._get_all_test_objs(results))
 
     def successes_count(self):
         """Count successes for a specific test."""
@@ -259,7 +246,6 @@ class ComplianceCheck(unittest.TestCase):
         """
 
         def wrapper(method):
-
             def check_failures():
                 method()
                 self.assertEquals(self.failures_count(), 0)
@@ -296,9 +282,7 @@ class ComplianceCheck(unittest.TestCase):
         """
         evidence = self.locker.get_evidence(evidence_path, True, evidence_dt)
         self.add_evidence_metadata(
-            evidence_path,
-            evidence_dt=evidence_dt,
-            evidence_locker=evidence.locker
+            evidence_path, evidence_dt=evidence_dt, evidence_locker=evidence.locker
         )
         return evidence
 
@@ -316,29 +300,29 @@ class ComplianceCheck(unittest.TestCase):
         locker = evidence_locker or self.locker
         metadata = locker.get_evidence_metadata(evidence_path, evidence_dt)
         if not metadata:
-            ev_dt_str = (evidence_dt or dt.utcnow()).strftime('%Y-%m-%d')
+            ev_dt_str = (evidence_dt or dt.utcnow()).strftime("%Y-%m-%d")
             raise EvidenceNotFoundError(
-                f'Evidence {evidence_path} is not found in the locker '
-                f'for {ev_dt_str}. It may not be a valid evidence path.'
+                f"Evidence {evidence_path} is not found in the locker "
+                f"for {ev_dt_str}. It may not be a valid evidence path."
             )
-        metadata.update({'path': evidence_path, 'locker_url': locker.repo_url})
-        if metadata.get('partitions'):
-            path, file_name = evidence_path.rsplit('/', 1)
+        metadata.update({"path": evidence_path, "locker_url": locker.repo_url})
+        if metadata.get("partitions"):
+            path, file_name = evidence_path.rsplit("/", 1)
             partitions = {}
-            for part_hash, part_key in metadata['partitions'].items():
+            for part_hash, part_key in metadata["partitions"].items():
                 partitions[part_hash] = {
-                    'key': part_key,
-                    'commit_sha': locker.get_latest_commit(
-                        f'{path}/{part_hash}_{file_name}', evidence_dt
-                    ).hexsha
+                    "key": part_key,
+                    "commit_sha": locker.get_latest_commit(
+                        f"{path}/{part_hash}_{file_name}", evidence_dt
+                    ).hexsha,
                 }
-            metadata['partitions'] = partitions
+            metadata["partitions"] = partitions
         else:
-            metadata['commit_sha'] = locker.get_latest_commit(
+            metadata["commit_sha"] = locker.get_latest_commit(
                 evidence_path, evidence_dt
             ).hexsha
-        metadata.pop('tombstones', None)
-        evidence_meta_key = (evidence_path, metadata['last_update'])
+        metadata.pop("tombstones", None)
+        evidence_meta_key = (evidence_path, metadata["last_update"])
         self.evidence_metadata[evidence_meta_key] = metadata
 
     def evidences_for_check(self, results):
@@ -360,7 +344,7 @@ class ComplianceCheck(unittest.TestCase):
         check class are returned.
         """
         return [
-            info['test'].test
+            info["test"].test
             for info in results.values()
-            if info['test'].test.__class__ == self.__class__
+            if info["test"].test.__class__ == self.__class__
         ]

@@ -20,29 +20,18 @@ from compliance.evidence import DAY, RawEvidence, ReportEvidence
 get_config().add_evidences(
     [
         RawEvidence(
-            'api_versions.json',
-            'github',
-            DAY,
-            'Supported GitHub API versions'
+            "api_versions.json", "github", DAY, "Supported GitHub API versions"
         ),
         RawEvidence(
-            'auditree_logo.png',
-            'images',
+            "auditree_logo.png",
+            "images",
             DAY,
-            'The Auditree logo image',
-            binary_content=True
+            "The Auditree logo image",
+            binary_content=True,
         ),
         ReportEvidence(
-            'api_versions.md',
-            'github',
-            DAY,
-            'Supported GitHub versions report.'
+            "api_versions.md", "github", DAY, "Supported GitHub versions report."
         ),
-        ReportEvidence(
-            'image_check.md',
-            'images',
-            DAY,
-            'Image Check Analysis report.'
-        )
+        ReportEvidence("image_check.md", "images", DAY, "Image Check Analysis report."),
     ]
 )

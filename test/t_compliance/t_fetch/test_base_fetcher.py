@@ -34,7 +34,7 @@ class ComplianceFetchTest(unittest.TestCase):
         # don't need this method, passing ``__doc__`` is enough for
         # building a ComplianceFetcher object successfully.
         ComplianceFetcher.config = ComplianceConfig()
-        self.fetcher = ComplianceFetcher('__doc__')
+        self.fetcher = ComplianceFetcher("__doc__")
         self.fetcher.config.load()
 
     def test_config(self):
@@ -48,15 +48,14 @@ class ComplianceFetchTest(unittest.TestCase):
         # Recycle session, create a BaseSession and persist it
         self.assertIsInstance(
             self.fetcher.session(
-                'https://foo.bar.com', ('foo', 'bar'), foo='FOO', bar='BAR'
+                "https://foo.bar.com", ("foo", "bar"), foo="FOO", bar="BAR"
             ),
-            BaseSession
+            BaseSession,
         )
-        self.assertEqual(self.fetcher.session().baseurl, 'https://foo.bar.com')
-        self.assertEqual(self.fetcher.session().auth, ('foo', 'bar'))
+        self.assertEqual(self.fetcher.session().baseurl, "https://foo.bar.com")
+        self.assertEqual(self.fetcher.session().auth, ("foo", "bar"))
         self.assertEqual(
-            self.fetcher.session().headers['User-Agent'],
-            'your_org-compliance-checks'
+            self.fetcher.session().headers["User-Agent"], "your_org-compliance-checks"
         )
-        self.assertEqual(self.fetcher.session().headers['foo'], 'FOO')
-        self.assertEqual(self.fetcher.session().headers['bar'], 'BAR')
+        self.assertEqual(self.fetcher.session().headers["foo"], "FOO")
+        self.assertEqual(self.fetcher.session().headers["bar"], "BAR")
