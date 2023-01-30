@@ -26,18 +26,42 @@ _sentinel = object()
 logger = logging.getLogger("compliance.utils.credentials")
 
 
+class OnePasswordBackend:
+    pass
+
+
+class ConfigParserBackend:
+    def __init__(self, **kwargs):
+        self._cfg = RawConfigParser()
+        self._cfg_file = kwargs.get("cfg_file")
+        self._cfg.read(str(Path(self._cfg_file).expanduser()))
+
+
 class Config:
     """Handle credentials configuration."""
 
-    def __init__(self, cfg_file="~/.credentials"):
+    BACKENDS = {"1password": OnePasswordBackend, "configparser": ConfigParserBackend}
+
+    def __init__(self, cfg_file="~/.credentials", backend_cfg=None):
         """
         Create an instance of a dictionary-like configuration object.
 
         :param cfg_file: The path to the RawConfigParser compatible config file
         """
-        self._cfg = RawConfigParser()
-        self._cfg.read(str(Path(cfg_file).expanduser()))
-        self._cfg_file = cfg_file
+
+        if backend_cfg is None:
+            backend_cfg = {"name": "configparser", "cfg_file": cfg_file}
+        self._init_backend(backend_cfg)
+
+    def _init_backend(self, backend_cfg):
+        name = backend_cfg.get("name")
+        if backend_cfg.get("name") not in Config.BACKENDS:
+            raise ValueError(f"Invalid credentials backend name: {name}")
+        self._backend = Config.BACKENDS[name](**backend_cfg)
+
+    @classmethod
+    def from_auditree_config(cls, at_cfg):
+        return cls(backend_cfg=at_cfg.get("creds.backend"))
 
     def __getitem__(self, section):
         """
