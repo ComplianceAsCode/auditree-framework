@@ -6,15 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>compliance.utils.services package &#8212; Auditree Framework 1.23.0 documentation</title>
+    <title>compliance.utils.services package &#8212; Auditree Framework 1.24.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -32,7 +30,7 @@
         <li class="right" >
           <a href="compliance.utils.html" title="compliance.utils package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="compliance.utils.html" accesskey="U">compliance.utils package</a> &#187;</li>
@@ -466,8 +464,55 @@ This uses the PD API v2.</p>
     <ul>
 <li><a class="reference internal" href="#">compliance.utils.services package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-compliance.utils.services.github">compliance.utils.services.github module</a></li>
-<li><a class="reference internal" href="#module-compliance.utils.services.pagerduty">compliance.utils.services.pagerduty module</a></li>
+<li><a class="reference internal" href="#module-compliance.utils.services.github">compliance.utils.services.github module</a><ul>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github"><code class="docutils literal notranslate"><span class="pre">Github</span></code></a><ul>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.add_card"><code class="docutils literal notranslate"><span class="pre">Github.add_card()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.add_issue"><code class="docutils literal notranslate"><span class="pre">Github.add_issue()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.add_issue_comment"><code class="docutils literal notranslate"><span class="pre">Github.add_issue_comment()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.add_milestone"><code class="docutils literal notranslate"><span class="pre">Github.add_milestone()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.apply_labels"><code class="docutils literal notranslate"><span class="pre">Github.apply_labels()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.create_column"><code class="docutils literal notranslate"><span class="pre">Github.create_column()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.create_label"><code class="docutils literal notranslate"><span class="pre">Github.create_label()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.create_project"><code class="docutils literal notranslate"><span class="pre">Github.create_project()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.creates_for_project"><code class="docutils literal notranslate"><span class="pre">Github.creates_for_project()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.extract_owner_repo"><code class="docutils literal notranslate"><span class="pre">Github.extract_owner_repo()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.extract_owner_repo_issue"><code class="docutils literal notranslate"><span class="pre">Github.extract_owner_repo_issue()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.extract_path_chunks"><code class="docutils literal notranslate"><span class="pre">Github.extract_path_chunks()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_all_cards"><code class="docutils literal notranslate"><span class="pre">Github.get_all_cards()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_all_issues"><code class="docutils literal notranslate"><span class="pre">Github.get_all_issues()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_all_projects"><code class="docutils literal notranslate"><span class="pre">Github.get_all_projects()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_branch_protection_details"><code class="docutils literal notranslate"><span class="pre">Github.get_branch_protection_details()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_cards"><code class="docutils literal notranslate"><span class="pre">Github.get_cards()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_columns"><code class="docutils literal notranslate"><span class="pre">Github.get_columns()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_commit_details"><code class="docutils literal notranslate"><span class="pre">Github.get_commit_details()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_issue"><code class="docutils literal notranslate"><span class="pre">Github.get_issue()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_issue_comments"><code class="docutils literal notranslate"><span class="pre">Github.get_issue_comments()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_issues_page"><code class="docutils literal notranslate"><span class="pre">Github.get_issues_page()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_project"><code class="docutils literal notranslate"><span class="pre">Github.get_project()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_pull_requests"><code class="docutils literal notranslate"><span class="pre">Github.get_pull_requests()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.get_repo_details"><code class="docutils literal notranslate"><span class="pre">Github.get_repo_details()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.list_milestones"><code class="docutils literal notranslate"><span class="pre">Github.list_milestones()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.make_request"><code class="docutils literal notranslate"><span class="pre">Github.make_request()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.move_card"><code class="docutils literal notranslate"><span class="pre">Github.move_card()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.paginate_api"><code class="docutils literal notranslate"><span class="pre">Github.paginate_api()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.patch_issue"><code class="docutils literal notranslate"><span class="pre">Github.patch_issue()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.rand_color"><code class="docutils literal notranslate"><span class="pre">Github.rand_color()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.remove_labels"><code class="docutils literal notranslate"><span class="pre">Github.remove_labels()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.search_issues"><code class="docutils literal notranslate"><span class="pre">Github.search_issues()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.github.Github.update_annotations"><code class="docutils literal notranslate"><span class="pre">Github.update_annotations()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#compliance.utils.services.github.extract_annotations"><code class="docutils literal notranslate"><span class="pre">extract_annotations()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-compliance.utils.services.pagerduty">compliance.utils.services.pagerduty module</a><ul>
+<li><a class="reference internal" href="#compliance.utils.services.pagerduty.delete"><code class="docutils literal notranslate"><span class="pre">delete()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.pagerduty.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.pagerduty.post"><code class="docutils literal notranslate"><span class="pre">post()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.pagerduty.put"><code class="docutils literal notranslate"><span class="pre">put()</span></code></a></li>
+<li><a class="reference internal" href="#compliance.utils.services.pagerduty.send_event"><code class="docutils literal notranslate"><span class="pre">send_event()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-compliance.utils.services">Module contents</a></li>
 </ul>
 </li>
@@ -512,7 +557,7 @@ This uses the PD API v2.</p>
         <li class="right" >
           <a href="compliance.utils.html" title="compliance.utils package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="compliance.html" >compliance package</a> &#187;</li>
           <li class="nav-item nav-item-3"><a href="compliance.utils.html" >compliance.utils package</a> &#187;</li>
@@ -520,8 +565,8 @@ This uses the PD API v2.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2022, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+        &#169; Copyright 2023, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>

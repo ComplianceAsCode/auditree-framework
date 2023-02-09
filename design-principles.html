@@ -6,15 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Design Principles &#8212; Auditree Framework 1.23.0 documentation</title>
+    <title>Design Principles &#8212; Auditree Framework 1.24.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -36,7 +34,7 @@
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>  
@@ -266,7 +264,7 @@ you after it has been fetched.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">store_raw_evidence</span></code> and <code class="docutils literal notranslate"><span class="pre">store_tmp_evidence</span></code> decorators: Use one of
 these decorators on your fetcher method when you know the path and name of
-your raw or tmp evidence.  The decorator takes as an argument, the path to
+your raw or tmp evidence. The decorator takes as an argument, the path to
 your raw or tmp evidence as a string.</p></li>
 </ul>
 <p>Usage example:</p>
@@ -283,7 +281,7 @@ your raw or tmp evidence as a string.</p></li>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">foo_bar_data</span><span class="p">)</span>
 </pre></div>
 </div>
-<ul class="simple">
+<ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">raw_evidence</span></code> and <code class="docutils literal notranslate"><span class="pre">tmp_evidence</span></code> context managers: Use one of these
 context managers within your fetcher method when your fetcher retrieves
 multiple, similar raw or tmp evidence based on a dynamic set of configurable
@@ -291,8 +289,7 @@ values.  In other words the full name and content of evidence is based on a
 configuration and not known prior to execution of the fetcher logic.  The
 context manager takes as arguments, a locker object and the path to your raw
 or tmp evidence as a string.  The context manager yields the corresponding
-raw or tmp evidence object.</p></li>
-</ul>
+raw or tmp evidence object.</p>
 <p>Usage example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
 <span class="kn">from</span> <span class="nn">compliance.evidence</span> <span class="kn">import</span> <span class="n">raw_evidence</span>
@@ -310,14 +307,20 @@ raw or tmp evidence object.</p></li>
                 <span class="n">evidence</span><span class="o">.</span><span class="n">set_content</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">foo_bar_data</span><span class="p">))</span>
 </pre></div>
 </div>
-<ul class="simple">
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This approach will not produce multiple log lines when the
+fetcher is run as everything is executed within.</p>
+<p>See <code class="docutils literal notranslate"><span class="pre">&#64;parameterized</span></code> if you want to generate multiple running
+fetchers based on parameter set.</p>
+</div>
+</li>
 <li><p><code class="docutils literal notranslate"><span class="pre">store_derived_evidence</span></code> decorator: Use this decorator on your fetcher
 method when you know the paths and names of your source evidences and
 the path and name of your target derived evidence.  The decorator takes
 as arguments, a list of source evidence paths as strings and a target derived
 evidence path as a string.  It also passes the source evidences to the
-decorated method in the form of method arguments.</p></li>
-</ul>
+decorated method in the form of method arguments.</p>
 <p>Usage example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
 <span class="kn">from</span> <span class="nn">compliance.evidence</span> <span class="kn">import</span> <span class="n">store_derived_evidence</span>
@@ -335,7 +338,7 @@ decorated method in the form of method arguments.</p></li>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">derived_data</span><span class="p">)</span>
 </pre></div>
 </div>
-<ul class="simple">
+</li>
 <li><p><code class="docutils literal notranslate"><span class="pre">derived_evidence</span></code> context manager: Use this context manager within your
 fetcher method when your fetcher generates multiple, similar derived
 evidences based on a dynamic set of configurable values.  In other words the
@@ -350,8 +353,7 @@ dictionary containing the source and target evidences as the dictionary
 values.  The source evidence key is its evidence path if a list of source
 paths were provided or its evidence short name if a dictionary of paths were
 provided or “source” if a single evidence path in the form of a string was
-provided.  The target derived evidence key is always “derived”.</p></li>
-</ul>
+provided.  The target derived evidence key is always “derived”.</p>
 <p>Usage example (source list provided):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
 <span class="kn">from</span> <span class="nn">compliance.evidence</span> <span class="kn">import</span> <span class="n">derived_evidence</span>
@@ -415,6 +417,47 @@ provided.  The target derived evidence key is always “derived”.</p></li>
                 <span class="n">evidences</span><span class="p">[</span><span class="s1">&#39;derived&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_content</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">derived_data</span><span class="p">))</span>
 </pre></div>
 </div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;parameterized</span></code> helper: it is often that a fetcher implementation
+is general enough to be used multiple by diferent parameters. A good
+example is a fetcher that collects resources of a cloud provider on
+several accounts. The implementation is exactly the same across the
+different accounts.</p>
+<p>One option to implement this is using the <cite>raw_evidence</cite> or
+<cite>tmp_evidence</cite> context-managers previously described. However, it
+has its own caveats. For instance, in the run log there will only be
+one fetcher execution although it would be great if each parameter
+generates a log line where it could be seen in detail what happened
+if something goes wrong.</p>
+<p><a class="reference external" href="https://github.com/wolever/parameterized">parameterized</a> is an
+external library that can be used for generating multiple fetchers
+at runtime.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">parameterized</span></code> is not installed as part of the
+auditree-framework. Remember to get installed if you use it in
+your project!</p>
+</div>
+<p>Usage example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="kn">from</span> <span class="nn">parameterized</span> <span class="kn">import</span> <span class="n">parameterized</span>
+<span class="o">...</span>
+<span class="k">def</span> <span class="nf">_get_domains</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;my.domains&#39;</span><span class="p">)</span>
+
+<span class="nd">@parameterized</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">_get_domains</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">fetch_foo_bar_evidence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">raw_evidence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locker</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;user/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s1">_users.json&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">evidence</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">evidence</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;https://</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s1">/users&#39;</span><span class="p">)</span>
+            <span class="n">evidence</span><span class="o">.</span><span class="n">set_content</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>In this example, auditree will generate multiple
+<code class="docutils literal notranslate"><span class="pre">fetch_foo_bar_evidence</span></code> methods at runtime, one per domain
+obtained from the configuration.</p>
+</li>
+</ul>
 </section>
 <section id="evidence-dependency-chaining">
 <h3>Evidence Dependency Chaining<a class="headerlink" href="#evidence-dependency-chaining" title="Permalink to this heading">¶</a></h3>
@@ -810,13 +853,13 @@ file should be similar to this:</p>
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2022, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+        &#169; Copyright 2023, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>

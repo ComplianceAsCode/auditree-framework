@@ -6,15 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Running on Travis &#8212; Auditree Framework 1.23.0 documentation</title>
+    <title>Running on Travis &#8212; Auditree Framework 1.24.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -36,7 +34,7 @@
         <li class="right" >
           <a href="coding-standards.html" title="Coding Standards"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Running on Travis</a></li> 
       </ul>
     </div>  
@@ -81,17 +79,17 @@ notifications and push evidences to Git).</p>
 <section id="travis-artifacts">
 <h2>Travis artifacts<a class="headerlink" href="#travis-artifacts" title="Permalink to this heading">¶</a></h2>
 <p>This is a typical <cite>.travis.yml</cite> file:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="nt">python</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;3.7&quot;</span><span class="w"></span>
-<span class="nt">install</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install -r requirements.txt</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./travis/gen-credentials.py &gt; ~/.credentials</span><span class="w"></span>
-<span class="nt">script</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">make clean</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./travis/run.sh</span><span class="w"></span>
-<span class="nt">after_script</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rm  ~/.credentials</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="nt">python</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;3.7&quot;</span>
+<span class="nt">install</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install -r requirements.txt</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./travis/gen-credentials.py &gt; ~/.credentials</span>
+<span class="nt">script</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">make clean</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./travis/run.sh</span>
+<span class="nt">after_script</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rm  ~/.credentials</span>
 </pre></div>
 </div>
 <p>Basically, this will firstly install the dependencies through
@@ -197,37 +195,37 @@ periodically. This will be considered the <cite>official</cite> run.</p></li>
 <span class="nv">OFFICIAL</span><span class="o">=</span><span class="s2">&quot;--evidence full-remote --notify slack&quot;</span>
 
 <span class="c1"># is this an official run or not?</span>
-<span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$TRAVIS_BRANCH</span><span class="s2">&quot;</span> <span class="o">==</span> <span class="s2">&quot;master&quot;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">[</span> -z <span class="nv">$TRAVIS_COMMIT_RANGE</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-  <span class="c1"># this is official as it has been run by an external call</span>
-  <span class="nv">OPTIONS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$OFFICIAL</span><span class="s2">&quot;</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TRAVIS_BRANCH</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;master&quot;</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-z<span class="w"> </span><span class="nv">$TRAVIS_COMMIT_RANGE</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="c1"># this is official as it has been run by an external call</span>
+<span class="w">  </span><span class="nv">OPTIONS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$OFFICIAL</span><span class="s2">&quot;</span>
 <span class="k">else</span>
-  <span class="nv">OPTIONS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$NON_OFFICIAL</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="nv">OPTIONS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$NON_OFFICIAL</span><span class="s2">&quot;</span>
 <span class="k">fi</span>
 
 <span class="c1"># run fetchers</span>
-compliance --fetch <span class="nv">$OPTIONS</span> -C official.json
+compliance<span class="w"> </span>--fetch<span class="w"> </span><span class="nv">$OPTIONS</span><span class="w"> </span>-C<span class="w"> </span>official.json
 
 <span class="c1"># run checks</span>
-compliance --check <span class="nv">$ACCREDITATIONS</span> <span class="nv">$OPTIONS</span> -C official.json
+compliance<span class="w"> </span>--check<span class="w"> </span><span class="nv">$ACCREDITATIONS</span><span class="w"> </span><span class="nv">$OPTIONS</span><span class="w"> </span>-C<span class="w"> </span>official.json
 <span class="nv">retval</span><span class="o">=</span><span class="nv">$?</span>
 
-<span class="nb">exit</span> <span class="nv">$retval</span>
+<span class="nb">exit</span><span class="w"> </span><span class="nv">$retval</span>
 </pre></div>
 </div>
 <p>Note that the arguments used in the <code class="docutils literal notranslate"><span class="pre">compliance</span></code> invocation depend
 on whether this is an official run or not. This script assumes you
 have stored the official configuration into <code class="docutils literal notranslate"><span class="pre">official.json</span></code> file:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;locker&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;repo_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/my-org/my-evidence-repo&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="p">},</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;notify&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;slack&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="nt">&quot;demo.hipaa&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;#security-team&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;#hipaa-compliance&quot;</span><span class="p">],</span><span class="w"></span>
-<span class="w">      </span><span class="nt">&quot;demo.soc2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;#soc2-compliance&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;#operations&quot;</span><span class="p">]</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;locker&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;repo_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/my-org/my-evidence-repo&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;notify&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;slack&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;demo.hipaa&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;#security-team&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;#hipaa-compliance&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;demo.soc2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;#soc2-compliance&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;#operations&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </section>
@@ -301,13 +299,13 @@ have stored the official configuration into <code class="docutils literal notran
         <li class="right" >
           <a href="coding-standards.html" title="Coding Standards"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Running on Travis</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2022, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+        &#169; Copyright 2023, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>

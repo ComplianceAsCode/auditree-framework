@@ -162,28 +162,28 @@ option when executing your compliance checks.
 Note that you have two options to configure the PagerDuty notifier:
 
 * Provide a list of checks by class path within an accreditation. This allows you
-to define which checks within the accreditation will trigger PageDuty notifications::
+  to define which checks within the accreditation will trigger PageDuty notifications::
 
-  {
-    "pagerduty": {
-      "my.accred1": {
-        "service_id": "SERVICE_ID",
-        "checks": [
-          "package.category.checks.test_module_one.CheckClassOne",
-          "package.category.checks.test_module_two.CheckClassTwo"
-        ]
+    {
+      "pagerduty": {
+        "my.accred1": {
+          "service_id": "SERVICE_ID",
+          "checks": [
+            "package.category.checks.test_module_one.CheckClassOne",
+            "package.category.checks.test_module_two.CheckClassTwo"
+          ]
+        }
       }
     }
-  }
 
 * Provide accreditations only and the notifier will send alerts for all checks with those
-accreditations::
+  accreditations::
 
-  {
-    "pagerduty": {
-      "my.accred1": "SERVICE_ID"
+    {
+      "pagerduty": {
+        "my.accred1": "SERVICE_ID"
+      }
     }
-  }
 
 Note that the ``service_id`` field is the service id from PagerDuty, e.g. ``PABC123``.
 The PagerDuty notifier loads the active incidents to determine if

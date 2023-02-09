@@ -217,7 +217,7 @@ Recommendations
 ---------------
 
 * Use the example project showcased above as a template for your configuration/execution
-repository/project:
+  repository/project:
 
   * Put your ``fetchers`` and ``checks`` in separate folders. Technically, there
     is no rule about fetcher and check organization, but it is a good guideline to

@@ -245,7 +245,7 @@ you after it has been fetched.
 
 * ``store_raw_evidence`` and ``store_tmp_evidence`` decorators: Use one of
   these decorators on your fetcher method when you know the path and name of
-  your raw or tmp evidence.  The decorator takes as an argument, the path to
+  your raw or tmp evidence. The decorator takes as an argument, the path to
   your raw or tmp evidence as a string.
 
 Usage example::
@@ -271,22 +271,29 @@ Usage example::
   or tmp evidence as a string.  The context manager yields the corresponding
   raw or tmp evidence object.
 
-Usage example::
+  Usage example::
 
-  ...
-  from compliance.evidence import raw_evidence
-  ...
-  fetch_foo_bar_evidence(self):
-      for system in systems:
-          evidence_path = 'foo/evidence_bar_{}.json'.format(system)
-          with raw_evidence(self.locker, evidence_path) as evidence:
-              # None is returned if evidence is not stale
-              if evidence:
-                  # Get the data from wherever
-                  foo_bar_data = self._get_from_wherever(...)
-                  # Set the content as a string
-                  # Upon exit it is written to the evidence locker
-                  evidence.set_content(json.dumps(foo_bar_data))
+    ...
+    from compliance.evidence import raw_evidence
+    ...
+    fetch_foo_bar_evidence(self):
+        for system in systems:
+            evidence_path = 'foo/evidence_bar_{}.json'.format(system)
+            with raw_evidence(self.locker, evidence_path) as evidence:
+                # None is returned if evidence is not stale
+                if evidence:
+                    # Get the data from wherever
+                    foo_bar_data = self._get_from_wherever(...)
+                    # Set the content as a string
+                    # Upon exit it is written to the evidence locker
+                    evidence.set_content(json.dumps(foo_bar_data))
+
+  .. note::
+     This approach will not produce multiple log lines when the
+     fetcher is run as everything is executed within.
+
+     See ``@parameterized`` if you want to generate multiple running
+     fetchers based on parameter set.
 
 * ``store_derived_evidence`` decorator: Use this decorator on your fetcher
   method when you know the paths and names of your source evidences and
@@ -295,22 +302,22 @@ Usage example::
   evidence path as a string.  It also passes the source evidences to the
   decorated method in the form of method arguments.
 
-Usage example::
+  Usage example::
 
-  ...
-  from compliance.evidence import store_derived_evidence
-  ...
-  @store_derived_evidence(
-      ['raw/foo/evidence_bar.json', 'raw/foo/evidence_baz.json'],
-      'foo/derived_bar_baz.json'
-  )
-  fetch_foo_bar_baz_derived_evidence(self, bar_evidence, baz_evidence):
-      # Fetcher code only executes if evidence is stale
-      # Construct your derived evidence
-      derived_data = self._do_whatever(bar_evidence, baz_evidence)
-      # Return the content as a string
-      # The decorator will write it to the evidence locker
-      return json.dumps(derived_data)
+    ...
+    from compliance.evidence import store_derived_evidence
+    ...
+    @store_derived_evidence(
+        ['raw/foo/evidence_bar.json', 'raw/foo/evidence_baz.json'],
+        'foo/derived_bar_baz.json'
+    )
+    fetch_foo_bar_baz_derived_evidence(self, bar_evidence, baz_evidence):
+        # Fetcher code only executes if evidence is stale
+        # Construct your derived evidence
+        derived_data = self._do_whatever(bar_evidence, baz_evidence)
+        # Return the content as a string
+        # The decorator will write it to the evidence locker
+        return json.dumps(derived_data)
 
 * ``derived_evidence`` context manager: Use this context manager within your
   fetcher method when your fetcher generates multiple, similar derived
@@ -328,68 +335,110 @@ Usage example::
   provided or "source" if a single evidence path in the form of a string was
   provided.  The target derived evidence key is always "derived".
 
-Usage example (source list provided)::
+  Usage example (source list provided)::
 
-  ...
-  from compliance.evidence import derived_evidence
-  ...
-  fetch_foo_bar_baz_derived_evidence(self):
-      for system in systems:
-          sources = ['raw/foo/evidence_bar.json', 'raw/foo/evidence_baz.json']
-          target = 'foo/derived_bar_baz_{}.json'.format(system)
-          with derived_evidence(self.locker, sources, target) as evidences:
-              # None is returned if target evidence is not stale
-              if evidences:
-                  # Construct your derived evidence
-                  derived_data = self._do_whatever(
-                      evidences['raw/foo/evidence_bar.json'],
-                      evidences['raw/foo/evidence_baz.json']
-                  )
-                  # Set the content as a string
-                  # Upon exit it is written to the evidence locker
-                  evidences['derived'].set_content(json.dumps(derived_data))
+    ...
+    from compliance.evidence import derived_evidence
+    ...
+    fetch_foo_bar_baz_derived_evidence(self):
+        for system in systems:
+            sources = ['raw/foo/evidence_bar.json', 'raw/foo/evidence_baz.json']
+            target = 'foo/derived_bar_baz_{}.json'.format(system)
+            with derived_evidence(self.locker, sources, target) as evidences:
+                # None is returned if target evidence is not stale
+                if evidences:
+                    # Construct your derived evidence
+                    derived_data = self._do_whatever(
+                        evidences['raw/foo/evidence_bar.json'],
+                        evidences['raw/foo/evidence_baz.json']
+                    )
+                    # Set the content as a string
+                    # Upon exit it is written to the evidence locker
+                    evidences['derived'].set_content(json.dumps(derived_data))
 
-Usage example (source dictionary provided)::
+  Usage example (source dictionary provided)::
 
-  ...
-  from compliance.evidence import derived_evidence
-  ...
-  fetch_foo_bar_baz_derived_evidence(self):
-      for system in systems:
-          sources = {
-              'bar': 'raw/foo/evidence_bar.json',
-              'baz': 'raw/foo/evidence_baz.json'
-          }
-          target = 'foo/derived_bar_baz_{}.json'.format(system)
-          with derived_evidence(self.locker, sources, target) as evidences:
-              # None is returned if target evidence is not stale
-              if evidences:
-                  # Construct your derived evidence
-                  derived_data = self._do_whatever(
-                      evidences['bar'],
-                      evidences['baz']
-                  )
-                  # Set the content as a string
-                  # Upon exit it is written to the evidence locker
-                  evidences['derived'].set_content(json.dumps(derived_data))
+    ...
+    from compliance.evidence import derived_evidence
+    ...
+    fetch_foo_bar_baz_derived_evidence(self):
+        for system in systems:
+            sources = {
+                'bar': 'raw/foo/evidence_bar.json',
+                'baz': 'raw/foo/evidence_baz.json'
+            }
+            target = 'foo/derived_bar_baz_{}.json'.format(system)
+            with derived_evidence(self.locker, sources, target) as evidences:
+                # None is returned if target evidence is not stale
+                if evidences:
+                    # Construct your derived evidence
+                    derived_data = self._do_whatever(
+                        evidences['bar'],
+                        evidences['baz']
+                    )
+                    # Set the content as a string
+                    # Upon exit it is written to the evidence locker
+                    evidences['derived'].set_content(json.dumps(derived_data))
 
-Usage example (source string provided)::
+  Usage example (source string provided)::
 
-  ...
-  from compliance.evidence import derived_evidence
-  ...
-  fetch_foo_bar_derived_evidence(self):
-      for system in systems:
-          source = 'raw/foo/evidence_bar.json'
-          target = 'foo/derived_bar_{}.json'.format(system)
-          with derived_evidence(self.locker, source, target) as evidences:
-              # None is returned if target evidence is not stale
-              if evidences:
-                  # Construct your derived evidence
-                  derived_data = self._do_whatever(evidences['source'])
-                  # Set the content as a string
-                  # Upon exit it is written to the evidence locker
-                  evidences['derived'].set_content(json.dumps(derived_data))
+    ...
+    from compliance.evidence import derived_evidence
+    ...
+    fetch_foo_bar_derived_evidence(self):
+        for system in systems:
+            source = 'raw/foo/evidence_bar.json'
+            target = 'foo/derived_bar_{}.json'.format(system)
+            with derived_evidence(self.locker, source, target) as evidences:
+                # None is returned if target evidence is not stale
+                if evidences:
+                    # Construct your derived evidence
+                    derived_data = self._do_whatever(evidences['source'])
+                    # Set the content as a string
+                    # Upon exit it is written to the evidence locker
+                    evidences['derived'].set_content(json.dumps(derived_data))
+
+
+* ``@parameterized`` helper: it is often that a fetcher implementation
+  is general enough to be used multiple by diferent parameters. A good
+  example is a fetcher that collects resources of a cloud provider on
+  several accounts. The implementation is exactly the same across the
+  different accounts.
+
+  One option to implement this is using the `raw_evidence` or
+  `tmp_evidence` context-managers previously described. However, it
+  has its own caveats. For instance, in the run log there will only be
+  one fetcher execution although it would be great if each parameter
+  generates a log line where it could be seen in detail what happened
+  if something goes wrong.
+
+  `parameterized <https://github.com/wolever/parameterized>`_ is an
+  external library that can be used for generating multiple fetchers
+  at runtime.
+
+  .. warning::
+     ``parameterized`` is not installed as part of the
+     auditree-framework. Remember to get installed if you use it in
+     your project!
+
+  Usage example::
+
+    ...
+    from parameterized import parameterized
+    ...
+    def _get_domains():
+        return get_config().get('my.domains')
+
+    @parameterized.expand(_get_domains)
+    def fetch_foo_bar_evidence(self, domain):
+        with raw_evidence(self.locker, f'user/{domain}_users.json') as evidence:
+	    if evidence:
+	        data = get(f'https://{domain}/users')
+                evidence.set_content(json.dumps(data))
+
+  In this example, auditree will generate multiple
+  ``fetch_foo_bar_evidence`` methods at runtime, one per domain
+  obtained from the configuration.
 
 Evidence Dependency Chaining
 ============================

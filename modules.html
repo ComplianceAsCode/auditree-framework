@@ -6,15 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>compliance &#8212; Auditree Framework 1.23.0 documentation</title>
+    <title>compliance &#8212; Auditree Framework 1.24.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -36,7 +34,7 @@
         <li class="right" >
           <a href="verifying-signed-evidence.html" title="Verifying Signed Evidence"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance</a></li> 
       </ul>
     </div>  
@@ -73,17 +71,265 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="compliance.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.agent">compliance.agent module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.check">compliance.check module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.config">compliance.config module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.controls">compliance.controls module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.evidence">compliance.evidence module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.fetch">compliance.fetch module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.fix">compliance.fix module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.locker">compliance.locker module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.notify">compliance.notify module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.report">compliance.report module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.runners">compliance.runners module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.agent">compliance.agent module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent.AGENTS_DIR"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent.AGENTS_DIR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent.PUBLIC_KEYS_EVIDENCE_PATH"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent.PUBLIC_KEYS_EVIDENCE_PATH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent.from_config"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent.from_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent.get_path"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent.get_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent.hash_and_sign"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent.hash_and_sign()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent.load_public_key_from_locker"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent.load_public_key_from_locker()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent.name"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent.private_key"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent.private_key</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent.public_key"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent.public_key</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent.signable"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent.signable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent.verifiable"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent.verifiable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.agent.ComplianceAgent.verify"><code class="docutils literal notranslate"><span class="pre">ComplianceAgent.verify()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.check">compliance.check module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.add_evidence_metadata"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.add_evidence_metadata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.add_failures"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.add_failures()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.add_issue_if_diff"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.add_issue_if_diff()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.add_successes"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.add_successes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.add_warnings"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.add_warnings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.evidence_metadata"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.evidence_metadata</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.evidences_for_check"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.evidences_for_check()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.failures"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.failures</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.failures_count"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.failures_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.failures_for_check"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.failures_for_check()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.failures_for_check_count"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.failures_for_check_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.fixed_failure_count"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.fixed_failure_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.get_historical_evidence"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.get_historical_evidence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.id"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.reports"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.reports</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.run"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.runbook_url"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.runbook_url</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.successes"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.successes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.successes_count"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.successes_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.successes_for_check"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.successes_for_check()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.successes_for_check_count"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.successes_for_check_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.title"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.title</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.total_issues_count"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.total_issues_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.warnings"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.warnings</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.warnings_count"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.warnings_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.warnings_for_check"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.warnings_for_check()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.check.ComplianceCheck.warnings_for_check_count"><code class="docutils literal notranslate"><span class="pre">ComplianceCheck.warnings_for_check_count()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.config">compliance.config module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.config.ComplianceConfig"><code class="docutils literal notranslate"><span class="pre">ComplianceConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.config.ComplianceConfig.DEFAULTS"><code class="docutils literal notranslate"><span class="pre">ComplianceConfig.DEFAULTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.config.ComplianceConfig.add_evidences"><code class="docutils literal notranslate"><span class="pre">ComplianceConfig.add_evidences()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.config.ComplianceConfig.creds"><code class="docutils literal notranslate"><span class="pre">ComplianceConfig.creds</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.config.ComplianceConfig.evidences"><code class="docutils literal notranslate"><span class="pre">ComplianceConfig.evidences</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.config.ComplianceConfig.get"><code class="docutils literal notranslate"><span class="pre">ComplianceConfig.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.config.ComplianceConfig.get_evidence"><code class="docutils literal notranslate"><span class="pre">ComplianceConfig.get_evidence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.config.ComplianceConfig.get_template_dir"><code class="docutils literal notranslate"><span class="pre">ComplianceConfig.get_template_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.config.ComplianceConfig.load"><code class="docutils literal notranslate"><span class="pre">ComplianceConfig.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.config.ComplianceConfig.raw_config"><code class="docutils literal notranslate"><span class="pre">ComplianceConfig.raw_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.config.get_config"><code class="docutils literal notranslate"><span class="pre">get_config()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.controls">compliance.controls module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.controls.ControlDescriptor"><code class="docutils literal notranslate"><span class="pre">ControlDescriptor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.controls.ControlDescriptor.accred_checks"><code class="docutils literal notranslate"><span class="pre">ControlDescriptor.accred_checks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.controls.ControlDescriptor.as_dict"><code class="docutils literal notranslate"><span class="pre">ControlDescriptor.as_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.controls.ControlDescriptor.get_accreditations"><code class="docutils literal notranslate"><span class="pre">ControlDescriptor.get_accreditations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.controls.ControlDescriptor.is_test_included"><code class="docutils literal notranslate"><span class="pre">ControlDescriptor.is_test_included()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.controls.ControlDescriptor.paths"><code class="docutils literal notranslate"><span class="pre">ControlDescriptor.paths</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.evidence">compliance.evidence module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.DerivedEvidence"><code class="docutils literal notranslate"><span class="pre">DerivedEvidence</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.evidence.DerivedEvidence.EVIDENCE_TYPE"><code class="docutils literal notranslate"><span class="pre">DerivedEvidence.EVIDENCE_TYPE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.ExternalEvidence"><code class="docutils literal notranslate"><span class="pre">ExternalEvidence</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.evidence.ExternalEvidence.EVIDENCE_TYPE"><code class="docutils literal notranslate"><span class="pre">ExternalEvidence.EVIDENCE_TYPE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.LazyLoader"><code class="docutils literal notranslate"><span class="pre">LazyLoader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.evidence.LazyLoader.ev_class"><code class="docutils literal notranslate"><span class="pre">LazyLoader.ev_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.evidence.LazyLoader.path"><code class="docutils literal notranslate"><span class="pre">LazyLoader.path</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.RawEvidence"><code class="docutils literal notranslate"><span class="pre">RawEvidence</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.evidence.RawEvidence.EVIDENCE_TYPE"><code class="docutils literal notranslate"><span class="pre">RawEvidence.EVIDENCE_TYPE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.evidence.RawEvidence.get_partition"><code class="docutils literal notranslate"><span class="pre">RawEvidence.get_partition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.evidence.RawEvidence.is_partitioned"><code class="docutils literal notranslate"><span class="pre">RawEvidence.is_partitioned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.evidence.RawEvidence.partition_keys"><code class="docutils literal notranslate"><span class="pre">RawEvidence.partition_keys</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.ReportEvidence"><code class="docutils literal notranslate"><span class="pre">ReportEvidence</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.evidence.ReportEvidence.EVIDENCE_TYPE"><code class="docutils literal notranslate"><span class="pre">ReportEvidence.EVIDENCE_TYPE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.TmpEvidence"><code class="docutils literal notranslate"><span class="pre">TmpEvidence</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.evidence.TmpEvidence.EVIDENCE_TYPE"><code class="docutils literal notranslate"><span class="pre">TmpEvidence.EVIDENCE_TYPE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.derived_evidence"><code class="docutils literal notranslate"><span class="pre">derived_evidence</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.evidences"><code class="docutils literal notranslate"><span class="pre">evidences</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.get_evidence_base_classes"><code class="docutils literal notranslate"><span class="pre">get_evidence_base_classes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.get_evidence_by_path"><code class="docutils literal notranslate"><span class="pre">get_evidence_by_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.get_evidence_class"><code class="docutils literal notranslate"><span class="pre">get_evidence_class()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.get_evidence_dependency"><code class="docutils literal notranslate"><span class="pre">get_evidence_dependency()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.get_evidence_types"><code class="docutils literal notranslate"><span class="pre">get_evidence_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.raw_evidence"><code class="docutils literal notranslate"><span class="pre">raw_evidence</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.store_derived_evidence"><code class="docutils literal notranslate"><span class="pre">store_derived_evidence()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.store_raw_evidence"><code class="docutils literal notranslate"><span class="pre">store_raw_evidence()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.store_tmp_evidence"><code class="docutils literal notranslate"><span class="pre">store_tmp_evidence()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.tmp_evidence"><code class="docutils literal notranslate"><span class="pre">tmp_evidence</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.with_derived_evidences"><code class="docutils literal notranslate"><span class="pre">with_derived_evidences()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.with_external_evidences"><code class="docutils literal notranslate"><span class="pre">with_external_evidences()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.with_raw_evidences"><code class="docutils literal notranslate"><span class="pre">with_raw_evidences()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.evidence.with_tmp_evidences"><code class="docutils literal notranslate"><span class="pre">with_tmp_evidences()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.fetch">compliance.fetch module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.fetch.ComplianceFetcher"><code class="docutils literal notranslate"><span class="pre">ComplianceFetcher</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.fetch.ComplianceFetcher.fetchCloudantDoc"><code class="docutils literal notranslate"><span class="pre">ComplianceFetcher.fetchCloudantDoc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.fetch.ComplianceFetcher.fetchLocalCommands"><code class="docutils literal notranslate"><span class="pre">ComplianceFetcher.fetchLocalCommands()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.fetch.ComplianceFetcher.fetchURL"><code class="docutils literal notranslate"><span class="pre">ComplianceFetcher.fetchURL()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.fetch.ComplianceFetcher.session"><code class="docutils literal notranslate"><span class="pre">ComplianceFetcher.session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.fetch.ComplianceFetcher.tearDownClass"><code class="docutils literal notranslate"><span class="pre">ComplianceFetcher.tearDownClass()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.fetch.fetch"><code class="docutils literal notranslate"><span class="pre">fetch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.fix">compliance.fix module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.fix.Fixer"><code class="docutils literal notranslate"><span class="pre">Fixer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.fix.Fixer.execute_fix"><code class="docutils literal notranslate"><span class="pre">Fixer.execute_fix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.fix.Fixer.fix"><code class="docutils literal notranslate"><span class="pre">Fixer.fix()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.locker">compliance.locker module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.locker.Locker"><code class="docutils literal notranslate"><span class="pre">Locker</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.add_content_to_locker"><code class="docutils literal notranslate"><span class="pre">Locker.add_content_to_locker()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.add_evidence"><code class="docutils literal notranslate"><span class="pre">Locker.add_evidence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.checkin"><code class="docutils literal notranslate"><span class="pre">Locker.checkin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.checkout"><code class="docutils literal notranslate"><span class="pre">Locker.checkout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.clone_depth"><code class="docutils literal notranslate"><span class="pre">Locker.clone_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.clone_shallow_since_days"><code class="docutils literal notranslate"><span class="pre">Locker.clone_shallow_since_days</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.create_tombstone_metadata"><code class="docutils literal notranslate"><span class="pre">Locker.create_tombstone_metadata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.delete_repo_locally"><code class="docutils literal notranslate"><span class="pre">Locker.delete_repo_locally()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_abandoned_evidences"><code class="docutils literal notranslate"><span class="pre">Locker.get_abandoned_evidences()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_content_from_locker"><code class="docutils literal notranslate"><span class="pre">Locker.get_content_from_locker()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_dependency_reruns"><code class="docutils literal notranslate"><span class="pre">Locker.get_dependency_reruns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_empty_evidences"><code class="docutils literal notranslate"><span class="pre">Locker.get_empty_evidences()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_evidence"><code class="docutils literal notranslate"><span class="pre">Locker.get_evidence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_evidence_metadata"><code class="docutils literal notranslate"><span class="pre">Locker.get_evidence_metadata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_file"><code class="docutils literal notranslate"><span class="pre">Locker.get_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_hash"><code class="docutils literal notranslate"><span class="pre">Locker.get_hash()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_index_file"><code class="docutils literal notranslate"><span class="pre">Locker.get_index_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_index_file_by_path"><code class="docutils literal notranslate"><span class="pre">Locker.get_index_file_by_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_large_files"><code class="docutils literal notranslate"><span class="pre">Locker.get_large_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_latest_commit"><code class="docutils literal notranslate"><span class="pre">Locker.get_latest_commit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_locker_repo"><code class="docutils literal notranslate"><span class="pre">Locker.get_locker_repo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_remote_location"><code class="docutils literal notranslate"><span class="pre">Locker.get_remote_location()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.get_reports_metadata"><code class="docutils literal notranslate"><span class="pre">Locker.get_reports_metadata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.head_commit_hexsha"><code class="docutils literal notranslate"><span class="pre">Locker.head_commit_hexsha</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.index"><code class="docutils literal notranslate"><span class="pre">Locker.index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.init"><code class="docutils literal notranslate"><span class="pre">Locker.init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.init_config"><code class="docutils literal notranslate"><span class="pre">Locker.init_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.load_content"><code class="docutils literal notranslate"><span class="pre">Locker.load_content()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.lock"><code class="docutils literal notranslate"><span class="pre">Locker.lock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.logger_init_msgs"><code class="docutils literal notranslate"><span class="pre">Locker.logger_init_msgs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.push"><code class="docutils literal notranslate"><span class="pre">Locker.push()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.remove_partitions"><code class="docutils literal notranslate"><span class="pre">Locker.remove_partitions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.reset_depenency_rerun"><code class="docutils literal notranslate"><span class="pre">Locker.reset_depenency_rerun()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.touched_files"><code class="docutils literal notranslate"><span class="pre">Locker.touched_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.validate"><code class="docutils literal notranslate"><span class="pre">Locker.validate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.locker.Locker.write_pkg_indexes"><code class="docutils literal notranslate"><span class="pre">Locker.write_pkg_indexes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.locker.is_evidence_file"><code class="docutils literal notranslate"><span class="pre">is_evidence_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.locker.is_index_file"><code class="docutils literal notranslate"><span class="pre">is_index_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.notify">compliance.notify module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.notify.FDNotifier"><code class="docutils literal notranslate"><span class="pre">FDNotifier</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.notify.FDNotifier.notify"><code class="docutils literal notranslate"><span class="pre">FDNotifier.notify()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.notify.FindingsNotifier"><code class="docutils literal notranslate"><span class="pre">FindingsNotifier</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.notify.FindingsNotifier.notify"><code class="docutils literal notranslate"><span class="pre">FindingsNotifier.notify()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.notify.GHIssuesNotifier"><code class="docutils literal notranslate"><span class="pre">GHIssuesNotifier</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.notify.GHIssuesNotifier.notify"><code class="docutils literal notranslate"><span class="pre">GHIssuesNotifier.notify()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.notify.LockerNotifier"><code class="docutils literal notranslate"><span class="pre">LockerNotifier</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.notify.LockerNotifier.notify"><code class="docutils literal notranslate"><span class="pre">LockerNotifier.notify()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.notify.PagerDutyNotifier"><code class="docutils literal notranslate"><span class="pre">PagerDutyNotifier</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.notify.PagerDutyNotifier.notify"><code class="docutils literal notranslate"><span class="pre">PagerDutyNotifier.notify()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.notify.SlackNotifier"><code class="docutils literal notranslate"><span class="pre">SlackNotifier</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.notify.SlackNotifier.MESSAGE_COLORS"><code class="docutils literal notranslate"><span class="pre">SlackNotifier.MESSAGE_COLORS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.notify.SlackNotifier.notify"><code class="docutils literal notranslate"><span class="pre">SlackNotifier.notify()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.notify.get_notifiers"><code class="docutils literal notranslate"><span class="pre">get_notifiers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.report">compliance.report module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.report.ReportBuilder"><code class="docutils literal notranslate"><span class="pre">ReportBuilder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.report.ReportBuilder.build"><code class="docutils literal notranslate"><span class="pre">ReportBuilder.build()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.report.ReportBuilder.generate_check_results"><code class="docutils literal notranslate"><span class="pre">ReportBuilder.generate_check_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.report.ReportBuilder.generate_toc"><code class="docutils literal notranslate"><span class="pre">ReportBuilder.generate_toc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.report.ReportBuilder.get_template_for"><code class="docutils literal notranslate"><span class="pre">ReportBuilder.get_template_for()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.report.ReportBuilder.render_evidence_with_template"><code class="docutils literal notranslate"><span class="pre">ReportBuilder.render_evidence_with_template()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance.runners">compliance.runners module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.runners.CheckMode"><code class="docutils literal notranslate"><span class="pre">CheckMode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.CheckMode.build_reports"><code class="docutils literal notranslate"><span class="pre">CheckMode.build_reports()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.CheckMode.fix_failures"><code class="docutils literal notranslate"><span class="pre">CheckMode.fix_failures()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.CheckMode.get_checks"><code class="docutils literal notranslate"><span class="pre">CheckMode.get_checks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.CheckMode.init_config"><code class="docutils literal notranslate"><span class="pre">CheckMode.init_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.CheckMode.run_checks"><code class="docutils literal notranslate"><span class="pre">CheckMode.run_checks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.CheckMode.run_notifiers"><code class="docutils literal notranslate"><span class="pre">CheckMode.run_notifiers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.runners.ComplianceBaseResult"><code class="docutils literal notranslate"><span class="pre">ComplianceBaseResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.ComplianceBaseResult.startTest"><code class="docutils literal notranslate"><span class="pre">ComplianceBaseResult.startTest()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.ComplianceBaseResult.stopTest"><code class="docutils literal notranslate"><span class="pre">ComplianceBaseResult.stopTest()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.runners.ComplianceCheckResult"><code class="docutils literal notranslate"><span class="pre">ComplianceCheckResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.ComplianceCheckResult.addError"><code class="docutils literal notranslate"><span class="pre">ComplianceCheckResult.addError()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.ComplianceCheckResult.addFailure"><code class="docutils literal notranslate"><span class="pre">ComplianceCheckResult.addFailure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.ComplianceCheckResult.addSuccess"><code class="docutils literal notranslate"><span class="pre">ComplianceCheckResult.addSuccess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.ComplianceCheckResult.record"><code class="docutils literal notranslate"><span class="pre">ComplianceCheckResult.record()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.runners.ComplianceTestWrapper"><code class="docutils literal notranslate"><span class="pre">ComplianceTestWrapper</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="compliance.html#compliance.runners.FetchMode"><code class="docutils literal notranslate"><span class="pre">FetchMode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.FetchMode.get_fetchers"><code class="docutils literal notranslate"><span class="pre">FetchMode.get_fetchers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="compliance.html#compliance.runners.FetchMode.run_fetchers"><code class="docutils literal notranslate"><span class="pre">FetchMode.run_fetchers()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="compliance.html#module-compliance">Module contents</a></li>
 </ul>
 </li>
@@ -144,13 +390,13 @@
         <li class="right" >
           <a href="verifying-signed-evidence.html" title="Verifying Signed Evidence"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.23.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2022, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+        &#169; Copyright 2023, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>
