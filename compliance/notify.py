@@ -66,12 +66,10 @@ class _BaseNotifier(object):
             test_obj = test_desc["test"].test
             method_name = parse_test_id(test_id)["method"]
 
-            msg_method = "get_notification_message"
-            if len(test_obj.tests) > 1:
-                candidate = method_name.replace("test_", "msg_", 1)
-                if hasattr(test_obj, candidate):
-                    msg_method = candidate
-
+            msg_method = "get_notification_message"  # default notification method
+            candidate = method_name.replace("test_", "msg_", 1)
+            if hasattr(test_obj, candidate):
+                msg_method = candidate
             # set body to None if the notification function hasn't been
             # defined or if it returns None.
             # use a predefined error message for error status.
@@ -96,19 +94,11 @@ class _BaseNotifier(object):
             if msg and "subtitle" in msg and msg["subtitle"]:
                 title += f' - {msg["subtitle"]}'
 
-            failure_count = 0
-            if msg and test_obj.failures:
-                failure_count = test_obj.failures_count()
-
-            warning_count = 0
-            if msg and test_obj.warnings:
-                warning_count = test_obj.warnings_count()
-
             msg = {
                 "title": title,
                 "body": body,
-                "failure_count": failure_count,
-                "warning_count": warning_count,
+                "failure_count": test_obj.failures_count(),
+                "warning_count": test_obj.warnings_count(),
             }
             yield test_id, test_desc, msg
 

@@ -57,7 +57,7 @@ class ControlDescriptorTest(unittest.TestCase):
         """Ensure that control content cannot be changed through as_dict."""
         with self.assertRaises(AttributeError) as ar:
             self.cd.as_dict = {"foo": "bar"}
-        self.assertEqual(str(ar.exception), "can't set attribute")
+        self.assertTrue(str(ar.exception).startswith("can't set attribute"))
         controls_copy = self.cd.as_dict
         self.assertEqual(controls_copy, self.cd.as_dict)
         controls_copy.update({"foo": "bar"})

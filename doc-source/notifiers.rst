@@ -14,8 +14,8 @@ system is that each ``test_`` can generate a short notification that has the
 following components:
 
     **NOTE:** When configuring notifiers, you should be aware of the
-    possibilitythat notifications may contain sensitive information that can be
-    sent to less trusted stores like Slack or public git issue trackers.  So be
+    possibility that notifications may contain sensitive information that can be
+    sent to less trusted stores like Slack or public git issue trackers. So be
     mindful of check notification content as well as the nature of the forum
     you intend to send these notifications to.
 

@@ -100,7 +100,7 @@ class GitHubOrgs(ComplianceCheck):
         if not members:
             self.add_failures(org, "There is nobody!")
         elif len(members) < 5:
-            self.add_warnings(org, "There are people int there, but less than 5!")
+            self.add_warnings(org, "There are people in there, but less than 5!")
 
     def get_reports(self):
         """Return GitHub report name."""
