@@ -57,104 +57,22 @@ This is a typical `.travis.yml` file:
      - "3.7"
    install:
      - pip install -r requirements.txt
-     - ./travis/gen-credentials.py > ~/.credentials
    script:
      - make clean
      - ./travis/run.sh
-   after_script:
-     - rm  ~/.credentials
 
 Basically, this will firstly install the dependencies through
 ``pip install -r requirements.txt`` and then generate the credentials file from
 using Travis environment variables.
 
-Credentials generation
-~~~~~~~~~~~~~~~~~~~~~~
+Credentials
+~~~~~~~~~~~
 
-This is an implementation you might want to use for your project of
-``gen-credentials.py``:
+The recommended way to use credentials in a CI job is to export them as environment variables.
+Auditree will automatically parsed the environment variables available to the process and make them available to the fetchers if they follow a specific structure.
 
-.. code-block:: python
+For more information on how to do this, have a look to the :ref:`credentials` section.
 
-   #!/usr/bin/env python
-   # -*- coding:utf-8; mode:python -*-
-
-   '''This script generates a config file suitable to be used by
-   `utilitarian.credentials.Config` from envvars. This is useful for
-   Travis CI that allows to deploy credentials safely using envvars.
-
-   Any new supported credential must be added to SUPPORTED_SECTIONS which
-   includes a list of sections of `Config` supported by the script. For
-   example, adding 'github' will make the script to generate
-   `github.username` from GITHUB_USERNAME and `github.password` from
-   GITHUB_PASSWORD, if both envvars are defined.
-   '''
-
-   import os
-   import sys
-   import ConfigParser
-
-
-   SUPPORTED_SECTIONS = ['github', 'slack']
-
-
-   def main():
-       matched_keys = filter(
-           lambda k: any([k.lower().startswith(x) for x in SUPPORTED_SECTIONS]),
-           os.environ.keys()
-       )
-       if not matched_keys:
-           return 0
-
-       cfg_parser = ConfigParser.ConfigParser()
-       for k in matched_keys:
-           # split the section name and option from this env var (max()
-           # to ensure the longest match)
-           section = max(
-               [s for s in SUPPORTED_SECTIONS if k.lower().startswith(s)],
-               key=len
-           )
-           option = k.split(section.upper())[1][1:].lower()
-
-           # add to the config
-           if not cfg_parser.has_section(section):
-               cfg_parser.add_section(section)
-           cfg_parser.set(section, option, os.environ[k])
-
-       cfg_parser.write(sys.stdout)
-
-       return 0
-
-
-   if __name__ == '__main__':
-       exit(main())
-
-So, for instance, using the previous script you will be able to create
-the credentials required for ``github`` and ``slack`` by
-defining the following environment variables in Travis:
-
-* ``GITHUB_TOKEN = XXX``
-
-* ``SLACK_WEBHOOK = YYY``
-
-Using those variables, ``./travis/gen-credentials.py >
-~/.credentials`` will generate::
-
-  [github]
-  token=XXX
-
-  [slack]
-  webhook=YYY
-
-This method has a few limitation:
-
-* Do not use ``$`` as part of the value of any variable as they will
-  be evaluated by bash.
-
-* You will need to add a new service into the
-  ``SUPPORTED_SECTIONS``. This is actually good since a manual
-  addition requires a code change (so new credentials are
-  tracked).
 
 ``travis/run.sh``
 ~~~~~~~~~~~~~~~~~

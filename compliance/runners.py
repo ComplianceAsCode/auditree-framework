@@ -91,11 +91,15 @@ class _BaseRunner(object):
                 yield test
 
     def _load_compliance_config(self):
-        creds_path = Path(self.opts.creds_path).expanduser()
-        if not creds_path.is_file():
-            raise ValueError(f"{creds_path} file does not exist.")
         self.config = get_config()
-        self.config.creds_path = str(creds_path)
+        creds_path = None
+        if self.opts.creds_path is not None:
+            creds_path = Path(self.opts.creds_path).expanduser()
+            if not creds_path.is_file():
+                raise ValueError(
+                    f"Invalid path to credentials file '{str(creds_path)}'"
+                )
+        self.config.creds_path = creds_path
         self.config.load(self.opts.compliance_config)
 
     def _init_dirs(self):

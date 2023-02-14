@@ -1,5 +1,7 @@
-# [1.24.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.24.1)
+# [1.25.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.25.0)
 
+- [ADDED] Documentation on how to use it with 1Password CLI.
+- [CHANGED] "--creds-path" does not default to "~/.credentials".
 - [FIXED] Number of errors/warnings shown correctly for single checks.
 
 # [1.24.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.24.0)

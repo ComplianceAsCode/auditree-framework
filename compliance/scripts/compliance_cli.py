@@ -83,7 +83,7 @@ class ComplianceCLI(Command):
                 "Defaults to %(default)s."
             ),
             metavar="/path/to/creds.ini",
-            default="~/.credentials",
+            default=None,
         )
         notify_options = [k for k in get_notifiers().keys() if k != "stdout"]
         self.add_argument(

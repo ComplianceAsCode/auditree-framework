@@ -750,9 +750,51 @@ levels:
 Credentials
 ~~~~~~~~~~~
 
-If you want to configure your credentials locally, the framework
-will look for a credentials file at ``~/.credentials`` by default. This
-file should be similar to this:
+There are 2 ways for providing credentials:
 
-.. include:: credentials-example.cfg
-   :literal:
+1. *Local file*: if you want to configure your credentials in a local file,
+   you will have to provide the the framework using ``--creds-path`` option.
+   This file should be similar to this:
+
+   .. include:: credentials-example.cfg
+      :literal:
+
+1. *Environment variables*: each section and field of the local file can be
+   rendered as an environment variable.
+   For instance, suppose your code requires ``creds['github'].token`` or ``creds['slack'].webhook``.
+   You just need to export:
+
+   * ``GITHUB_TOKEN = XXX``
+
+   * ``MY_SERVICE_API_KEY = YYY``
+
+   This is equivalent to the credentials file::
+
+     [github]
+     token=XXX
+
+     [my_service]
+     api_key=YYY
+
+Creds with ``.env`` files and 1Password
++++++++++++++++++++++++++++++++++++++++
+
+Combining the method based on passing env vars to Auditree and `1Password CLI <https://developer.1password.com/docs/cli/>`_,
+it is possible to grab the secrets from 1Password and inject them into Auditree.
+Here it is how to do it:
+
+1. Create the following alias::
+
+     alias compliance="op run --env-file .env -- compliance"
+
+1. In your fetchers/checks project, create an ``.env`` file with the following schema::
+
+     <SECTION>_<ATTRIBUTE>="op://<VAULT>/<ITEM>/<FIELD>"
+
+   For example::
+
+     GITHUB_TOKEN="op://Private/github/token"
+     MY_SERVICE_ORG="the-org-id"
+     MY_SERVICE_API_KEY="op://Shared/my_service/api_key"
+
+1. Now running ``compliance`` will pull credentials from 1Password vaults.
