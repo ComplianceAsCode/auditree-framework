@@ -683,7 +683,7 @@ accreditations passed to the framework by the CLI.
 
 
 Fixers
-~~~~~~
+------
 
 After checks have been run, but before notifications or reports are
 generated, the Auditree framework will optionally try to fix the
@@ -703,7 +703,7 @@ See :ref:`fixers` section for more information.
 
 
 Report Builder
-~~~~~~~~~~~~~~
+--------------
 
 Once the execution of all checks and (optionally) fixers have been
 executed, the :py:class:`~compliance.report.ReportBuilder` generates
@@ -715,7 +715,7 @@ See :ref:`report-builder` section for more information.
 
 
 Notifiers
-~~~~~~~~~
+---------
 
 After reports have been generated, the tool will collect notification
 messages from them and will create a
@@ -727,7 +727,7 @@ See :ref:`notifiers-description` section for more information.
 
 
 Execution Config
-~~~~~~~~~~~~~~~~
+----------------
 
 The Auditree framework is designed to be run locally from your PC or from
 a CI server like Jenkins or Travis. The execution can be tweaked at 2
@@ -748,18 +748,18 @@ levels:
 
 
 Credentials
-~~~~~~~~~~~
+-----------
 
 There are 2 ways for providing credentials:
 
-1. *Local file*: if you want to configure your credentials in a local file,
+#. *Local file*: if you want to configure your credentials in a local file,
    you will have to provide the the framework using ``--creds-path`` option.
    This file should be similar to this:
 
    .. include:: credentials-example.cfg
       :literal:
 
-1. *Environment variables*: each section and field of the local file can be
+#. *Environment variables*: each section and field of the local file can be
    rendered as an environment variable.
    For instance, suppose your code requires ``creds['github'].token`` or ``creds['slack'].webhook``.
    You just need to export:
@@ -777,17 +777,17 @@ There are 2 ways for providing credentials:
      api_key=YYY
 
 Creds with ``.env`` files and 1Password
-+++++++++++++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Combining the method based on passing env vars to Auditree and `1Password CLI <https://developer.1password.com/docs/cli/>`_,
 it is possible to grab the secrets from 1Password and inject them into Auditree.
 Here it is how to do it:
 
-1. Create the following alias::
+#. Create the following alias::
 
      alias compliance="op run --env-file .env -- compliance"
 
-1. In your fetchers/checks project, create an ``.env`` file with the following schema::
+#. In your fetchers/checks project, create an ``.env`` file with the following schema::
 
      <SECTION>_<ATTRIBUTE>="op://<VAULT>/<ITEM>/<FIELD>"
 
@@ -797,4 +797,4 @@ Here it is how to do it:
      MY_SERVICE_ORG="the-org-id"
      MY_SERVICE_API_KEY="op://Shared/my_service/api_key"
 
-1. Now running ``compliance`` will pull credentials from 1Password vaults.
+#. Now running ``compliance`` will pull credentials from 1Password vaults.

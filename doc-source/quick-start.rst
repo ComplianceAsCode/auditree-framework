@@ -113,8 +113,9 @@ evidence locker repository and use ``--evidence no-push`` to pull down a remote
 evidence locker only or ``--evidence full-remote`` to pull down and push to a
 remote evidence locker.  Finally you'll need to configure your credentials file
 with the appropriate personal access token for your Git remote hosting service.  The
-credentials file defaults to ``~/.credentials`` or use the ``--creds-path`` option
-to point elsewhere.  Valid section headings for Git remote hosting services in your
+credentials can be configured in multiple ways. See :ref:`credentials` section.
+For this example, we can use the ``--creds-path`` option to point to a credentials file.
+Valid section headings for Git remote hosting services in your
 credentials are ``github``, ``github_enterprise``, ``bitbucket``, and ``gitlab``.
 Using ``github`` as an example, add the following to your credentials file::
 
