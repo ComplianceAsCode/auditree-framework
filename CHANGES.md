@@ -1,3 +1,7 @@
+# [1.24.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.24.1)
+
+- [FIXED] Number of errors/warnings shown correctly for single checks.
+
 # [1.24.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v1.24.0)
 
 - [FIXED] Update pre-commit dependencies.
