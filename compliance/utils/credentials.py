@@ -36,8 +36,9 @@ class Config:
         :param cfg_file: The path to the RawConfigParser compatible config file
         """
         self._cfg = RawConfigParser()
-        self._cfg.read(str(Path(cfg_file).expanduser()))
         self._cfg_file = cfg_file
+        if cfg_file is not None:
+            self._cfg.read(str(Path(cfg_file).expanduser()))
 
     def __getitem__(self, section):
         """
@@ -60,13 +61,16 @@ class Config:
             try:
                 return t.__getattribute__(attr)
             except AttributeError as exc:
-                exc.args = (
-                    (
+                if self._cfg_file:
+                    msg = (
                         f'Unable to locate attribute "{attr}" '
                         f'in section "{type(t).__name__}" '
                         f'at config file "{self._cfg_file}"'
-                    ),
-                )
+                    )
+                else:
+                    env_var_name = f"{type(t).__name__}_{attr}".upper()
+                    msg = f"Unable to find the env var: {env_var_name}"
+                exc.args = (msg,)
                 raise exc
 
         env_vars = [k for k in environ.keys() if k.startswith(f"{section.upper()}_")]

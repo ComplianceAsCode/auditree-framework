@@ -134,7 +134,9 @@ You can also use a Slack app token (recommended if you need to post
 messages to private channels)::
 
   [slack]
-  slack=XXX
+  token=XXX
+
+Note that you can do the same thing using env vars ``SLACK_WEBHOOK`` and ``SLACK_TOKEN``.
 
 In case you need private channels as part of the list, you have to
 specify the channel ID::

@@ -68,11 +68,9 @@ class ComplianceConfig(object):
     @property
     def creds(self):
         """Credentials used for locker management and running fetchers."""
-        if self.creds_path is None:
-            raise ValueError("Path to credentials file not provided")
-
-        if self._creds is None:
-            self._creds = Config(self.creds_path)
+        if not self._creds:
+            path = None if self.creds_path is None else str(self.creds_path)
+            self._creds = Config(path)
         return self._creds
 
     @property
