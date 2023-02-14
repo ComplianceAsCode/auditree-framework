@@ -8,9 +8,8 @@ Coding Standards
 In this project, we use Python as programming language so please
 follow these rules:
 
-* Keep the code tidy using `black
-  < https://github.com/psf/black>`_ and `flake8
-  <http://flake8.pycqa.org/en/latest>`_. Don't introduce new
+* Keep the code tidy using `black <https://github.com/psf/black>`_
+  and `flake8 <http://flake8.pycqa.org/en/latest>`_. Don't introduce new
   violations and remove them if you spot any. This is enforced by
   Github Actions builds. To check your code locally, use::
 
