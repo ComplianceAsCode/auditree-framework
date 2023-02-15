@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Running on Travis &#8212; Auditree Framework 1.24.0 documentation</title>
+    <title>Running on Travis &#8212; Auditree Framework 2.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
@@ -34,7 +34,7 @@
         <li class="right" >
           <a href="coding-standards.html" title="Coding Standards"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 2.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Running on Travis</a></li> 
       </ul>
     </div>  
@@ -84,100 +84,19 @@ notifications and push evidences to Git).</p>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;3.7&quot;</span>
 <span class="nt">install</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install -r requirements.txt</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./travis/gen-credentials.py &gt; ~/.credentials</span>
 <span class="nt">script</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">make clean</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./travis/run.sh</span>
-<span class="nt">after_script</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rm  ~/.credentials</span>
 </pre></div>
 </div>
 <p>Basically, this will firstly install the dependencies through
 <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code> and then generate the credentials file from
 using Travis environment variables.</p>
-<section id="credentials-generation">
-<h3>Credentials generation<a class="headerlink" href="#credentials-generation" title="Permalink to this heading">¶</a></h3>
-<p>This is an implementation you might want to use for your project of
-<code class="docutils literal notranslate"><span class="pre">gen-credentials.py</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
-<span class="c1"># -*- coding:utf-8; mode:python -*-</span>
-
-<span class="sd">&#39;&#39;&#39;This script generates a config file suitable to be used by</span>
-<span class="sd">`utilitarian.credentials.Config` from envvars. This is useful for</span>
-<span class="sd">Travis CI that allows to deploy credentials safely using envvars.</span>
-
-<span class="sd">Any new supported credential must be added to SUPPORTED_SECTIONS which</span>
-<span class="sd">includes a list of sections of `Config` supported by the script. For</span>
-<span class="sd">example, adding &#39;github&#39; will make the script to generate</span>
-<span class="sd">`github.username` from GITHUB_USERNAME and `github.password` from</span>
-<span class="sd">GITHUB_PASSWORD, if both envvars are defined.</span>
-<span class="sd">&#39;&#39;&#39;</span>
-
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">ConfigParser</span>
-
-
-<span class="n">SUPPORTED_SECTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;github&#39;</span><span class="p">,</span> <span class="s1">&#39;slack&#39;</span><span class="p">]</span>
-
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">matched_keys</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="nb">any</span><span class="p">([</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">SUPPORTED_SECTIONS</span><span class="p">]),</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">matched_keys</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-
-    <span class="n">cfg_parser</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">matched_keys</span><span class="p">:</span>
-        <span class="c1"># split the section name and option from this env var (max()</span>
-        <span class="c1"># to ensure the longest match)</span>
-        <span class="n">section</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">SUPPORTED_SECTIONS</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">s</span><span class="p">)],</span>
-            <span class="n">key</span><span class="o">=</span><span class="nb">len</span>
-        <span class="p">)</span>
-        <span class="n">option</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">upper</span><span class="p">())[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-
-        <span class="c1"># add to the config</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg_parser</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">section</span><span class="p">):</span>
-            <span class="n">cfg_parser</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
-        <span class="n">cfg_parser</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
-
-    <span class="n">cfg_parser</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="mi">0</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
-</pre></div>
-</div>
-<p>So, for instance, using the previous script you will be able to create
-the credentials required for <code class="docutils literal notranslate"><span class="pre">github</span></code> and <code class="docutils literal notranslate"><span class="pre">slack</span></code> by
-defining the following environment variables in Travis:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">GITHUB_TOKEN</span> <span class="pre">=</span> <span class="pre">XXX</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">SLACK_WEBHOOK</span> <span class="pre">=</span> <span class="pre">YYY</span></code></p></li>
-</ul>
-<p>Using those variables, <code class="docutils literal notranslate"><span class="pre">./travis/gen-credentials.py</span> <span class="pre">&gt;</span>
-<span class="pre">~/.credentials</span></code> will generate:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">github</span><span class="p">]</span>
-<span class="n">token</span><span class="o">=</span><span class="n">XXX</span>
-
-<span class="p">[</span><span class="n">slack</span><span class="p">]</span>
-<span class="n">webhook</span><span class="o">=</span><span class="n">YYY</span>
-</pre></div>
-</div>
-<p>This method has a few limitation:</p>
-<ul class="simple">
-<li><p>Do not use <code class="docutils literal notranslate"><span class="pre">$</span></code> as part of the value of any variable as they will
-be evaluated by bash.</p></li>
-<li><p>You will need to add a new service into the
-<code class="docutils literal notranslate"><span class="pre">SUPPORTED_SECTIONS</span></code>. This is actually good since a manual
-addition requires a code change (so new credentials are
-tracked).</p></li>
-</ul>
+<section id="credentials">
+<h3>Credentials<a class="headerlink" href="#credentials" title="Permalink to this heading">¶</a></h3>
+<p>The recommended way to use credentials in a CI job is to export them as environment variables.
+Auditree will automatically parsed the environment variables available to the process and make them available to the fetchers if they follow a specific structure.</p>
+<p>For more information on how to do this, have a look to the <a class="reference internal" href="design-principles.html#credentials"><span class="std std-ref">Credentials</span></a> section.</p>
 </section>
 <section id="travis-run-sh">
 <h3><code class="docutils literal notranslate"><span class="pre">travis/run.sh</span></code><a class="headerlink" href="#travis-run-sh" title="Permalink to this heading">¶</a></h3>
@@ -244,7 +163,7 @@ have stored the official configuration into <code class="docutils literal notran
     <ul>
 <li><a class="reference internal" href="#">Running on Travis</a><ul>
 <li><a class="reference internal" href="#travis-artifacts">Travis artifacts</a><ul>
-<li><a class="reference internal" href="#credentials-generation">Credentials generation</a></li>
+<li><a class="reference internal" href="#credentials">Credentials</a></li>
 <li><a class="reference internal" href="#travis-run-sh"><code class="docutils literal notranslate"><span class="pre">travis/run.sh</span></code></a></li>
 </ul>
 </li>
@@ -299,7 +218,7 @@ have stored the official configuration into <code class="docutils literal notran
         <li class="right" >
           <a href="coding-standards.html" title="Coding Standards"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 2.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Running on Travis</a></li> 
       </ul>
     </div>

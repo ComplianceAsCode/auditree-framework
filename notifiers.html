@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Notifiers &#8212; Auditree Framework 1.24.0 documentation</title>
+    <title>Notifiers &#8212; Auditree Framework 2.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
@@ -34,7 +34,7 @@
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 2.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>  
@@ -55,8 +55,8 @@ system is that each <code class="docutils literal notranslate"><span class="pre"
 following components:</p>
 <blockquote>
 <div><p><strong>NOTE:</strong> When configuring notifiers, you should be aware of the
-possibilitythat notifications may contain sensitive information that can be
-sent to less trusted stores like Slack or public git issue trackers.  So be
+possibility that notifications may contain sensitive information that can be
+sent to less trusted stores like Slack or public git issue trackers. So be
 mindful of check notification content as well as the nature of the forum
 you intend to send these notifications to.</p>
 </div></blockquote>
@@ -166,9 +166,10 @@ file:</p>
 <p>You can also use a Slack app token (recommended if you need to post
 messages to private channels):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">slack</span><span class="p">]</span>
-<span class="n">slack</span><span class="o">=</span><span class="n">XXX</span>
+<span class="n">token</span><span class="o">=</span><span class="n">XXX</span>
 </pre></div>
 </div>
+<p>Note that you can do the same thing using env vars <code class="docutils literal notranslate"><span class="pre">SLACK_WEBHOOK</span></code> and <code class="docutils literal notranslate"><span class="pre">SLACK_TOKEN</span></code>.</p>
 <p>In case you need private channels as part of the list, you have to
 specify the channel ID:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -539,7 +540,7 @@ file:</p>
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 2.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>

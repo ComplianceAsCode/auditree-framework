@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Design Principles &#8212; Auditree Framework 1.24.0 documentation</title>
+    <title>Design Principles &#8212; Auditree Framework 2.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
@@ -34,7 +34,7 @@
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 2.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>  
@@ -698,8 +698,9 @@ accreditations passed to the framework by the CLI.</p>
 </div>
 </section>
 </section>
+</section>
 <section id="fixers">
-<h2>Fixers<a class="headerlink" href="#fixers" title="Permalink to this heading">¶</a></h2>
+<h1>Fixers<a class="headerlink" href="#fixers" title="Permalink to this heading">¶</a></h1>
 <p>After checks have been run, but before notifications or reports are
 generated, the Auditree framework will optionally try to fix the
 issues automatically. This is controlled with the <code class="docutils literal notranslate"><span class="pre">--fix</span></code> option.
@@ -714,7 +715,7 @@ in the notification message.</p>
 <p>See <a class="reference internal" href="fixers.html#fixers"><span class="std std-ref">Fixers</span></a> section for more information.</p>
 </section>
 <section id="report-builder">
-<h2>Report Builder<a class="headerlink" href="#report-builder" title="Permalink to this heading">¶</a></h2>
+<h1>Report Builder<a class="headerlink" href="#report-builder" title="Permalink to this heading">¶</a></h1>
 <p>Once the execution of all checks and (optionally) fixers have been
 executed, the <a class="reference internal" href="compliance.html#compliance.report.ReportBuilder" title="compliance.report.ReportBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReportBuilder</span></code></a> generates
 reports by inspecting each check and storing the results in the
@@ -723,7 +724,7 @@ regarding what failures were found.</p>
 <p>See <a class="reference internal" href="report-builder.html#report-builder"><span class="std std-ref">Report Builder</span></a> section for more information.</p>
 </section>
 <section id="notifiers">
-<h2>Notifiers<a class="headerlink" href="#notifiers" title="Permalink to this heading">¶</a></h2>
+<h1>Notifiers<a class="headerlink" href="#notifiers" title="Permalink to this heading">¶</a></h1>
 <p>After reports have been generated, the tool will collect notification
 messages from them and will create a
 <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseNotifier</span></code> object which deals with the
@@ -732,7 +733,7 @@ messages to stdout, etc).</p>
 <p>See <a class="reference internal" href="notifiers.html#notifiers-description"><span class="std std-ref">Notifiers</span></a> section for more information.</p>
 </section>
 <section id="execution-config">
-<h2>Execution Config<a class="headerlink" href="#execution-config" title="Permalink to this heading">¶</a></h2>
+<h1>Execution Config<a class="headerlink" href="#execution-config" title="Permalink to this heading">¶</a></h1>
 <p>The Auditree framework is designed to be run locally from your PC or from
 a CI server like Jenkins or Travis. The execution can be tweaked at 2
 levels:</p>
@@ -749,10 +750,12 @@ example.</p></li>
 </ul>
 </section>
 <section id="credentials">
-<span id="id3"></span><h2>Credentials<a class="headerlink" href="#credentials" title="Permalink to this heading">¶</a></h2>
-<p>If you want to configure your credentials locally, the framework
-will look for a credentials file at <code class="docutils literal notranslate"><span class="pre">~/.credentials</span></code> by default. This
-file should be similar to this:</p>
+<span id="id3"></span><h1>Credentials<a class="headerlink" href="#credentials" title="Permalink to this heading">¶</a></h1>
+<p>There are 2 ways for providing credentials:</p>
+<ol class="arabic">
+<li><p><em>Local file</em>: if you want to configure your credentials in a local file,
+you will have to provide the the framework using <code class="docutils literal notranslate"><span class="pre">--creds-path</span></code> option.
+This file should be similar to this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- mode:conf -*-</span>
 
 <span class="c1"># Token for github.com to be used by the Locker</span>
@@ -770,6 +773,49 @@ file should be similar to this:</p>
 <span class="n">events_integration_key</span><span class="o">=</span><span class="n">XXX</span>
 </pre></div>
 </div>
+</li>
+<li><p><em>Environment variables</em>: each section and field of the local file can be
+rendered as an environment variable.
+For instance, suppose your code requires <code class="docutils literal notranslate"><span class="pre">creds['github'].token</span></code> or <code class="docutils literal notranslate"><span class="pre">creds['slack'].webhook</span></code>.
+You just need to export:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">GITHUB_TOKEN</span> <span class="pre">=</span> <span class="pre">XXX</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MY_SERVICE_API_KEY</span> <span class="pre">=</span> <span class="pre">YYY</span></code></p></li>
+</ul>
+<p>This is equivalent to the credentials file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">github</span><span class="p">]</span>
+<span class="n">token</span><span class="o">=</span><span class="n">XXX</span>
+
+<span class="p">[</span><span class="n">my_service</span><span class="p">]</span>
+<span class="n">api_key</span><span class="o">=</span><span class="n">YYY</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<section id="creds-with-env-files-and-1password">
+<h2>Creds with <code class="docutils literal notranslate"><span class="pre">.env</span></code> files and 1Password<a class="headerlink" href="#creds-with-env-files-and-1password" title="Permalink to this heading">¶</a></h2>
+<p>Combining the method based on passing env vars to Auditree and <a class="reference external" href="https://developer.1password.com/docs/cli/">1Password CLI</a>,
+it is possible to grab the secrets from 1Password and inject them into Auditree.
+Here it is how to do it:</p>
+<ol class="arabic">
+<li><p>Create the following alias:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">alias</span> <span class="n">compliance</span><span class="o">=</span><span class="s2">&quot;op run --env-file .env -- compliance&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>In your fetchers/checks project, create an <code class="docutils literal notranslate"><span class="pre">.env</span></code> file with the following schema:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">SECTION</span><span class="o">&gt;</span><span class="n">_</span><span class="o">&lt;</span><span class="n">ATTRIBUTE</span><span class="o">&gt;=</span><span class="s2">&quot;op://&lt;VAULT&gt;/&lt;ITEM&gt;/&lt;FIELD&gt;&quot;</span>
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GITHUB_TOKEN</span><span class="o">=</span><span class="s2">&quot;op://Private/github/token&quot;</span>
+<span class="n">MY_SERVICE_ORG</span><span class="o">=</span><span class="s2">&quot;the-org-id&quot;</span>
+<span class="n">MY_SERVICE_API_KEY</span><span class="o">=</span><span class="s2">&quot;op://Shared/my_service/api_key&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Now running <code class="docutils literal notranslate"><span class="pre">compliance</span></code> will pull credentials from 1Password vaults.</p></li>
+</ol>
 </section>
 </section>
 
@@ -797,11 +843,14 @@ file should be similar to this:</p>
 <li><a class="reference internal" href="#check-execution">Check Execution</a></li>
 </ul>
 </li>
+</ul>
+</li>
 <li><a class="reference internal" href="#fixers">Fixers</a></li>
 <li><a class="reference internal" href="#report-builder">Report Builder</a></li>
 <li><a class="reference internal" href="#notifiers">Notifiers</a></li>
 <li><a class="reference internal" href="#execution-config">Execution Config</a></li>
-<li><a class="reference internal" href="#credentials">Credentials</a></li>
+<li><a class="reference internal" href="#credentials">Credentials</a><ul>
+<li><a class="reference internal" href="#creds-with-env-files-and-1password">Creds with <code class="docutils literal notranslate"><span class="pre">.env</span></code> files and 1Password</a></li>
 </ul>
 </li>
 </ul>
@@ -853,7 +902,7 @@ file should be similar to this:</p>
         <li class="right" >
           <a href="quick-start.html" title="Quick Start"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 1.24.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 2.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Design Principles</a></li> 
       </ul>
     </div>
