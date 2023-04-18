@@ -1,3 +1,7 @@
+# [2.0.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v2.0.1)
+
+- [FIXED] Enable universal newlines when executing local commands.
+
 # [2.0.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v2.0.0)
 
 - [ADDED] Documentation on how to use it with 1Password CLI.

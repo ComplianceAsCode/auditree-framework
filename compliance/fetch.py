@@ -150,12 +150,10 @@ class ComplianceFetcher(unittest.TestCase):
             cmd += ["-t"]
         if not cwd:
             cwd = os.path.expanduser("~")
-        stdin = str.encode("\n".join(commands) + "\n")
-        return (
-            check_output(cmd, cwd=cwd, env=env, input=stdin, timeout=timeout)
-            .decode()
-            .rstrip()
-        )
+        stdin = "\n".join(commands) + "\n"
+        return check_output(
+            cmd, cwd=cwd, env=env, input=stdin, timeout=timeout, universal_newlines=True
+        ).rstrip()
 
 
 def fetch(url, name):
