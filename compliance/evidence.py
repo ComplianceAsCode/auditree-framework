@@ -863,8 +863,11 @@ def store_derived_evidence(evidences, target):
       For example, ``src/evidence.json``.
     """
 
-    def decorator(f):
-        @wraps(f)  # required for preserving the function context
+    def decorator(fn):
+        # generate the information for re-running
+        fetcher = f"{fn.__module__}.{fn.__qualname__}"
+
+        @wraps(fn)  # required for preserving the function context
         def wrapper(self, *args, **kwargs):
             target_path = target
             if not target_path.startswith("derived/"):
@@ -872,8 +875,11 @@ def store_derived_evidence(evidences, target):
             target_evidence = get_evidence_by_path(target_path)
             if self.locker.validate(target_evidence):
                 return
-            depends = [get_evidence_by_path(e, self.locker) for e in evidences]
-            content = f(self, *depends)
+            depends = [
+                get_evidence_dependency(e, self.locker, fetcher=fetcher)
+                for e in evidences
+            ]
+            content = fn(self, *depends)
             target_evidence.set_content(content)
             self.locker.add_evidence(target_evidence)
 
