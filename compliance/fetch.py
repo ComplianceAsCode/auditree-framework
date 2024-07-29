@@ -90,7 +90,7 @@ class ComplianceFetcher(unittest.TestCase):
         org = self.config.raw_config.get("org", {}).get("name", "")
         ua = f'{org.lower().replace(" ", "-")}-compliance-checks'
         response = requests.get(
-            url, params=params, auth=creds, headers={"User-Agent": ua}
+            url, params=params, auth=creds, headers={"User-Agent": ua}, timeout=3600
         )
         response.raise_for_status()
         return response.content
@@ -151,7 +151,7 @@ class ComplianceFetcher(unittest.TestCase):
         if not cwd:
             cwd = os.path.expanduser("~")
         stdin = "\n".join(commands) + "\n"
-        return check_output(
+        return check_output(  # nosec: B603 The input command can be anything.
             cmd, cwd=cwd, env=env, input=stdin, timeout=timeout, universal_newlines=True
         ).rstrip()
 
@@ -165,7 +165,7 @@ def fetch(url, name):
 
     :returns: the path to the file.
     """
-    r = requests.get(url)
+    r = requests.get(url, timeout=3600)
     r.raise_for_status()
     path = Path(tempfile.gettempdir(), name)
     with path.open("wb") as f:

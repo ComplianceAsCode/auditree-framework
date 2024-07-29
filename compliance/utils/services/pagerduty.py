@@ -56,7 +56,7 @@ def get(path, params=None, headers=None, creds=None):
     params.update({"limit": PAGES_LIMIT, "offset": offset})
     more = True
     while more:
-        r = requests.get(url, headers=hdrs, params=params)
+        r = requests.get(url, headers=hdrs, params=params, timeout=180)
         yield r
         more = r.json().get("more", False)
         if more:
@@ -77,7 +77,7 @@ def delete(path, params=None, headers=None, creds=None):
     :param creds: a Config object with PagerDuty credentials
     """
     url, params, hdrs = _init_request(path, params, headers, creds)
-    return requests.delete(url, headers=hdrs, params=params)
+    return requests.delete(url, headers=hdrs, params=params, timeout=180)
 
 
 def put(path, params=None, headers=None, creds=None):
@@ -93,7 +93,7 @@ def put(path, params=None, headers=None, creds=None):
     :param creds: a Config object with PagerDuty credentials
     """
     url, params, hdrs = _init_request(path, params, headers, creds)
-    return requests.put(url, headers=hdrs, params=params)
+    return requests.put(url, headers=hdrs, params=params, timeout=180)
 
 
 def post(path, params=None, headers=None, creds=None):
@@ -109,7 +109,7 @@ def post(path, params=None, headers=None, creds=None):
     :param creds: a Config object with PagerDuty credentials
     """
     url, params, hdrs = _init_request(path, params, headers, creds)
-    return requests.post(url, headers=hdrs, params=params)
+    return requests.post(url, headers=hdrs, params=params, timeout=180)
 
 
 def send_event(
@@ -132,7 +132,9 @@ def send_event(
     }
     headers = {"Content-Type": "application/json"}
 
-    response = requests.post(PD_EVENTS_V2_URL, headers=headers, data=json.dumps(msg))
+    response = requests.post(
+        PD_EVENTS_V2_URL, headers=headers, data=json.dumps(msg), timeout=180
+    )
     response.raise_for_status()
     if response.json().get("status") != "success":
         raise RuntimeError("PagerDuty Error: " + response.json())

@@ -49,9 +49,6 @@ class ComplianceConfig(object):
             # Pagerduty service id to use for an accreditation
             # E.g. {"mycompany.soc2": "ABCDEFG"}
             "pagerduty": {},
-            # Security Advisor FindingsAPI endpoint to use for an accreditation
-            # E.g. {"mycompany.soc2": "https://my.findings.api/findings"}
-            "findings": {},
         },
         "org": {"name": "YOUR_ORG", "settings": {}},
     }

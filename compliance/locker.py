@@ -654,7 +654,7 @@ class Locker(object):
     def init_config(self):
         """Apply the git configuration."""
         with self.repo.config_writer() as cw:
-            for (section, cfg) in self.gitconfig.items():
+            for section, cfg in self.gitconfig.items():
                 for key, value in cfg.items():
                     cw.set_value(section, key, value)
 
