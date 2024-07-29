@@ -8,7 +8,7 @@ Notifiers
 The last phase in a typical framework check run is the notification
 system.  Multiple notifiers can be targeted as part of this phase by using
 the ``--notify`` option on the ``compliance --check`` command.  Valid
-notifier options are ``stdout``, ``slack``, ``pagerduty``, ``findings``,
+notifier options are ``stdout``, ``slack``, ``pagerduty``,
 ``gh_issues`` and, ``locker``.  The general idea behind the notification
 system is that each ``test_`` can generate a short notification that has the
 following components:
@@ -347,33 +347,3 @@ locker.  The summary markdown file will **only** be pushed to the remote
 evidence locker if the ``full-remote`` argument is applied to the ``evidence``
 option when executing your checks otherwise the file will remain in the local
 evidence locker.  No additional configuration is required for this notifier.
-
-Security Advisor Findings
--------------------------
-
-This configurable notifier will post findings to Security Advisor Findings API
-per accreditation. The following is an example configuration for this notifier
-to be added to a configuration file and used with the ``-C`` option when
-executing your compliance checks::
-
-  {
-    "notify": {
-      "findings": {
-        "accr1": "https://us-south.secadvisor.cloud.ibm.com/findings",
-        "accr2": "https://eu-gb.secadvisor.cloud.ibm.com/findings"
-      }
-    }
-  }
-
-Supported regions for Security Advisor Findings API
-  - us-south: https://us-south.secadvisor.cloud.ibm.com/findings
-  - eu-gb: https://eu-gb.secadvisor.cloud.ibm.com/findings
-
-This notifier also needs to know the credentials for sending findings
-to Security Advisor Findings API. Include the following in your credentials
-file::
-
-  [findings]
-  api_key=platform-api-key
-
-``api_key`` is your IBM Cloud Platform API Key.

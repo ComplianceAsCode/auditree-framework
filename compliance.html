@@ -1,18 +1,17 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>compliance package &#8212; Auditree Framework 2.0.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    <title>compliance package &#8212; Auditree Framework 3.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=89b800e6" />
     
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=8ebd99bd"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -34,7 +33,7 @@
         <li class="right" >
           <a href="modules.html" title="compliance"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 2.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 3.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
@@ -523,7 +522,7 @@ assumed that the runbook exists and is in HTML format.</p>
 <p>Credentials and a cache of known evidences are included.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="compliance.config.ComplianceConfig.DEFAULTS">
-<span class="sig-name descname"><span class="pre">DEFAULTS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'locker':</span> <span class="pre">{'dirname':</span> <span class="pre">'compliance',</span> <span class="pre">'repo_url':</span> <span class="pre">'https://github.com/YOUR_ORG/YOUR_PROJECT'},</span> <span class="pre">'notify':</span> <span class="pre">{'findings':</span> <span class="pre">{},</span> <span class="pre">'gh_issues':</span> <span class="pre">{},</span> <span class="pre">'ghe_issues':</span> <span class="pre">{},</span> <span class="pre">'pagerduty':</span> <span class="pre">{},</span> <span class="pre">'slack':</span> <span class="pre">{}},</span> <span class="pre">'org':</span> <span class="pre">{'name':</span> <span class="pre">'YOUR_ORG',</span> <span class="pre">'settings':</span> <span class="pre">{}},</span> <span class="pre">'runbooks':</span> <span class="pre">{'base_url':</span> <span class="pre">'https://example.com/runbooks',</span> <span class="pre">'enabled':</span> <span class="pre">False}}</span></em><a class="headerlink" href="#compliance.config.ComplianceConfig.DEFAULTS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DEFAULTS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'locker':</span> <span class="pre">{'dirname':</span> <span class="pre">'compliance',</span> <span class="pre">'repo_url':</span> <span class="pre">'https://github.com/YOUR_ORG/YOUR_PROJECT'},</span> <span class="pre">'notify':</span> <span class="pre">{'gh_issues':</span> <span class="pre">{},</span> <span class="pre">'ghe_issues':</span> <span class="pre">{},</span> <span class="pre">'pagerduty':</span> <span class="pre">{},</span> <span class="pre">'slack':</span> <span class="pre">{}},</span> <span class="pre">'org':</span> <span class="pre">{'name':</span> <span class="pre">'YOUR_ORG',</span> <span class="pre">'settings':</span> <span class="pre">{}},</span> <span class="pre">'runbooks':</span> <span class="pre">{'base_url':</span> <span class="pre">'https://example.com/runbooks',</span> <span class="pre">'enabled':</span> <span class="pre">False}}</span></em><a class="headerlink" href="#compliance.config.ComplianceConfig.DEFAULTS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1784,21 +1783,6 @@ Defaults to STDOUT.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="compliance.notify.FindingsNotifier">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.notify.</span></span><span class="sig-name descname"><span class="pre">FindingsNotifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">push_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#FindingsNotifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.notify.FindingsNotifier" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseNotifier</span></code></p>
-<p>Findings notifier class.</p>
-<p>Notifications are sent using the Findings API.  This notifier is
-configurable via <a class="reference internal" href="#compliance.config.ComplianceConfig" title="compliance.config.ComplianceConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">compliance.config.ComplianceConfig</span></code></a>.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="compliance.notify.FindingsNotifier.notify">
-<span class="sig-name descname"><span class="pre">notify</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#FindingsNotifier.notify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.notify.FindingsNotifier.notify" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send notifications to the Findings API.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="compliance.notify.GHIssuesNotifier">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compliance.notify.</span></span><span class="sig-name descname"><span class="pre">GHIssuesNotifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">push_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compliance/notify.html#GHIssuesNotifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compliance.notify.GHIssuesNotifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseMDNotifier</span></code></p>
@@ -2335,10 +2319,6 @@ compatibility with checks, reporting, and notifiers.</p>
 <li><a class="reference internal" href="#compliance.notify.FDNotifier.notify"><code class="docutils literal notranslate"><span class="pre">FDNotifier.notify()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#compliance.notify.FindingsNotifier"><code class="docutils literal notranslate"><span class="pre">FindingsNotifier</span></code></a><ul>
-<li><a class="reference internal" href="#compliance.notify.FindingsNotifier.notify"><code class="docutils literal notranslate"><span class="pre">FindingsNotifier.notify()</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#compliance.notify.GHIssuesNotifier"><code class="docutils literal notranslate"><span class="pre">GHIssuesNotifier</span></code></a><ul>
 <li><a class="reference internal" href="#compliance.notify.GHIssuesNotifier.notify"><code class="docutils literal notranslate"><span class="pre">GHIssuesNotifier.notify()</span></code></a></li>
 </ul>
@@ -2452,14 +2432,14 @@ compatibility with checks, reporting, and notifiers.</p>
         <li class="right" >
           <a href="modules.html" title="compliance"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 2.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 3.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >compliance</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">compliance package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2023, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    &#169; Copyright 2024, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>

@@ -1,18 +1,17 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Notifiers &#8212; Auditree Framework 2.0.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    <title>Notifiers &#8212; Auditree Framework 3.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=89b800e6" />
     
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=8ebd99bd"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -34,7 +33,7 @@
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 2.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 3.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>  
@@ -49,7 +48,7 @@
 <p>The last phase in a typical framework check run is the notification
 system.  Multiple notifiers can be targeted as part of this phase by using
 the <code class="docutils literal notranslate"><span class="pre">--notify</span></code> option on the <code class="docutils literal notranslate"><span class="pre">compliance</span> <span class="pre">--check</span></code> command.  Valid
-notifier options are <code class="docutils literal notranslate"><span class="pre">stdout</span></code>, <code class="docutils literal notranslate"><span class="pre">slack</span></code>, <code class="docutils literal notranslate"><span class="pre">pagerduty</span></code>, <code class="docutils literal notranslate"><span class="pre">findings</span></code>,
+notifier options are <code class="docutils literal notranslate"><span class="pre">stdout</span></code>, <code class="docutils literal notranslate"><span class="pre">slack</span></code>, <code class="docutils literal notranslate"><span class="pre">pagerduty</span></code>,
 <code class="docutils literal notranslate"><span class="pre">gh_issues</span></code> and, <code class="docutils literal notranslate"><span class="pre">locker</span></code>.  The general idea behind the notification
 system is that each <code class="docutils literal notranslate"><span class="pre">test_</span></code> can generate a short notification that has the
 following components:</p>
@@ -434,38 +433,6 @@ evidence locker if the <code class="docutils literal notranslate"><span class="p
 option when executing your checks otherwise the file will remain in the local
 evidence locker.  No additional configuration is required for this notifier.</p>
 </section>
-<section id="security-advisor-findings">
-<h2>Security Advisor Findings<a class="headerlink" href="#security-advisor-findings" title="Permalink to this heading">¶</a></h2>
-<p>This configurable notifier will post findings to Security Advisor Findings API
-per accreditation. The following is an example configuration for this notifier
-to be added to a configuration file and used with the <code class="docutils literal notranslate"><span class="pre">-C</span></code> option when
-executing your compliance checks:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-  <span class="s2">&quot;notify&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;findings&quot;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="s2">&quot;accr1&quot;</span><span class="p">:</span> <span class="s2">&quot;https://us-south.secadvisor.cloud.ibm.com/findings&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;accr2&quot;</span><span class="p">:</span> <span class="s2">&quot;https://eu-gb.secadvisor.cloud.ibm.com/findings&quot;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt>Supported regions for Security Advisor Findings API</dt><dd><ul class="simple">
-<li><p>us-south: <a class="reference external" href="https://us-south.secadvisor.cloud.ibm.com/findings">https://us-south.secadvisor.cloud.ibm.com/findings</a></p></li>
-<li><p>eu-gb: <a class="reference external" href="https://eu-gb.secadvisor.cloud.ibm.com/findings">https://eu-gb.secadvisor.cloud.ibm.com/findings</a></p></li>
-</ul>
-</dd>
-</dl>
-<p>This notifier also needs to know the credentials for sending findings
-to Security Advisor Findings API. Include the following in your credentials
-file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">findings</span><span class="p">]</span>
-<span class="n">api_key</span><span class="o">=</span><span class="n">platform</span><span class="o">-</span><span class="n">api</span><span class="o">-</span><span class="n">key</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">api_key</span></code> is your IBM Cloud Platform API Key.</p>
-</section>
 </section>
 
 
@@ -488,7 +455,6 @@ file:</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#evidence-locker">Evidence Locker</a></li>
-<li><a class="reference internal" href="#security-advisor-findings">Security Advisor Findings</a></li>
 </ul>
 </li>
 </ul>
@@ -540,13 +506,13 @@ file:</p>
         <li class="right" >
           <a href="report-builder.html" title="Report Builder"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 2.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Auditree Framework 3.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notifiers</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2023, IBM.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    &#169; Copyright 2024, IBM.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>
