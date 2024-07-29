@@ -42,7 +42,8 @@ class TestSigningEvidence(unittest.TestCase):
 
         self.agent = ComplianceAgent(name="auditree.local")
         self.unknown_agent = ComplianceAgent(name="unknown.local")
-        self.agent.private_key = self.unknown_agent.private_key = """
+        self.agent.private_key = self.unknown_agent.private_key = (
+            """
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAxYosRYnahnSuH3SmNupnzQhxJsDEhqChKjrcyN19L8+vcjUU
 iMSaKRoAHuUKp5Pfwkoylryd4AyXIU9UnXZgdIOl2+r5xzXqfdLwi+PAU/eEWPLA
@@ -71,6 +72,7 @@ p6u8/fRZssZdelNwkUQMMw1gTdhV91Xd/3lbfoWQ72KnaITItUqYgP3Th9AQOFyO
 YLmlUVKZU7mt43D8aj8l4l11jWDBkvOba/wJ7CjTQ15ik4ntl9TRzg==
 -----END RSA PRIVATE KEY-----
 """.encode()
+        )
 
         self.pub_key = """
 -----BEGIN PUBLIC KEY-----

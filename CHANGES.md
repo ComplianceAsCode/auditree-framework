@@ -1,3 +1,7 @@
+# [3.0.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v3.0.0)
+
+- [CHANGED] Remove IBM findings notifier.
+
 # [2.0.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v2.0.1)
 
 - [FIXED] Enable universal newlines when executing local commands.

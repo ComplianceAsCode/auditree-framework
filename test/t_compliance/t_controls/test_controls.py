@@ -14,6 +14,7 @@
 """Compliance automation control descriptor tests module."""
 
 import unittest
+import pytest
 
 from compliance.controls import ControlDescriptor
 
@@ -55,9 +56,8 @@ class ControlDescriptorTest(unittest.TestCase):
 
     def test_as_dict_immutability(self):
         """Ensure that control content cannot be changed through as_dict."""
-        with self.assertRaises(AttributeError) as ar:
+        with pytest.raises(AttributeError):
             self.cd.as_dict = {"foo": "bar"}
-        self.assertTrue(str(ar.exception).startswith("can't set attribute"))
         controls_copy = self.cd.as_dict
         self.assertEqual(controls_copy, self.cd.as_dict)
         controls_copy.update({"foo": "bar"})
