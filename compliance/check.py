@@ -248,7 +248,7 @@ class ComplianceCheck(unittest.TestCase):
         def wrapper(method):
             def check_failures():
                 method()
-                self.assertEquals(self.failures_count(), 0)
+                self.assertEqual(self.failures_count(), 0)
 
             return check_failures
 
@@ -348,3 +348,6 @@ class ComplianceCheck(unittest.TestCase):
             for info in results.values()
             if info["test"].test.__class__ == self.__class__
         ]
+
+    # keep backward compatibility so users can still use assertEquals()
+    assertEquals = unittest.TestCase.assertEqual

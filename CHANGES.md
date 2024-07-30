@@ -1,3 +1,7 @@
+# [3.0.1](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v3.0.1)
+
+- [CHANGED] Add compatibility with assertEquals() for Python 3.12+.
+
 # [3.0.0](https://github.com/ComplianceAsCode/auditree-framework/releases/tag/v3.0.0)
 
 - [CHANGED] Remove IBM findings notifier.
