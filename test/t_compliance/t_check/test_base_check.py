@@ -212,3 +212,7 @@ class ComplianceCheckTest(unittest.TestCase):
                 }
             },
         )
+
+    def test_has_assertEquals(self):
+        """Test assertEquals is still present"""
+        self.check.assertEquals(1, 1)

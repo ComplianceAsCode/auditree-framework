@@ -13,4 +13,4 @@
 # limitations under the License.
 """Compliance automation package."""
 
-__version__ = "3.0.0"
+__version__ = "3.0.1"
